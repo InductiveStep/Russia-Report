@@ -21,6 +21,9 @@
 <script src="index_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="index_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="index_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="index_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="index_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="index_files/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="index_files/navigation-1.1/tabsets.js"></script>
 <link href="index_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="index_files/highlightjs-9.12.0/highlight.js"></script>
@@ -163,6 +166,69 @@ summary {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -170,6 +236,16 @@ summary {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -194,8 +270,10 @@ library(pdftools)
 library(stringr)
 rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf&quot;)</code></pre>
 <p>The <code>pdf_text</code> command returns a character vector with one element per PDF page. The main report text is on pages 8-42.</p>
-<p>I’d like to know where the juicy pages are - one way to index them is by number of reduction marks, ***.</p>
-<p>First try for one page to get the hang of it. Page 10 has one.</p>
+<div id="finding-the-juiciest-pages" class="section level2">
+<h2>Finding the juiciest pages</h2>
+<p>I’d like to know where the juicy pages are - one way to index them is by number of reduction marks, "***".</p>
+<p>First try for one page to get the hang of it. I had a look at page 10 and there was one.</p>
 <pre class="r"><code>str_count(rr_text[10], pattern = &quot;\\*\\*\\*&quot;)</code></pre>
 <pre><code>## [1] 1</code></pre>
 <p>It worked - hurrah. Try for page 8 which has none.</p>
@@ -210,6 +288,8 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
 <pre class="r"><code>rr_tib &lt;- tibble(page = 1:length(rr_text),
                  text = rr_text,
                  redactions = redact_n)</code></pre>
+<div id="histogram" class="section level3">
+<h3>Histogram</h3>
 <p>Now a histogram of those redactions:</p>
 <pre class="r"><code>ggplot(rr_tib, aes(x=redactions)) +
   geom_histogram(binwidth = 1, fill = &quot;firebrick&quot;, color = &quot;white&quot;) +
@@ -218,7 +298,9 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
        title = &quot;Histogram of redactions on each page of the Russia Report&quot;) +
   theme_classic()</code></pre>
 <p><img src="index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<p>What page has the maximum number of redactions?</p>
+</div>
+<div id="what-page-has-the-maximum-number-of-redactions" class="section level3">
+<h3>What page has the maximum number of redactions?</h3>
 <pre class="r"><code>rr_tib %&gt;%
   filter(redactions == max(rr_tib$redactions)) %&gt;%
   select(page, redactions)</code></pre>
@@ -226,8 +308,9 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
 ##    page redactions
 ##   &lt;int&gt;      &lt;int&gt;
 ## 1    38         19</code></pre>
-<div id="ta-da---the-page-with-most-redactions-p.-31-in-the-printed-report" class="section level2">
-<h2>Ta da - the page with most redactions (p. 31 in the printed report)</h2>
+</div>
+<div id="the-most-redacted-page-p.-31-in-the-printed-report" class="section level3">
+<h3>The most redacted page (p. 31 in the printed report)</h3>
 <pre class="r"><code>cat(gsub(pattern = &quot;\\*\\*\\*&quot;,
          replace = &quot;\\*\\*\\*[redacted]\\*\\*\\*&quot;,
          x = rr_tib$text[38]))</code></pre>
@@ -248,9 +331,12 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
 <li>We note that the focus on <strong><em>[redacted]</em></strong> work increased significantly following the events in Salisbury as HMG <strong><em>[redacted]</em></strong> engaged in a substantive and concerted diplomacy effort to co- ordinate a strong international response to the use of chemical weapons against civilians on UK soil. 120 This raises the question of whether return now to a ‘normal’, relatively low, level of <strong><em>[redacted]</em></strong> effort against Russia would undermine this, or whether it would now be more 113 GCHQ and Defence Intelligence staff working on Russia are UK based. 114 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018. 115 <strong><em>[redacted]</em></strong> 116 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018. 117 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018. 118 Oral evidence – SIS and GCHQ, <strong><em>[redacted]</em></strong> January 2019. 119 More information on this is included in the Strategy, Co-ordination and Tasking section of this Report. 120 The international response to Salisbury is discussed in more detail in the International Partnerships section of this Report. 31</li>
 </ol>
 </div>
+</div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -283,6 +369,32 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
