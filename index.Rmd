@@ -87,14 +87,14 @@ rr_tib %>%
 
 The section on PDF pages 37 and 38 (printed page nums 30 and 31) is the winner: "Rising to the challenge".
 
-### The most redacted pages (pp. 30-31 in the printed report)
+### The most redacted pages (pp. 30-32 in the printed report)
 
 Here's a link to the [pdf pages](https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=37).
 
 ```{r results='asis'}
 gsub(pattern = "\\*\\*\\*",
      replace = "\\*\\*\\*[redacted]\\*\\*\\*",
-     x = rr_tib$text[37:38]) %>%
+     x = rr_tib$text[37:39]) %>%
   writeLines()
 ```
 
