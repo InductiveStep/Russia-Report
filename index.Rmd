@@ -95,7 +95,7 @@ Here's a link to the [pdf pages](https://inductivestep.github.io/Russia-Report/2
 gsub(pattern = "\\*\\*\\*",
      replace = "\\*\\*\\*[redacted]\\*\\*\\*",
      x = rr_tib$text[37:38]) %>%
-  cat()
+  writeLines()
 ```
 
 
