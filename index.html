@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Andi Fugard (almost@gmail.com, @inductivestep)" />
+
+<meta name="date" content="2020-07-21" />
+
+<title>Analysing the Russia Report</title>
+
+<script src="index_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="index_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="index_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="index_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="index_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="index_files/navigation-1.1/tabsets.js"></script>
+<link href="index_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="index_files/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Analysing the Russia Report</h1>
+<h4 class="author">Andi Fugard (<a href="mailto:almost@gmail.com" class="email">almost@gmail.com</a>, @<a href="https://twitter.com/InductiveStep">inductivestep</a>)</h4>
+<h4 class="date">21 July 2020</h4>
+
+</div>
+
+
+<p>The report is available on the <a href="http://isc.independent.gov.uk/news-archive/21july2020">ISC website</a> and <a href="20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf">in this github repository</a>.</p>
+<p>First, load it into R.</p>
+<pre class="r"><code>library(tidyverse)
+library(knitr)
+library(pdftools)
+library(stringr)
+rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf&quot;)</code></pre>
+<p>The <code>pdf_text</code> command returns a character vector with one element per PDF page. The main report text is on pages 8-42.</p>
+<p>I’d like to know where the juicy pages are - one way to index them is by number of reduction marks, ***.</p>
+<p>First try for one page to get the hang of it. Page 10 has one.</p>
+<pre class="r"><code>str_count(rr_text[10], pattern = &quot;\\*\\*\\*&quot;)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<p>It worked - hurrah. Try for page 8 which has none.</p>
+<pre class="r"><code>str_count(rr_text[8], pattern = &quot;\\*\\*\\*&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p>And page 12, which has 8:</p>
+<pre class="r"><code>str_count(rr_text[12], pattern = &quot;\\*\\*\\*&quot;)</code></pre>
+<pre><code>## [1] 8</code></pre>
+<p>All good. <code>str_count</code> takes a vector, so we can do the whole report in one go:</p>
+<pre class="r"><code>redact_n &lt;- str_count(rr_text, pattern = &quot;\\*\\*\\*&quot;)</code></pre>
+<p>Let’s stick these in a tibble, alongside the (pdf, as opposed to printed) page number and original page text.</p>
+<pre class="r"><code>rr_tib &lt;- tibble(page = 1:length(rr_text),
+                 text = rr_text,
+                 redactions = redact_n)</code></pre>
+<p>Now a histogram of those redactions:</p>
+<pre class="r"><code>ggplot(rr_tib, aes(x=redactions)) +
+  geom_histogram(binwidth = 1, fill = &quot;firebrick&quot;, color = &quot;white&quot;) +
+  labs(x = &quot;Number of redactions&quot;,
+       y = &quot;Count&quot;,
+       title = &quot;Histogram of redactions on each page of the Russia Report&quot;) +
+  theme_classic()</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>What page has the maximum number of redactions?</p>
+<pre class="r"><code>rr_tib %&gt;%
+  filter(redactions == max(rr_tib$redactions)) %&gt;%
+  select(page, redactions)</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##    page redactions
+##   &lt;int&gt;      &lt;int&gt;
+## 1    38         19</code></pre>
+<div id="ta-da---the-page-with-most-redactions-p.-31-in-the-printed-report" class="section level2">
+<h2>Ta da - the page with most redactions (p. 31 in the printed report)</h2>
+<pre class="r"><code>cat(gsub(pattern = &quot;\\*\\*\\*&quot;,
+         replace = &quot;\\*\\*\\*[redacted]\\*\\*\\*&quot;,
+         x = rr_tib$text[38]))</code></pre>
+<ol start="2" style="list-style-type: lower-roman">
+<li>Using a range of capabilities</li>
+</ol>
+<ol start="104" style="list-style-type: decimal">
+<li>Russia is a particularly hard operating environment for other countries’ intelligence officers, so <strong><em>[redacted]</em></strong>. 113 <strong><em>[redacted]</em></strong>. 114 As a result, HUMINT opportunities need to be sought elsewhere. This may be <strong><em>[redacted]</em></strong>. 115</li>
+<li>Due to the difficulties in finding and operating HUMINT sources on Russia, the Intelligence Community rely on the “bringing together of a range of intelligence disciplines” in order to get the best possible picture of the Russian threat. 116 In relation to SIGINT, GCHQ has focused on not only deploying a broad range of capabilities against Russia, but in joining up with others to use their capabilities in tandem, allowing them to <strong><em>[redacted]</em></strong>.</li>
+<li>Defence Intelligence brings to the table a range of specialised geospatial intelligence (GEOINT) and measurement and signature intelligence (MASINT) capabilities, which can be used to observe Russian targets at a distance, with a focus on military capabilities and organisations. Defence Intelligence has sought to <strong><em>[redacted]</em></strong> “try to understand how they think and why they think”. 117 Defence Intelligence is also involved in the expansion of HMG’s open source intelligence capabilities (i.e. the analysis of information that can be accessed freely on the internet, or bought through commercial providers) through the Defence Intelligence Open Source Hub. Analysis of open source information is being increasingly used by the Agencies and Defence Intelligence to enhance their overall situational awareness, and can be fused with a smaller proportion of secret intelligence to provide a richer picture.</li>
+</ol>
+<ol start="3" style="list-style-type: lower-roman">
+<li>Real-world threat, real-world outcomes</li>
+</ol>
+<ol start="107" style="list-style-type: decimal">
+<li>The Committee was struck by the relatively small proportion of <strong><em>[redacted]</em></strong> work that is carried out by the Agencies in relation to Russia, compared with the intelligence coverage of Russia that is undertaken. For example, SIS usually deploys only <strong><em>[redacted]</em></strong> of its overall operational Russia effort in support of <strong><em>[redacted]</em></strong>, whilst GCHQ uses approximately <strong><em>[redacted]</em></strong>. 118</li>
+<li>We were told that, since the overall cross-Whitehall Russia Strategy aim, in relation to Russia, is to develop “a Russia that chooses to co-operate, rather than challenge or confront”, any work must be proportionate to this outcome – notably HMG does not deploy effects with the goal of effecting organisational collapse, in the way that they might be deployed against international terrorist groups, for example. 119 However, of equal concern, it appears, is the need to tread carefully so as not to provoke unexpected escalation. As a result, the Agencies’ effects work primarily concentrates on <strong><em>[redacted]</em></strong>; capability-building (the sharing of knowledge and capabilities with partners); and counter-intelligence work to disrupt <strong><em>[redacted]</em></strong> operations.</li>
+<li>We note that the focus on <strong><em>[redacted]</em></strong> work increased significantly following the events in Salisbury as HMG <strong><em>[redacted]</em></strong> engaged in a substantive and concerted diplomacy effort to co- ordinate a strong international response to the use of chemical weapons against civilians on UK soil. 120 This raises the question of whether return now to a ‘normal’, relatively low, level of <strong><em>[redacted]</em></strong> effort against Russia would undermine this, or whether it would now be more 113 GCHQ and Defence Intelligence staff working on Russia are UK based. 114 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018. 115 <strong><em>[redacted]</em></strong> 116 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018. 117 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018. 118 Oral evidence – SIS and GCHQ, <strong><em>[redacted]</em></strong> January 2019. 119 More information on this is included in the Strategy, Co-ordination and Tasking section of this Report. 120 The international response to Salisbury is discussed in more detail in the International Partnerships section of this Report. 31</li>
+</ol>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

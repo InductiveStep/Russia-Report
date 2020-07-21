@@ -1,0 +1,90 @@
+---
+title: "Analysing the Russia Report"
+author: "Andi Fugard (almost@gmail.com, @[inductivestep](https://twitter.com/InductiveStep))"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    self_contained: no
+    #toc: yes
+    #toc_float: yes
+---
+
+The report is available on the [ISC website](http://isc.independent.gov.uk/news-archive/21july2020) and [in this github repository](20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf).
+
+First, load it into R.
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(pdftools)
+library(stringr)
+rr_text <- pdf_text("20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf")
+```
+The `pdf_text` command returns a character vector with one element per PDF page. The main report text is on pages 8-42.
+
+
+I'd like to know where the juicy pages are - one way to index them is by number of reduction marks, ***.
+
+First try for one page to get the hang of it. Page 10 has one.
+
+```{r}
+str_count(rr_text[10], pattern = "\\*\\*\\*")
+```
+
+It worked - hurrah. Try for page 8 which has none.
+
+```{r}
+str_count(rr_text[8], pattern = "\\*\\*\\*")
+```
+
+And page 12, which has 8:
+
+```{r}
+str_count(rr_text[12], pattern = "\\*\\*\\*")
+```
+
+All good. `str_count` takes a vector, so we can do the whole report in one go:
+
+```{r}
+redact_n <- str_count(rr_text, pattern = "\\*\\*\\*")
+```
+
+Let's stick these in a tibble, alongside the (pdf, as opposed to printed) page number and original page text.
+
+```{r}
+rr_tib <- tibble(page = 1:length(rr_text),
+                 text = rr_text,
+                 redactions = redact_n)
+```
+
+Now a histogram of those redactions:
+
+```{r message=FALSE}
+ggplot(rr_tib, aes(x=redactions)) +
+  geom_histogram(binwidth = 1, fill = "firebrick", color = "white") +
+  labs(x = "Number of redactions",
+       y = "Count",
+       title = "Histogram of redactions on each page of the Russia Report") +
+  theme_classic()
+```
+
+What page has the maximum number of redactions?
+
+```{r}
+rr_tib %>%
+  filter(redactions == max(rr_tib$redactions)) %>%
+  select(page, redactions)
+```
+
+## Ta da - the page with most redactions (p. 31 in the printed report)
+
+```{r results='asis'}
+cat(gsub(pattern = "\\*\\*\\*",
+         replace = "\\*\\*\\*[redacted]\\*\\*\\*",
+         x = rr_tib$text[38]))
+```
+
+
+
+
+
