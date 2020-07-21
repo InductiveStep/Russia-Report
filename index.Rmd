@@ -76,20 +76,26 @@ ggplot(rr_tib, aes(x=redactions)) +
   theme_classic()
 ```
 
-### What page has the maximum number of redactions?
+### Which pages have the most redactions?
 
 ```{r}
 rr_tib %>%
-  filter(redactions == max(rr_tib$redactions)) %>%
-  select(page, redactions)
+  filter(redactions > 10) %>%
+  select(page, redactions) %>%
+  arrange(redactions)
 ```
 
-### The most redacted page (p. 31 in the printed report)
+The section on PDF pages 37 and 38 (printed page nums 30 and 31) is the winner: "Rising to the challenge".
+
+### The most redacted pages (pp. 30-31 in the printed report)
+
+Here's a link to the [pdf pages](https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=37).
 
 ```{r results='asis'}
-cat(gsub(pattern = "\\*\\*\\*",
-         replace = "\\*\\*\\*[redacted]\\*\\*\\*",
-         x = rr_tib$text[38]))
+gsub(pattern = "\\*\\*\\*",
+     replace = "\\*\\*\\*[redacted]\\*\\*\\*",
+     x = rr_tib$text[37:38]) %>%
+  cat()
 ```
 
 
