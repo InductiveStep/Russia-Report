@@ -140,7 +140,8 @@ rr_sentences <- rr_tib %>%
   unnest_sentences(sentence, text, to_lower = FALSE)
 
 rr_sentences %>%
-  slice_sample(n = 10)
+  slice_sample(n = 10) %>%
+  kable()
 ```
 
 That worked reasonably well, though citations at the end of sentences confused it (possible to fix with a regex), footnotes need to be addressed separately (sentences beginning numbers, once the aforementioned sentence problem has been fixed), and it probably doesn't deal with sentences which cross pages - definitely not when there's a footnote on the first page (possible to fix by removing footnotes then gluing all the sentences together and unnesting again).

@@ -471,20 +471,74 @@ rr_words</code></pre>
   unnest_sentences(sentence, text, to_lower = FALSE)
 
 rr_sentences %&gt;%
-  slice_sample(n = 10)</code></pre>
-<pre><code>## # A tibble: 10 x 3
-##     page redactions sentence                                                    
-##    &lt;int&gt;      &lt;int&gt; &lt;chr&gt;                                                       
-##  1    24          9 62     ‘From Russia with Blood’, BuzzFeed News, 15 June 201~
-##  2    22          0 In brief, Russian influence in the UK is  ‘the new normal’,~
-##  3    21          8 ***.  (iii) Lack of retrospective assessment  47.           
-##  4    17         10 36     In addition to providing secret intelligence, the Ag~
-##  5    33          6 The Intelligence Coverage and Effects (ICE) process is the ~
-##  6    48          3 155      The cross-Whitehall Russia Strategy seeks engageme~
-##  7    28          6 83     Geospatial intelligence (GEOINT) consists of collect~
-##  8    32          3 However, it is clear that Russia is a high  ministerial pri~
-##  9    18          2 32.                                                         
-## 10    28          6 Defence Intelligence has wide-ranging responsibilities for ~</code></pre>
+  slice_sample(n = 10) %&gt;%
+  kable()</code></pre>
+<table>
+<colgroup>
+<col width="0%" />
+<col width="1%" />
+<col width="98%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">page</th>
+<th align="right">redactions</th>
+<th align="left">sentence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">34</td>
+<td align="right">5</td>
+<td align="left">27</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="left">25 The cross-Whitehall Russia Strategy ……………………………………………………………………..25 Ministerial responsibility ……………………………………………………………………………………..25 The Fusion Doctrine and joint working ………………………………………………………………….26 The intelligence contributions to the Russia Strategy ……………………………………………….26 Less talk, more action?…………………………………………………………………………………………27 Measuring performance ……………………………………………………………………………………….27 A HARD TARGET …………………………………………………………………………………………….</td>
+</tr>
+<tr class="odd">
+<td align="right">16</td>
+<td align="right">1</td>
+<td align="left">9</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="right">6</td>
+<td align="left">This is understandable: the 80 Oral evidence – GCHQ, *** December 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="right">19</td>
+<td align="left">For example, SIS usually deploys only *** of its overall operational Russia effort in support of <strong><em>, whilst GCHQ uses approximately </em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">27</td>
+<td align="right">11</td>
+<td align="left">70 MI5 states its objectives in this area as being to “seek to find those trying to pass sensitive UK information and equipment to other countries and ensure they don’t succeed” and to “investigate and disrupt the actions of foreign intelligence officers where these are damaging to our country’s interests”.</td>
+</tr>
+<tr class="odd">
+<td align="right">34</td>
+<td align="right">5</td>
+<td align="left">Whilst we would not expect to receive highly 104 Oral evidence – Defence Intelligence, *** December 2018.</td>
+</tr>
+<tr class="even">
+<td align="right">42</td>
+<td align="right">0</td>
+<td align="left">136 Written evidence – NCA, 6 November 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">32</td>
+<td align="right">3</td>
+<td align="left">Ministerial responsibility 82.</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="right">6</td>
+<td align="left">21</td>
+</tr>
+</tbody>
+</table>
 <p>That worked reasonably well, though citations at the end of sentences confused it (possible to fix with a regex), footnotes need to be addressed separately (sentences beginning numbers, once the aforementioned sentence problem has been fixed), and it probably doesn’t deal with sentences which cross pages - definitely not when there’s a footnote on the first page (possible to fix by removing footnotes then gluing all the sentences together and unnesting again).</p>
 <p>Next: code sentences in terms of whether they mention an intel agency.</p>
 <pre class="r"><code>rr_sentences &lt;- rr_sentences %&gt;%
