@@ -223,7 +223,9 @@ rr_sentences %>%
 
 ### Some text
 
-#### Sentences mentioning a service with a redaction:
+#### Sentences mentioning a service with a redaction
+
+**Note** be careful with the numbers - they're mostly superscript citations!
 
 
 ```{r}
@@ -237,7 +239,9 @@ rr_sentences %>%
   kable()
 ```
 
-#### Sentences mentioning a service with no redaction:
+#### Sentences mentioning a service with no redaction
+
+**Note** be careful with the numbers - they're mostly superscript citations!
 
 
 ```{r}
@@ -254,8 +258,9 @@ rr_sentences %>%
 
 
 
-#### Sentences mentioning none of the services but still redacted:
+#### Sentences mentioning none of the services but still redacted
 
+**Note** be careful with the numbers - they're mostly superscript citations!
 
 ```{r}
 rr_sentences %>%

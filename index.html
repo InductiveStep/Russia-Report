@@ -524,7 +524,7 @@ rr_sentences %&gt;%
   kable()</code></pre>
 <table>
 <colgroup>
-<col width="0%" />
+<col width="1%" />
 <col width="2%" />
 <col width="96%" />
 </colgroup>
@@ -537,54 +537,54 @@ rr_sentences %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">28</td>
-<td align="right">6</td>
-<td align="left">It leads the UK’s work on geospatial intelligence (GEOINT) and measurement and signature intelligence (MASINT).</td>
+<td align="right">14</td>
+<td align="right">4</td>
+<td align="left">The Government announced its intention to develop an Offensive Cyber capability in September 2013, and in 2014 the National Offensive Cyber Programme (NOCP) – a partnership between the Ministry of Defence and GCHQ – was established.</td>
 </tr>
 <tr class="even">
-<td align="right">38</td>
-<td align="right">19</td>
-<td align="left">As a result, the Agencies’ effects work primarily concentrates on <strong><em>; capability-building (the sharing of knowledge and capabilities with partners); and counter-intelligence work to disrupt </em></strong> operations.</td>
+<td align="right">24</td>
+<td align="right">9</td>
+<td align="left">60 A Tier 1 (Investor) visa allows the recipient to stay in the UK for three years and four months in exchange for a £2m investment in the UK.</td>
 </tr>
 <tr class="odd">
-<td align="right">42</td>
+<td align="right">9</td>
 <td align="right">0</td>
-<td align="left">The NCA outlined changes that it would wish to see to the legislation: • including serious and organised crime as grounds for introducing sanctions; 137 and • providing for Closed Material Proceedings to protect sensitive intelligence in the granting of, and any appeal against, sanctions (the Special Immigration Appeals Commission procedures offer a useful model for this).</td>
-</tr>
-<tr class="even">
-<td align="right">52</td>
-<td align="right">1</td>
-<td align="left">ANNEX *** 45</td>
-</tr>
-<tr class="odd">
-<td align="right">17</td>
-<td align="right">10</td>
-<td align="left">32 Oral evidence – GCHQ, *** February 2019.</td>
-</tr>
-<tr class="even">
-<td align="right">6</td>
-<td align="right">0</td>
-<td align="left">33 Counter-espionage ………………………………………………………………………………………………33 Tackling crime ……………………………………………………………………………………………………34 Protecting democracy …………………………………………………………………………………………..36 v</td>
-</tr>
-<tr class="odd">
-<td align="right">12</td>
-<td align="right">8</td>
-<td align="left">6 The GRU is the Main Intelligence Directorate of the General Staff of the Russian Armed Forces.</td>
-</tr>
-<tr class="even">
-<td align="right">7</td>
-<td align="right">0</td>
-<td align="left">41 Russian disengagement ………………………………………………………………………………………..41 The purpose of communication……………………………………………………………………………..41 Sending the right message…………………………………………………………………………………….41 WITNESSES ………………………………………………………………………………………………………</td>
-</tr>
-<tr class="odd">
-<td align="right">12</td>
-<td align="right">8</td>
-<td align="left">11 Oral evidence – GCHQ, *** February 2019.</td>
+<td align="left">This Annex is not published at this time, in view of the current Russian threat.</td>
 </tr>
 <tr class="even">
 <td align="right">19</td>
 <td align="right">3</td>
-<td align="left">view, urgent and we expect the Government to report on progress in this area as soon as possible.</td>
+<td align="left">43 This was noteworthy in terms of the way it was couched (<strong><em>) and the reference to open source studies </em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">45</td>
+<td align="right">11</td>
+<td align="left">system”, including “working very closely with NATO colleagues, putting assessments into NATO, [and] working very closely with the NATO Intelligence Fusion Cell at RAF Molesworth”.</td>
+</tr>
+<tr class="even">
+<td align="right">41</td>
+<td align="right">1</td>
+<td align="left">We note that new powers to stop, question, search or detain any person entering the UK gained Royal Assent in February 2019; it is not necessary for there to be suspicion of engagement in hostile activity in order to use these powers.</td>
+</tr>
+<tr class="odd">
+<td align="right">33</td>
+<td align="right">6</td>
+<td align="left">We note, however, that Russia’s own version of this ‘joined-up working’ approach is far more developed: given the amount of power centralised in the Kremlin, the lack of strong public institutions, the close connections between big business and the state, and – crucially – its operation outside the Rules Based International Order, Russia is easily able to combine its political, economic, military and intelligence power to achieve its objectives.</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="left">The Chair of the Committee is elected by its Members.</td>
+</tr>
+<tr class="odd">
+<td align="right">36</td>
+<td align="right">3</td>
+<td align="left">Moreover, the President can make swift decisions that even his inner circle are not aware of – further complicating any ability to understand or predict Russian government intent.</td>
+</tr>
+<tr class="even">
+<td align="right">24</td>
+<td align="right">9</td>
+<td align="left">The Committee has taken evidence on these matters.</td>
 </tr>
 </tbody>
 </table>
@@ -746,7 +746,8 @@ any_redact_tab %&gt;%
 <div id="some-text" class="section level3">
 <h3>Some text</h3>
 <div id="sentences-mentioning-a-service-with-a-redaction" class="section level4">
-<h4>Sentences mentioning a service with a redaction:</h4>
+<h4>Sentences mentioning a service with a redaction</h4>
+<p><strong>Note</strong> be careful with the numbers - they’re mostly superscript citations!</p>
 <pre class="r"><code>rr_sentences %&gt;%
   filter(mentioned_intel_agency == 1 &amp; redacted == 1) %&gt;%
   mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
@@ -943,7 +944,8 @@ any_redact_tab %&gt;%
 </table>
 </div>
 <div id="sentences-mentioning-a-service-with-no-redaction" class="section level4">
-<h4>Sentences mentioning a service with no redaction:</h4>
+<h4>Sentences mentioning a service with no redaction</h4>
+<p><strong>Note</strong> be careful with the numbers - they’re mostly superscript citations!</p>
 <pre class="r"><code>rr_sentences %&gt;%
   filter(mentioned_intel_agency == 1 &amp; redacted == 0) %&gt;%
   mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
@@ -1196,7 +1198,8 @@ any_redact_tab %&gt;%
 </table>
 </div>
 <div id="sentences-mentioning-none-of-the-services-but-still-redacted" class="section level4">
-<h4>Sentences mentioning none of the services but still redacted:</h4>
+<h4>Sentences mentioning none of the services but still redacted</h4>
+<p><strong>Note</strong> be careful with the numbers - they’re mostly superscript citations!</p>
 <pre class="r"><code>rr_sentences %&gt;%
   filter(mentioned_intel_agency == 0 &amp; redacted == 1) %&gt;%
   mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
