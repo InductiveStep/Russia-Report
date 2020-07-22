@@ -270,13 +270,6 @@ library(pdftools)
 library(stringr)
 rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf&quot;)</code></pre>
 <p>The <code>pdf_text</code> command returns a character vector with one element per PDF page. The main report text is on pages 8-42.</p>
-<p>Also some handy code:</p>
-<pre class="r"><code>pretty_mod &lt;- function(mod) {
-  mod %&gt;%
-    tidy() %&gt;%
-    kable(col.names = c(&quot;Predictor&quot;, &quot;B&quot;, &quot;SE&quot;, &quot;t&quot;, &quot;p&quot;),
-          digits = c(0,2,2,2,3))
-}</code></pre>
 <div id="finding-the-juiciest-pages" class="section level2">
 <h2>Finding the juiciest pages</h2>
 <p>I’d like to know where the juicy pages are - one way to index them is by number of reduction marks, ***.</p>
@@ -304,7 +297,7 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
        y = &quot;Count&quot;,
        title = &quot;Histogram of redactions on each page of the Russia Report&quot;) +
   theme_classic()</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 </div>
 <div id="which-pages-have-the-most-redactions" class="section level3">
 <h3>Which pages have the most redactions?</h3>
@@ -532,8 +525,8 @@ rr_sentences %&gt;%
 <table>
 <colgroup>
 <col width="1%" />
-<col width="3%" />
-<col width="95%" />
+<col width="2%" />
+<col width="96%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -544,54 +537,54 @@ rr_sentences %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">33</td>
-<td align="right">6</td>
-<td align="left">In some cases, we have noted that it has not been clear ***: this must be addressed.</td>
-</tr>
-<tr class="even">
-<td align="right">32</td>
-<td align="right">3</td>
-<td align="left">83.</td>
-</tr>
-<tr class="odd">
 <td align="right">14</td>
 <td align="right">4</td>
-<td align="left">The issue of Offensive Cyber is addressed in more detail in the classified Annex to this Report.</td>
+<td align="left">that this is in itself resource-intensive – the Government must always consider ‘naming and shaming’.</td>
 </tr>
 <tr class="even">
+<td align="right">18</td>
+<td align="right">2</td>
+<td align="left">This would also have the advantage that the relationship built with social media companies to encourage them to co-operate in dealing with terrorist use of social media could be brought to bear against the hostile state threat; indeed, it is not clear to us why the Government is not already doing this.</td>
+</tr>
+<tr class="odd">
+<td align="right">22</td>
+<td align="right">0</td>
+<td align="left">It is widely recognised that the key to London’s appeal was the exploitation of the UK’s investor visa scheme, introduced in 1994, followed by the promotion of a light and limited touch to regulation, with London’s strong capital and housing markets offering sound investment opportunities.</td>
+</tr>
+<tr class="even">
+<td align="right">42</td>
+<td align="right">0</td>
+<td align="left">The NCA outlined changes that it would wish to see to the legislation: • including serious and organised crime as grounds for introducing sanctions; 137 and • providing for Closed Material Proceedings to protect sensitive intelligence in the granting of, and any appeal against, sanctions (the Special Immigration Appeals Commission procedures offer a useful model for this).</td>
+</tr>
+<tr class="odd">
 <td align="right">36</td>
 <td align="right">3</td>
-<td align="left">Putin’s inner circle appear to be willing and able to make and enact major decisions (for example, on the deployment of troops) within days, and they retain tight command and control over the whole government infrastructure – which can be put in the service of Russia’s foreign policy goals at a moment’s notice.</td>
+<td align="left">As already noted, the Russian government is an accomplished adversary with well- resourced and world-class offensive and defensive intelligence capabilities.</td>
+</tr>
+<tr class="even">
+<td align="right">24</td>
+<td align="right">9</td>
+<td align="left">Whilst the oligarchs and their money have been the most obviously visible part of the Russian diaspora, recent events have highlighted the number of Russians in the UK who are on the opposing side.</td>
 </tr>
 <tr class="odd">
 <td align="right">13</td>
 <td align="right">1</td>
-<td align="left">Accountability is an issue in particular – whilst the Foreign Secretary has responsibility for the NCSC, which is responsible for incident response, the Home Secretary leads on the response to major cyber incidents.</td>
+<td align="left">It makes for an unnecessarily complicated wiring diagram of responsibilities; this should be kept under review by the National Security Council (NSC).</td>
 </tr>
 <tr class="even">
-<td align="right">34</td>
-<td align="right">5</td>
-<td align="left">However, this has, to a certain extent, been hampered by the organisations we oversee referring frequently in oral evidence to the exemption (in the Justice and Security Act 2013) for information that relates to ongoing operations.</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="left">THE INTELLIGENCE AND SECURITY COMMITTEE OF PARLIAMENT The Rt Hon.</td>
 </tr>
 <tr class="odd">
-<td align="right">30</td>
-<td align="right">8</td>
-<td align="left">With pressures from International Counter-Terrorism work, the Chinese threat, Iran and the Democratic People’s Republic of Korea, we recognise that it is difficult to single out the Russian threat as deserving greater allocation of effort.</td>
+<td align="right">20</td>
+<td align="right">15</td>
+<td align="left">45 Oral evidence – GCHQ, *** December 2018 ***.</td>
 </tr>
 <tr class="even">
-<td align="right">43</td>
-<td align="right">2</td>
-<td align="left">It is important to include local authorities ***.</td>
-</tr>
-<tr class="odd">
-<td align="right">41</td>
-<td align="right">1</td>
-<td align="left">PEP status also extends to relatives and close associates.</td>
-</tr>
-<tr class="even">
-<td align="right">28</td>
-<td align="right">6</td>
-<td align="left">70.</td>
+<td align="right">22</td>
+<td align="right">0</td>
+<td align="left">RUSSIAN EXPATRIATES Welcoming oligarchs with open arms 49.</td>
 </tr>
 </tbody>
 </table>
@@ -750,7 +743,7 @@ any_redact_tab %&gt;%
 </tr>
 </tbody>
 </table>
-<p>What sorts of texts get redacted which don’t mention a service?</p>
+<p>Here are the sentences containing a redaction which don’t mention one of the intel services.</p>
 <pre class="r"><code>rr_sentences %&gt;%
   filter(mentioned_intel_agency == 0 &amp; redacted == 1) %&gt;%
   mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
