@@ -475,16 +475,16 @@ rr_sentences %&gt;%
 <pre><code>## # A tibble: 10 x 3
 ##     page redactions sentence                                                    
 ##    &lt;int&gt;      &lt;int&gt; &lt;chr&gt;                                                       
-##  1    16          1 23     We note that Russia’s disinformation efforts against~
-##  2    16          1 Equally, the spreading of disinformation is not  necessaril~
-##  3    36          3 It is difficult for the UK’s  democratic and consensus-base~
-##  4    17         10 In this instance, employees of the Russian state and Russia~
-##  5    30          8 94 He did, however, caution that the threat is wider than R~
-##  6    46          1 137.                                                        
-##  7    20         15 50     We note that Arron Banks became the biggest donor in~
-##  8    34          5 We  remind the Government that the Justice and Security Act~
-##  9    44          7 It is clear that this partnership provides valuable capabil~
-## 10    40          2 The US, in 1938, introduced  the US Foreign Agents Registra~</code></pre>
+##  1    24          9 62     ‘From Russia with Blood’, BuzzFeed News, 15 June 201~
+##  2    22          0 In brief, Russian influence in the UK is  ‘the new normal’,~
+##  3    21          8 ***.  (iii) Lack of retrospective assessment  47.           
+##  4    17         10 36     In addition to providing secret intelligence, the Ag~
+##  5    33          6 The Intelligence Coverage and Effects (ICE) process is the ~
+##  6    48          3 155      The cross-Whitehall Russia Strategy seeks engageme~
+##  7    28          6 83     Geospatial intelligence (GEOINT) consists of collect~
+##  8    32          3 However, it is clear that Russia is a high  ministerial pri~
+##  9    18          2 32.                                                         
+## 10    28          6 Defence Intelligence has wide-ranging responsibilities for ~</code></pre>
 <p>That worked reasonably well, though citations at the end of sentences confused it (possible to fix with a regex), footnotes need to be addressed separately (sentences beginning numbers, once the aforementioned sentence problem has been fixed), and it probably doesn’t deal with sentences which cross pages - definitely not when there’s a footnote on the first page (possible to fix by removing footnotes then gluing all the sentences together and unnesting again).</p>
 <p>Next: code sentences in terms of whether they mention an intel agency.</p>
 <pre class="r"><code>rr_sentences &lt;- rr_sentences %&gt;%
@@ -614,6 +614,421 @@ summary(mod_redact1)</code></pre>
 ## 
 ## Number of Fisher Scoring iterations: 13</code></pre>
 <p>There only appears to be a difference if one (and only one) service is mentioned.</p>
+<p>What sorts of texts get redacted which don’t mention a service?</p>
+<pre class="r"><code>rr_sentences %&gt;%
+  filter(mentioned_intel_agency == 0 &amp; redacted == 1) %&gt;%
+  mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
+         replace = &quot;\\*\\*\\*[redacted]\\*\\*\\*&quot;,
+         x = sentence)
+     ) %&gt;%
+  select(page, nice_sentence) %&gt;%
+  kable()</code></pre>
+<table>
+<colgroup>
+<col width="1%" />
+<col width="98%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">page</th>
+<th align="left">nice_sentence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">The Committee believes that it is important that Parliament and the public should be able to see where information had to be redacted: redactions are clearly indicated in the report by <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="left">We note here, however, that there have been a number of cross-cutting themes which have emerged during the course of our work: • Most surprising, perhaps, was the extent to which much of the work of the Intelligence Community is focused on <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="left">5 The National Cyber Security Centre (NCSC) has advised that there is <strong><em>[redacted]</em></strong> Russian cyber intrusion into the UK’s CNI – particularly marked in the <strong><em>[redacted]</em></strong> sectors.</td>
+</tr>
+<tr class="even">
+<td align="right">13</td>
+<td align="left">When attacks can be traced back – and we accept 12 Oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">14</td>
+<td align="left">18 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">16</td>
+<td align="left">25 <strong><em>[redacted]</em></strong> 26 Written evidence – HMG, 29 June 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="left">33 This was reflected in the Joint Intelligence Committee (JIC) judgement in May 2017 that “the UK paper-based voting process is protected from cyber operations but <strong><em>[redacted]</em></strong>”.</td>
+</tr>
+<tr class="even">
+<td align="right">17</td>
+<td align="left">34 <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="left">33 Oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">17</td>
+<td align="left">35 We note that the formal HMG assessment categorises the UK as a “<strong><em>[redacted]</em></strong>” target for political influence operations.</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="left">36 In addition to providing secret intelligence, the Agencies may <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">18</td>
+<td align="left">With that said, we note that – as with so many other issues currently – it is the social media companies which hold the key and yet are failing to play their part; DCMS informed us that <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">19</td>
+<td align="left">It stated that <strong><em>[redacted]</em></strong>, before referring to academic studies.</td>
+</tr>
+<tr class="even">
+<td align="right">19</td>
+<td align="left">43 This was noteworthy in terms of the way it was couched (<strong><em>[redacted]</em></strong>) and the reference to open source studies <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="left">44 However, at the time <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="left">It appears that <strong><em>[redacted]</em></strong> what some commentators have described as potentially the first post-Soviet Russian interference in a Western democratic process.</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="left">We note that – almost five years on – <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="left">In May 2017, the Joint Intelligence Committee (JIC) concluded that “<strong><em>[redacted]</em></strong>” and that “<strong><em>[redacted]</em></strong>”.</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="left">49,50 <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="left"><strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="left">46 <strong><em>[redacted]</em></strong> 47 <strong><em>[redacted]</em></strong> 48 JIC Key Judgement, <strong><em>[redacted]</em></strong>, 26 May 2017. 49 <strong><em>[redacted]</em></strong> (written evidence – HMG, 29 June 2018).</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="left">In October 2018, the Electoral Commission – which had been investigating the source of this donation – referred the case to the National Crime Agency, which investigated it <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="left">51 <strong><em>[redacted]</em></strong> 13</td>
+</tr>
+<tr class="even">
+<td align="right">21</td>
+<td align="left">This focus on <strong><em>[redacted]</em></strong> indicates that open source material (for example, the studies of attempts to influence the referendum using RT and Sputnik, or social media campaigns referred to earlier) was not fully taken into account.</td>
+</tr>
+<tr class="odd">
+<td align="right">21</td>
+<td align="left">52 However, we have found <strong><em>[redacted]</em></strong> which suggests that <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">21</td>
+<td align="left"><strong><em>[redacted]</em></strong>. (iii) Lack of retrospective assessment 47.</td>
+</tr>
+<tr class="odd">
+<td align="right">21</td>
+<td align="left">We have not been provided with any post-referendum assessment of Russian attempts at interference, <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">21</td>
+<td align="left"><strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">21</td>
+<td align="left">52 <strong><em>[redacted]</em></strong> 53 <strong><em>[redacted]</em></strong> 54 Office of the Director of National Intelligence, Assessing Russian Activities and Intentions in Recent US Elections, 6 January 2017.</td>
+</tr>
+<tr class="even">
+<td align="right">23</td>
+<td align="left">The extent to which Russian expatriates are using their access to UK businesses and politicians to exert influence in the UK is <strong><em>[redacted]</em></strong>: it is widely recognised that Russian intelligence and business are completely intertwined.</td>
+</tr>
+<tr class="odd">
+<td align="right">23</td>
+<td align="left">The Government must <strong><em>[redacted]</em></strong>, take the necessary measures to counter the threat and challenge the impunity of Putin-linked elites.</td>
+</tr>
+<tr class="even">
+<td align="right">24</td>
+<td align="left">We have been told that <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">24</td>
+<td align="left">64 <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">24</td>
+<td align="left">We were assured that all figures at risk – Russian or otherwise – receive protection according to the level of risk, through a police-led process <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">24</td>
+<td align="left">This would appear to be an immediate and obvious way in to the issue, and the <strong><em>[redacted]</em></strong>, so it would appear manageable.</td>
+</tr>
+<tr class="even">
+<td align="right">24</td>
+<td align="left">In response we were told that <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">24</td>
+<td align="left">61 These include such high-profile figures as <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">24</td>
+<td align="left">64 <strong><em>[redacted]</em></strong> 65 Oral evidence – <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">27</td>
+<td align="left">75 The past two years have seen <strong><em>[redacted]</em></strong>: currently, <strong><em>[redacted]</em></strong>% is allocated to Hostile State Activity, approximately <strong><em>[redacted]</em></strong> which is dedicated to countering Russian Hostile State Activity.</td>
+</tr>
+<tr class="even">
+<td align="right">27</td>
+<td align="left">This declined to <strong><em>[redacted]</em></strong>% in 2007.</td>
+</tr>
+<tr class="odd">
+<td align="right">27</td>
+<td align="left">It only began to increase significantly in <strong><em>[redacted]</em></strong> and currently stands at approximately <strong><em>[redacted]</em></strong>%.</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="left">83 It also holds a SIGINT role <strong><em>[redacted]</em></strong>, and has a HUMINT unit which is primarily used to support military operations.</td>
+</tr>
+<tr class="odd">
+<td align="right">28</td>
+<td align="left">Defence Intelligence has advised that currently <strong><em>[redacted]</em></strong> of its All Source analysts spend more than 50% of their time on Russia and a further <strong><em>[redacted]</em></strong> spend less than 50% of their time on Russia.</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="left">84 This represents <strong><em>[redacted]</em></strong>% of Defence Intelligence’s current analytical resource being focused on Russia (written evidence – Defence Intelligence, 6 March 2019).</td>
+</tr>
+<tr class="odd">
+<td align="right">29</td>
+<td align="left"><strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">29</td>
+<td align="left">88 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">30</td>
+<td align="left">The Home Secretary told us that, in his view, resourcing on Russia <strong><em>[redacted]</em></strong> and that there “needs to be more resources in … countering the Hostile State Activity”.</td>
+</tr>
+<tr class="even">
+<td align="right">32</td>
+<td align="left">The latest iteration of the Strategy – in March 2019 – has an overarching long-term ‘vision’ of “A Russia that chooses to co-operate, rather than challenge or confront”, 96 <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">33</td>
+<td align="left">In relation to the Agencies and Defence Intelligence, given the difficulties in working against Russia (explored in the next section), it is particularly important that all sources – HUMINT, SIGINT, MASINT, GEOINT, 101 open source and others – are used to complement each other as much as possible, and that they are used across all aspects of the co-ordinated Russian threat (<strong><em>[redacted]</em></strong>).</td>
+</tr>
+<tr class="even">
+<td align="right">33</td>
+<td align="left">Given the combined nature of the Russian threat, it is essential that the Agencies’ and Defence Intelligence’s work on <strong><em>[redacted]</em></strong> is not viewed separately from wider Russian foreign policy and influence efforts.</td>
+</tr>
+<tr class="odd">
+<td align="right">33</td>
+<td align="left">In some cases, we have noted that it has not been clear <strong><em>[redacted]</em></strong>: this must be addressed.</td>
+</tr>
+<tr class="even">
+<td align="right">33</td>
+<td align="left">102 The ICE Plan for Russia requires <strong><em>[redacted]</em></strong> coverage outcomes and <strong><em>[redacted]</em></strong> effects outcomes, which are prioritised at five levels: ‘non-negotiable’, high, medium, low and ‘opportunity only’.</td>
+</tr>
+<tr class="odd">
+<td align="right">33</td>
+<td align="left">103 <strong><em>[redacted]</em></strong> 26</td>
+</tr>
+<tr class="even">
+<td align="right">34</td>
+<td align="left">104 We recognise that it may not be appropriate for Defence Intelligence to be covered by ICE, but we were surprised to discover that Defence Intelligence is not included in the tri-Agency approach: <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">34</td>
+<td align="left">Defence Intelligence clearly explained that “we survey our customers of our product, on a scale that we set out from zero to nine, at the moment … the score that we have aggregated across all of our Russia work is <strong><em>[redacted]</em></strong>”.</td>
+</tr>
+<tr class="even">
+<td align="right">34</td>
+<td align="left">Whilst we would not expect to receive highly 104 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">34</td>
+<td align="left">105 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> January 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">36</td>
+<td align="left">While some are generic problems that are heightened by Russian ability to exploit them (for example, <strong><em>[redacted]</em></strong>), others are unique to Russia (for example, <strong><em>[redacted]</em></strong>). (i) Structure 94.</td>
+</tr>
+<tr class="odd">
+<td align="right">36</td>
+<td align="left">However, <strong><em>[redacted]</em></strong>: a way must be found to maintain this momentum across Government. (ii) Technology and data 97.</td>
+</tr>
+<tr class="even">
+<td align="right">37</td>
+<td align="left">In terms of human intelligence (HUMINT) operations, technological advancements that gather and analyse data on individuals have generally increased the difficulty <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">37</td>
+<td align="left">The expansion of smart city technology (such as CCTV, smart sensors and mobile device tracking), and the capability that this provides, has increased the ability of <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">37</td>
+<td align="left">108 <strong><em>[redacted]</em></strong>. (iii) The risk of escalation 99.</td>
+</tr>
+<tr class="odd">
+<td align="right">37</td>
+<td align="left">The Agencies and Defence Intelligence must therefore be particularly discerning <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">37</td>
+<td align="left">Due to the difficulty of <strong><em>[redacted]</em></strong>, the Intelligence Community have focused their effort on <strong><em>[redacted]</em></strong> main strategic targets, which they assess will provide insight on the most important strategic topics, with intelligence on the lowest priorities collected on an ‘opportunity-only’ basis.</td>
+</tr>
+<tr class="odd">
+<td align="right">37</td>
+<td align="left">These key targets are <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">37</td>
+<td align="left"><strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="left">Russia is a particularly hard operating environment for other countries’ intelligence officers, so <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">38</td>
+<td align="left">113 <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="left">This may be <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">38</td>
+<td align="left">Defence Intelligence has sought to <strong><em>[redacted]</em></strong> “try to understand how they think and why they think”.</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="left">The Committee was struck by the relatively small proportion of <strong><em>[redacted]</em></strong> work that is carried out by the Agencies in relation to Russia, compared with the intelligence coverage of Russia that is undertaken.</td>
+</tr>
+<tr class="even">
+<td align="right">38</td>
+<td align="left">As a result, the Agencies’ effects work primarily concentrates on <strong><em>[redacted]</em></strong>; capability-building (the sharing of knowledge and capabilities with partners); and counter-intelligence work to disrupt <strong><em>[redacted]</em></strong> operations.</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="left">We note that the focus on <strong><em>[redacted]</em></strong> work increased significantly following the events in Salisbury as HMG <strong><em>[redacted]</em></strong> engaged in a substantive and concerted diplomacy effort to co- ordinate a strong international response to the use of chemical weapons against civilians on UK soil.</td>
+</tr>
+<tr class="even">
+<td align="right">38</td>
+<td align="left">115 <strong><em>[redacted]</em></strong> 116 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="left">117 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="even">
+<td align="right">43</td>
+<td align="left">It is important to include local authorities <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">44</td>
+<td align="left">It is clear that this partnership provides valuable capabilities that <strong><em>[redacted]</em></strong> to the UK, and avoids the duplication of coverage through effective burden-sharing.</td>
+</tr>
+<tr class="even">
+<td align="right">44</td>
+<td align="left">However, there remains a question as to whether <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">44</td>
+<td align="left">The Agencies and Defence Intelligence are increasingly working with <strong><em>[redacted]</em></strong> on the Russian threat.</td>
+</tr>
+<tr class="even">
+<td align="right">44</td>
+<td align="left">Their perspectives are particularly useful: whilst UK and Western resources were diverted towards the threat from international terrorism in the early 2000s, <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">44</td>
+<td align="left">As well as providing a wealth of <strong><em>[redacted]</em></strong> intelligence on Russia, they also share the UK’s approach to the Russian threat, and have been willing to stand alongside the UK in taking an increasingly assertive approach to Russian activities.</td>
+</tr>
+<tr class="even">
+<td align="right">44</td>
+<td align="left">Whilst there appear to be increasing signs that others in Europe are taking the threat from Russia more seriously <strong><em>[redacted]</em></strong> there has clearly been less success in translating this into building public support for the UK’s diplomatic approach to attribution and condemnation of Russia’s cyber activities.</td>
+</tr>
+<tr class="odd">
+<td align="right">44</td>
+<td align="left">144 We also note reporting that Israel <strong><em>[redacted]</em></strong> has welcomed Russian oligarchs and their investment, and has thus far been unwilling to challenge the Kremlin openly.</td>
+</tr>
+<tr class="even">
+<td align="right">45</td>
+<td align="left"><strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">45</td>
+<td align="left">In terms of its ‘near abroad’, Russia clearly intends keeping these countries within its ‘sphere of influence’, and conducts cyber activity and pursues economic policy to that end in <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">45</td>
+<td align="left">HMG initiatives <strong><em>[redacted]</em></strong> are therefore essential.</td>
+</tr>
+<tr class="odd">
+<td align="right">45</td>
+<td align="left">However, we note that this is not a short-term project: continuing investment and a long-term strategy are required <strong><em>[redacted]</em></strong> against Russian influence.</td>
+</tr>
+<tr class="even">
+<td align="right">45</td>
+<td align="left">148 The UK Government (<strong><em>[redacted]</em></strong>) embarked on a diplomacy effort to provide allies with the evidence related to the attack, and to persuade them to join the UK in taking action in the form of expulsions and strengthened sanctions.</td>
+</tr>
+<tr class="odd">
+<td align="right">45</td>
+<td align="left">149 Whilst the fact that chemical weapons were used – in clear breach of international law and attracting the opprobrium of the international community – was undoubtedly a factor in persuading countries to join forces with the UK, the quick and co- ordinated response from <strong><em>[redacted]</em></strong> HMG more widely, which provided evidence and reassurance to partners, made it easier for them to join in the public condemnation.</td>
+</tr>
+<tr class="even">
+<td align="right">45</td>
+<td align="left">147 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> January 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">45</td>
+<td align="left">148 <strong><em>[redacted]</em></strong> 149 It presents a stark comparison with HMG’s slow and isolated response to Russian aggression after the murder of Alexander Litvinenko in 2006 (despite the use of a radioactive substance in that case).</td>
+</tr>
+<tr class="even">
+<td align="right">45</td>
+<td align="left">Defence Intelligence also observed that the impact of the Salisbury attack on the NATO intelligence community had “been significant in terms of bolstering individuals”, noting that <strong><em>[redacted]</em></strong> (oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> February 2019).</td>
+</tr>
+<tr class="odd">
+<td align="right">46</td>
+<td align="left">If HMG is to contribute to peace and security in the Middle East, the Intelligence Community must <strong><em>[redacted]</em></strong>, and the UK must have a clear strategy as to how this should be tackled.</td>
+</tr>
+<tr class="even">
+<td align="right">48</td>
+<td align="left">153 These were subsequently closed in 2014 after the Games, but re-opened in 2016 ahead of the Euro 2016 tournament and kept open in the run-up to the 2018 Football World Cup, to ensure the security of Russian citizens visiting the UK and UK citizens visiting Russia respectively. <strong><em>[redacted]</em></strong> more proactive engagement, or relationship-building, has been frozen recently, as has planned ministerial engagement.</td>
+</tr>
+<tr class="odd">
+<td align="right">48</td>
+<td align="left">The ability to have direct conversations enables an understanding of the intentions of both sides in times of crisis – <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">48</td>
+<td align="left">Any public move towards a more allied relationship with Russia at present 153 <strong><em>[redacted]</em></strong> 154 We note, however, that these two pillars only make up a very small part of the overall action.</td>
+</tr>
+<tr class="odd">
+<td align="right">52</td>
+<td align="left">ANNEX <strong><em>[redacted]</em></strong> 45</td>
+</tr>
+<tr class="even">
+<td align="right">54</td>
+<td align="left">CLASSIFIED ORAL AND WRITTEN EVIDENCE <strong><em>[redacted]</em></strong> 47</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 

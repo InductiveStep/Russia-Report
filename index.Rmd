@@ -200,5 +200,18 @@ summary(mod_redact1)
 
 There only appears to be a difference if one (and only one) service is mentioned.
 
+What sorts of texts get redacted which don't mention a service?
+
+
+```{r}
+rr_sentences %>%
+  filter(mentioned_intel_agency == 0 & redacted == 1) %>%
+  mutate(nice_sentence = gsub(pattern = "\\*\\*\\*",
+         replace = "\\*\\*\\*[redacted]\\*\\*\\*",
+         x = sentence)
+     ) %>%
+  select(page, nice_sentence) %>%
+  kable()
+```
 
 
