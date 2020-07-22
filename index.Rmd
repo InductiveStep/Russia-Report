@@ -221,8 +221,41 @@ rr_sentences %>%
         digits = c(0,1))
 ```
 
+### Some text
 
-Here are the sentences containing a redaction which don't mention one of the intel services.
+#### Sentences mentioning a service with a redaction:
+
+
+```{r}
+rr_sentences %>%
+  filter(mentioned_intel_agency == 1 & redacted == 1) %>%
+  mutate(nice_sentence = gsub(pattern = "\\*\\*\\*",
+         replace = "\\*\\*\\*[redacted]\\*\\*\\*",
+         x = sentence)
+     ) %>%
+  select(mentioned_services, nice_sentence) %>%
+  kable()
+```
+
+#### Sentences mentioning a service with no redaction:
+
+
+```{r}
+rr_sentences %>%
+  filter(mentioned_intel_agency == 1 & redacted == 0) %>%
+  mutate(nice_sentence = gsub(pattern = "\\*\\*\\*",
+         replace = "\\*\\*\\*[redacted]\\*\\*\\*",
+         x = sentence)
+     ) %>%
+  select(mentioned_services, nice_sentence) %>%
+  kable()
+```
+
+
+
+
+#### Sentences mentioning none of the services but still redacted:
+
 
 ```{r}
 rr_sentences %>%
