@@ -67,7 +67,7 @@ rr_tib <- tibble(page = 1:length(rr_text),
 
 Now a histogram of those redactions:
 
-```{r message=FALSE}
+```{r fig.height=3, fig.width=6, message=FALSE}
 ggplot(rr_tib, aes(x=redactions)) +
   geom_histogram(binwidth = 1, fill = "firebrick", color = "white") +
   labs(x = "Number of redactions",
