@@ -235,7 +235,7 @@ rr_sentences %>%
          replace = "\\*\\*\\*[redacted]\\*\\*\\*",
          x = sentence)
      ) %>%
-  select(mentioned_services, nice_sentence) %>%
+  select(page, mentioned_services, nice_sentence) %>%
   kable()
 ```
 
@@ -251,7 +251,7 @@ rr_sentences %>%
          replace = "\\*\\*\\*[redacted]\\*\\*\\*",
          x = sentence)
      ) %>%
-  select(mentioned_services, nice_sentence) %>%
+  select(page, mentioned_services, nice_sentence) %>%
   kable()
 ```
 
