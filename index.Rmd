@@ -100,5 +100,105 @@ gsub(pattern = "\\*\\*\\*",
 
 
 
+## Word counts
+
+Let's try the `tidytext` package, which is introduced in a [great book](https://www.tidytextmining.com/) by [Julia Silge](https://juliasilge.com/) and [David Robinson](http://varianceexplained.org/).
+
+```{r}
+library(tidytext)
+```
+
+Here's a tidy tibble with all the words:
+
+```{r}
+rr_words <- rr_tib %>%
+  unnest_tokens(word, # the name of the new column
+                text) # the column with text
+rr_words
+```
+
+And the top 20 most common words:
+
+```{r}
+rr_words %>%
+  anti_join(stop_words, by = "word") %>%
+  count(word) %>%
+  arrange(desc(n)) %>%
+  head(20) %>%
+  kable()
+```
+
+
+## Sentence-level analysis
+
+Is there a relationship between which intelligence service (MI5, MI6, or GCHQ) is mentioned and whether there is a redaction in that sentence?
+
+Again use `tidytext`, but this time at the sentence level.
+
+```{r}
+rr_sentences <- rr_tib %>%
+  unnest_sentences(sentence, text, to_lower = FALSE)
+
+rr_sentences %>%
+  slice_sample(n = 10)
+```
+
+That worked reasonably well, though citations at the end of sentences confused it (possible to fix with a regex), footnotes need to be addressed separately (sentences beginning numbers, once the aforementioned sentence problem has been fixed), and it probably doesn't deal with sentences which cross pages - definitely not when there's a footnote on the first page (possible to fix by removing footnotes then gluing all the sentences together and unnesting again).
+
+Next: code sentences in terms of whether they mention an intel agency.
+
+```{r}
+rr_sentences <- rr_sentences %>%
+  mutate(
+    redacted       = 0+str_detect(sentence, "\\*\\*\\*"),
+    mentioned_MI5  = 0+str_detect(sentence, "MI5"),
+    mentioned_MI6  = 0+str_detect(sentence, "(MI6|SIS)"),
+    mentioned_GCHQ = 0+str_detect(sentence, "GCHQ"),
+    mentioned_intel_agency = pmax(mentioned_MI5,
+                                  mentioned_MI6,
+                                  mentioned_GCHQ),
+    mentioned_code = paste0(mentioned_MI5,
+                            mentioned_MI6,
+                            mentioned_GCHQ)
+  )
+```
+
+The `mentioned_code` is a three-bit string: 000 means no agency was mentioned, 100 is MI5 (and no others), 101 is MI6 (and no others), 001 is GCHQ (and no others). All combinations are also captured, e.g., 011 would be MI6 and GCHQ.
+
+Let's count them:
+
+```{r}
+rr_sentences %>%
+  count(mentioned_code) %>%
+  arrange(desc(n)) %>%
+  kable()
+```
+
+Does mentioning an intel agency (any of them) in a sentence make it more likely that the sentence will be reacted?
+
+```{r}
+mod_redact <- glm(redacted ~ mentioned_intel_agency,
+                  data = rr_sentences, family = binomial)
+
+summary(mod_redact)
+```
+
+Yes. The odds of a redaction are `r round(exp(coef(mod_redact))[2],1)` times greater if an intel service is mentioned.
+
+```{r}
+exp(coef(mod_redact))
+```
+
+How about the various patterns of mention, compared with no mention?
+
+```{r}
+mod_redact1 <- glm(redacted ~ mentioned_code,
+                  data = rr_sentences, 
+                  family = binomial)
+summary(mod_redact1)
+```
+
+There only appears to be a difference if one (and only one) service is mentioned.
+
 
 

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Andi Fugard (almost@gmail.com, @inductivestep)" />
 
-<meta name="date" content="2020-07-21" />
+<meta name="date" content="2020-07-22" />
 
 <title>Analysing the Russia Report</title>
 
@@ -256,7 +256,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Analysing the Russia Report</h1>
 <h4 class="author">Andi Fugard (<a href="mailto:almost@gmail.com" class="email">almost@gmail.com</a>, @<a href="https://twitter.com/InductiveStep">inductivestep</a>)</h4>
-<h4 class="date">21 July 2020</h4>
+<h4 class="date">22 July 2020</h4>
 
 </div>
 
@@ -341,6 +341,279 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
 </ol>
 <p>appropriate for HMG to capitalise on its strengthened international relationships and push forward with greater emphasis on exposing Russian Hostile State Activity multilaterally; in our view it must be the latter. 32</p>
 </div>
+</div>
+<div id="word-counts" class="section level2">
+<h2>Word counts</h2>
+<p>Let’s try the <code>tidytext</code> package, which is introduced in a <a href="https://www.tidytextmining.com/">great book</a> by <a href="https://juliasilge.com/">Julia Silge</a> and <a href="http://varianceexplained.org/">David Robinson</a>.</p>
+<pre class="r"><code>library(tidytext)</code></pre>
+<p>Here’s a tidy tibble with all the words:</p>
+<pre class="r"><code>rr_words &lt;- rr_tib %&gt;%
+  unnest_tokens(word, # the name of the new column
+                text) # the column with text
+rr_words</code></pre>
+<pre><code>## # A tibble: 19,798 x 3
+##     page redactions word        
+##    &lt;int&gt;      &lt;int&gt; &lt;chr&gt;       
+##  1     1          0 intelligence
+##  2     1          0 and         
+##  3     1          0 security    
+##  4     1          0 committee   
+##  5     1          0 of          
+##  6     1          0 parliament  
+##  7     1          0 russia      
+##  8     1          0 hc          
+##  9     1          0 632         
+## 10     2          0 intelligence
+## # ... with 19,788 more rows</code></pre>
+<p>And the top 20 most common words:</p>
+<pre class="r"><code>rr_words %&gt;%
+  anti_join(stop_words, by = &quot;word&quot;) %&gt;%
+  count(word) %&gt;%
+  arrange(desc(n)) %&gt;%
+  head(20) %&gt;%
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">word</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">intelligence</td>
+<td align="right">193</td>
+</tr>
+<tr class="even">
+<td align="left">russia</td>
+<td align="right">147</td>
+</tr>
+<tr class="odd">
+<td align="left">russian</td>
+<td align="right">143</td>
+</tr>
+<tr class="even">
+<td align="left">uk</td>
+<td align="right">103</td>
+</tr>
+<tr class="odd">
+<td align="left">security</td>
+<td align="right">93</td>
+</tr>
+<tr class="even">
+<td align="left">evidence</td>
+<td align="right">90</td>
+</tr>
+<tr class="odd">
+<td align="left">committee</td>
+<td align="right">72</td>
+</tr>
+<tr class="even">
+<td align="left">defence</td>
+<td align="right">70</td>
+</tr>
+<tr class="odd">
+<td align="left">threat</td>
+<td align="right">60</td>
+</tr>
+<tr class="even">
+<td align="left">2018</td>
+<td align="right">59</td>
+</tr>
+<tr class="odd">
+<td align="left">government</td>
+<td align="right">59</td>
+</tr>
+<tr class="even">
+<td align="left">cyber</td>
+<td align="right">58</td>
+</tr>
+<tr class="odd">
+<td align="left">oral</td>
+<td align="right">54</td>
+</tr>
+<tr class="even">
+<td align="left">2019</td>
+<td align="right">51</td>
+</tr>
+<tr class="odd">
+<td align="left">gchq</td>
+<td align="right">49</td>
+</tr>
+<tr class="even">
+<td align="left">international</td>
+<td align="right">47</td>
+</tr>
+<tr class="odd">
+<td align="left">national</td>
+<td align="right">46</td>
+</tr>
+<tr class="even">
+<td align="left">foreign</td>
+<td align="right">43</td>
+</tr>
+<tr class="odd">
+<td align="left">mi5</td>
+<td align="right">43</td>
+</tr>
+<tr class="even">
+<td align="left">agencies</td>
+<td align="right">41</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sentence-level-analysis" class="section level2">
+<h2>Sentence-level analysis</h2>
+<p>Is there a relationship between which intelligence service (MI5, MI6, or GCHQ) is mentioned and whether there is a redaction in that sentence?</p>
+<p>Again use <code>tidytext</code>, but this time at the sentence level.</p>
+<pre class="r"><code>rr_sentences &lt;- rr_tib %&gt;%
+  unnest_sentences(sentence, text, to_lower = FALSE)
+
+rr_sentences %&gt;%
+  slice_sample(n = 10)</code></pre>
+<pre><code>## # A tibble: 10 x 3
+##     page redactions sentence                                                    
+##    &lt;int&gt;      &lt;int&gt; &lt;chr&gt;                                                       
+##  1    16          1 23     We note that Russia’s disinformation efforts against~
+##  2    16          1 Equally, the spreading of disinformation is not  necessaril~
+##  3    36          3 It is difficult for the UK’s  democratic and consensus-base~
+##  4    17         10 In this instance, employees of the Russian state and Russia~
+##  5    30          8 94 He did, however, caution that the threat is wider than R~
+##  6    46          1 137.                                                        
+##  7    20         15 50     We note that Arron Banks became the biggest donor in~
+##  8    34          5 We  remind the Government that the Justice and Security Act~
+##  9    44          7 It is clear that this partnership provides valuable capabil~
+## 10    40          2 The US, in 1938, introduced  the US Foreign Agents Registra~</code></pre>
+<p>That worked reasonably well, though citations at the end of sentences confused it (possible to fix with a regex), footnotes need to be addressed separately (sentences beginning numbers, once the aforementioned sentence problem has been fixed), and it probably doesn’t deal with sentences which cross pages - definitely not when there’s a footnote on the first page (possible to fix by removing footnotes then gluing all the sentences together and unnesting again).</p>
+<p>Next: code sentences in terms of whether they mention an intel agency.</p>
+<pre class="r"><code>rr_sentences &lt;- rr_sentences %&gt;%
+  mutate(
+    redacted       = 0+str_detect(sentence, &quot;\\*\\*\\*&quot;),
+    mentioned_MI5  = 0+str_detect(sentence, &quot;MI5&quot;),
+    mentioned_MI6  = 0+str_detect(sentence, &quot;(MI6|SIS)&quot;),
+    mentioned_GCHQ = 0+str_detect(sentence, &quot;GCHQ&quot;),
+    mentioned_intel_agency = pmax(mentioned_MI5,
+                                  mentioned_MI6,
+                                  mentioned_GCHQ),
+    mentioned_code = paste0(mentioned_MI5,
+                            mentioned_MI6,
+                            mentioned_GCHQ)
+  )</code></pre>
+<p>The <code>mentioned_code</code> is a three-bit string: 000 means no agency was mentioned, 100 is MI5 (and no others), 101 is MI6 (and no others), 001 is GCHQ (and no others). All combinations are also captured, e.g., 011 would be MI6 and GCHQ.</p>
+<p>Let’s count them:</p>
+<pre class="r"><code>rr_sentences %&gt;%
+  count(mentioned_code) %&gt;%
+  arrange(desc(n)) %&gt;%
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">mentioned_code</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">000</td>
+<td align="right">802</td>
+</tr>
+<tr class="even">
+<td align="left">001</td>
+<td align="right">33</td>
+</tr>
+<tr class="odd">
+<td align="left">100</td>
+<td align="right">30</td>
+</tr>
+<tr class="even">
+<td align="left">010</td>
+<td align="right">15</td>
+</tr>
+<tr class="odd">
+<td align="left">011</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">111</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">110</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">101</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+<p>Does mentioning an intel agency (any of them) in a sentence make it more likely that the sentence will be reacted?</p>
+<pre class="r"><code>mod_redact &lt;- glm(redacted ~ mentioned_intel_agency,
+                  data = rr_sentences, family = binomial)
+
+summary(mod_redact)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = redacted ~ mentioned_intel_agency, family = binomial, 
+##     data = rr_sentences)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.0603  -0.5105  -0.5105  -0.5105   2.0504  
+## 
+## Coefficients:
+##                        Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)             -1.9718     0.1078 -18.289  &lt; 2e-16 ***
+## mentioned_intel_agency   1.6900     0.2290   7.381 1.57e-13 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 782.06  on 901  degrees of freedom
+## Residual deviance: 732.19  on 900  degrees of freedom
+## AIC: 736.19
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<p>Yes. The odds of a redaction are 5.4 times greater if an intel service is mentioned.</p>
+<pre class="r"><code>exp(coef(mod_redact))</code></pre>
+<pre><code>##            (Intercept) mentioned_intel_agency 
+##              0.1392045              5.4192624</code></pre>
+<p>How about the various patterns of mention, compared with no mention?</p>
+<pre class="r"><code>mod_redact1 &lt;- glm(redacted ~ mentioned_code,
+                  data = rr_sentences, 
+                  family = binomial)
+summary(mod_redact1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = redacted ~ mentioned_code, family = binomial, data = rr_sentences)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.4823  -0.5105  -0.5105  -0.5105   2.0504  
+## 
+## Coefficients:
+##                   Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)        -1.9718     0.1078 -18.288  &lt; 2e-16 ***
+## mentioned_code001   2.1541     0.3659   5.888 3.91e-09 ***
+## mentioned_code010   2.6650     0.5582   4.774 1.81e-06 ***
+## mentioned_code011   0.9910     0.6855   1.446 0.148301    
+## mentioned_code100   1.4253     0.3939   3.618 0.000297 ***
+## mentioned_code101 -12.5943   882.7434  -0.014 0.988617    
+## mentioned_code110 -12.5943   624.1938  -0.020 0.983902    
+## mentioned_code111   0.0259     1.0745   0.024 0.980768    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 782.06  on 901  degrees of freedom
+## Residual deviance: 718.44  on 894  degrees of freedom
+## AIC: 734.44
+## 
+## Number of Fisher Scoring iterations: 13</code></pre>
+<p>There only appears to be a difference if one (and only one) service is mentioned.</p>
 </div>
 
 
