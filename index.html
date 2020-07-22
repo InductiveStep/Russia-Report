@@ -272,17 +272,7 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
 <p>The <code>pdf_text</code> command returns a character vector with one element per PDF page. The main report text is on pages 8-42.</p>
 <div id="finding-the-juiciest-pages" class="section level2">
 <h2>Finding the juiciest pages</h2>
-<p>I’d like to know where the juicy pages are - one way to index them is by number of reduction marks, ***.</p>
-<p>First try for one page to get the hang of it. I had a look at page 10 and there was one.</p>
-<pre class="r"><code>str_count(rr_text[10], pattern = &quot;\\*\\*\\*&quot;)</code></pre>
-<pre><code>## [1] 1</code></pre>
-<p>It worked - hurrah. Try for page 8 which has none.</p>
-<pre class="r"><code>str_count(rr_text[8], pattern = &quot;\\*\\*\\*&quot;)</code></pre>
-<pre><code>## [1] 0</code></pre>
-<p>And page 12, which has 8:</p>
-<pre class="r"><code>str_count(rr_text[12], pattern = &quot;\\*\\*\\*&quot;)</code></pre>
-<pre><code>## [1] 8</code></pre>
-<p>All good. <code>str_count</code> takes a vector, so we can do the whole report in one go:</p>
+<p>I’d like to know where the juicy pages are - one way to count how many redactions there are, ***.</p>
 <pre class="r"><code>redact_n &lt;- str_count(rr_text, pattern = &quot;\\*\\*\\*&quot;)</code></pre>
 <p>Let’s stick these in a tibble, alongside the (pdf, as opposed to printed) page number and original page text.</p>
 <pre class="r"><code>rr_tib &lt;- tibble(page = 1:length(rr_text),
@@ -297,7 +287,7 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
        y = &quot;Count&quot;,
        title = &quot;Histogram of redactions on each page of the Russia Report&quot;) +
   theme_classic()</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" width="576" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" width="576" /></p>
 </div>
 <div id="which-pages-have-the-most-redactions" class="section level3">
 <h3>Which pages have the most redactions?</h3>
@@ -348,8 +338,9 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
 <pre class="r"><code>library(tidytext)</code></pre>
 <p>Here’s a tidy tibble with all the words:</p>
 <pre class="r"><code>rr_words &lt;- rr_tib %&gt;%
-  unnest_tokens(word, # the name of the new column
-                text) # the column with text
+  select(page,text) %&gt;%
+  unnest_tokens(word, # name of the new column
+                text) # column with text
 rr_words %&gt;%
   head(10) %&gt;%
   kable()</code></pre>
@@ -357,59 +348,48 @@ rr_words %&gt;%
 <thead>
 <tr class="header">
 <th align="right">page</th>
-<th align="right">redactions</th>
 <th align="left">word</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">0</td>
 <td align="left">intelligence</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">0</td>
 <td align="left">and</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">0</td>
 <td align="left">security</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">0</td>
 <td align="left">committee</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">0</td>
 <td align="left">of</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">0</td>
 <td align="left">parliament</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">0</td>
 <td align="left">russia</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">0</td>
 <td align="left">hc</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">0</td>
 <td align="left">632</td>
 </tr>
 <tr class="even">
 <td align="right">2</td>
-<td align="right">0</td>
 <td align="left">intelligence</td>
 </tr>
 </tbody>
@@ -517,10 +497,11 @@ rr_words %&gt;%
 <p>Is there a relationship between which intelligence service (MI5, MI6, or GCHQ) is mentioned and whether there is a redaction in that sentence?</p>
 <p>Again use <code>tidytext</code>, but this time at the sentence level.</p>
 <pre class="r"><code>rr_sentences &lt;- rr_tib %&gt;%
-  unnest_sentences(sentence, text, to_lower = FALSE)
+  unnest_sentences(sentence, text,
+                   to_lower = FALSE)
 
 rr_sentences %&gt;%
-  slice_sample(n = 10) %&gt;%
+  slice_sample(n = 5) %&gt;%
   kable()</code></pre>
 <table>
 <colgroup>
@@ -537,58 +518,33 @@ rr_sentences %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">14</td>
-<td align="right">4</td>
-<td align="left">HMG as a player: Offensive Cyber 21.</td>
+<td align="right">42</td>
+<td align="right">0</td>
+<td align="left">Economic Area (EEA), someone involved in serious crime, or an individual or entity connected to such people.</td>
 </tr>
 <tr class="even">
 <td align="right">20</td>
 <td align="right">15</td>
-<td align="left">We repeat that this attitude is illogical; this is about the protection of the process and mechanism from hostile state interference, which should fall to our intelligence and security Agencies. (i) Failure to prepare 41.</td>
+<td align="left">49,50 ***.</td>
 </tr>
 <tr class="odd">
-<td align="right">23</td>
+<td align="right">43</td>
 <td align="right">2</td>
-<td align="left">The extent to which Russian expatriates are using their access to UK businesses and politicians to exert influence in the UK is ***: it is widely recognised that Russian intelligence and business are completely intertwined.</td>
+<td align="left">The NCA explained: The Computer Misuse Act … is very outdated legislation.</td>
 </tr>
 <tr class="even">
-<td align="right">44</td>
-<td align="right">7</td>
-<td align="left">126.</td>
+<td align="right">27</td>
+<td align="right">11</td>
+<td align="left">MI5 66.</td>
 </tr>
 <tr class="odd">
 <td align="right">19</td>
 <td align="right">3</td>
-<td align="left">The aim is sound, but the response proposed is still rather fragmented (with at least ten separate teams within Government involved, as well as the Electoral Commission and Information Commissioner’s Office).</td>
-</tr>
-<tr class="even">
-<td align="right">18</td>
-<td align="right">2</td>
-<td align="left">Such a protocol could, usefully, be expanded to encompass the other areas in which action is required from the social media companies, since this issue is not unique to Hostile State Activity.</td>
-</tr>
-<tr class="odd">
-<td align="right">41</td>
-<td align="right">1</td>
-<td align="left">In terms of tackling the criminal activities of Russian expatriates and those who enable such activities, Unexplained Wealth Orders came into force in January 2018 through the Criminal Finances Act 2017.</td>
-</tr>
-<tr class="even">
-<td align="right">34</td>
-<td align="right">5</td>
-<td align="left">91.</td>
-</tr>
-<tr class="odd">
-<td align="right">23</td>
-<td align="right">2</td>
-<td align="left">It is important that the Code of Conduct for Members of the House of Lords, and the Register of Lords’ interests, including financial interests, provide the necessary transparency and are enforced.</td>
-</tr>
-<tr class="even">
-<td align="right">18</td>
-<td align="right">2</td>
-<td align="left">This would also have the advantage that the relationship built with social media companies to encourage them to co-operate in dealing with terrorist use of social media could be brought to bear against the hostile state threat; indeed, it is not clear to us why the Government is not already doing this.</td>
+<td align="left">In the Committee’s view, a foreign power seeking to interfere in our democratic processes – whether it is successful or not – cannot be taken lightly; our democracy is intrinsic to our country’s success and well-being and any threat to it must be treated as a serious national security issue by those tasked with defending us.</td>
 </tr>
 </tbody>
 </table>
-<p>That worked reasonably well, though citations at the end of sentences confused it (possible to fix with a regex), footnotes need to be addressed separately (they are sentences beginning with numbers, once the aforementioned sentence problem has been fixed), and it probably doesn’t deal with sentences which cross pages - definitely not when there’s a footnote on the first page (possible to fix by removing footnotes then gluing all the sentences together and unnesting again).</p>
+<p>That worked reasonably well, though citations at the end of sentences confused it (possible to fix using <code>unnest_regex</code>), footnotes need to be addressed separately (they are sentences beginning with numbers, once the aforementioned sentence problem has been fixed), and it probably doesn’t deal with sentences which cross pages - definitely not when there’s a footnote splitting them too (possible to fix this problem by removing footnotes, gluing all the sentences together, and unnesting again).</p>
 <p>Next: code whether sentences mention one of the big three intel agencies.</p>
 <pre class="r"><code>rr_sentences &lt;- rr_sentences %&gt;%
   mutate(
@@ -604,6 +560,7 @@ rr_sentences %&gt;%
                             mentioned_GCHQ)
   )</code></pre>
 <p>The <code>mentioned_code</code> is a three-bit string: 000 means no agency was mentioned, 100 is MI5 (and no others), 010 is MI6 (and no others), 001 is GCHQ (and no others). All combinations are also captured, e.g., 011 would be MI6 and GCHQ.</p>
+<p>This next bit could be automated…</p>
 <pre class="r"><code>service_mentions &lt;- tibble(
   mentioned_code = c(&quot;000&quot;, &quot;111&quot;, &quot;001&quot;, &quot;010&quot;,
                      &quot;100&quot;, &quot;011&quot;, &quot;101&quot;, &quot;110&quot;),
@@ -615,7 +572,7 @@ rr_sentences %&gt;%
                         &quot;MI6 &amp; GCHQ&quot;,
                         &quot;MI5 &amp; GCHQ&quot;,
                         &quot;MI5 &amp; MI6&quot;)
-                        )
+)
 rr_sentences &lt;- left_join(rr_sentences, service_mentions)</code></pre>
 <pre><code>## Joining, by = &quot;mentioned_code&quot;</code></pre>
 <p>Let’s count them:</p>
@@ -665,7 +622,7 @@ rr_sentences &lt;- left_join(rr_sentences, service_mentions)</code></pre>
 </tr>
 </tbody>
 </table>
-<p>Does mentioning an intel agency (any of them) in a sentence make it more likely that the sentence will have a reaction?</p>
+<p>Does mentioning an intel agency (any of them) in a sentence make it more likely that the sentence will have a redaction?</p>
 <pre class="r"><code>any_redact_tab &lt;- rr_sentences %&gt;%
   group_by(mentioned_intel_agency) %&gt;%
   summarise(n_redacted = 100*mean(redacted)) %&gt;%
@@ -673,7 +630,8 @@ rr_sentences &lt;- left_join(rr_sentences, service_mentions)</code></pre>
                                     &quot;One or more&quot;))
 
 any_redact_tab %&gt;%
-  kable(col.names = c(&quot;Mentioned&quot;, &quot;% of sentences redacted&quot;),
+  kable(col.names = c(&quot;Mentioned&quot;,
+                      &quot;% of sentences redacted&quot;),
         digits = c(0,1))</code></pre>
 <table>
 <thead>
@@ -699,7 +657,8 @@ any_redact_tab %&gt;%
   group_by(mentioned_services) %&gt;%
   summarise(percentage_redacted = 100*mean(redacted)) %&gt;%
   arrange(desc(percentage_redacted)) %&gt;%
-  kable(col.names = c(&quot;Mentioned services&quot;, &quot;% of sentences redacted&quot;),
+  kable(col.names = c(&quot;Mentioned services&quot;,
+                      &quot;% of sentences redacted&quot;),
         digits = c(0,1))</code></pre>
 <table>
 <thead>
@@ -753,7 +712,7 @@ any_redact_tab %&gt;%
   mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
          replace = &quot;\\*\\*\\*[redacted]\\*\\*\\*&quot;,
          x = sentence)
-     ) %&gt;%
+  ) %&gt;%
   select(page, mentioned_services, nice_sentence) %&gt;%
   kable()</code></pre>
 <table>
@@ -996,7 +955,7 @@ any_redact_tab %&gt;%
   mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
          replace = &quot;\\*\\*\\*[redacted]\\*\\*\\*&quot;,
          x = sentence)
-     ) %&gt;%
+  ) %&gt;%
   select(page, mentioned_services, nice_sentence) %&gt;%
   kable()</code></pre>
 <table>
@@ -1309,7 +1268,7 @@ any_redact_tab %&gt;%
   mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
          replace = &quot;\\*\\*\\*[redacted]\\*\\*\\*&quot;,
          x = sentence)
-     ) %&gt;%
+  ) %&gt;%
   select(page, nice_sentence) %&gt;%
   kable()</code></pre>
 <table>

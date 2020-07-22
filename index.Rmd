@@ -29,27 +29,7 @@ The `pdf_text` command returns a character vector with one element per PDF page.
 
 ## Finding the juiciest pages
 
-I'd like to know where the juicy pages are - one way to index them is by number of reduction marks, ***.
-
-First try for one page to get the hang of it. I had a look at page 10 and there was one.
-
-```{r}
-str_count(rr_text[10], pattern = "\\*\\*\\*")
-```
-
-It worked - hurrah. Try for page 8 which has none.
-
-```{r}
-str_count(rr_text[8], pattern = "\\*\\*\\*")
-```
-
-And page 12, which has 8:
-
-```{r}
-str_count(rr_text[12], pattern = "\\*\\*\\*")
-```
-
-All good. `str_count` takes a vector, so we can do the whole report in one go:
+I'd like to know where the juicy pages are - one way to count how many redactions there are, ***.
 
 ```{r}
 redact_n <- str_count(rr_text, pattern = "\\*\\*\\*")
@@ -112,8 +92,9 @@ Here's a tidy tibble with all the words:
 
 ```{r}
 rr_words <- rr_tib %>%
-  unnest_tokens(word, # the name of the new column
-                text) # the column with text
+  select(page,text) %>%
+  unnest_tokens(word, # name of the new column
+                text) # column with text
 rr_words %>%
   head(10) %>%
   kable()
@@ -139,14 +120,15 @@ Again use `tidytext`, but this time at the sentence level.
 
 ```{r}
 rr_sentences <- rr_tib %>%
-  unnest_sentences(sentence, text, to_lower = FALSE)
+  unnest_sentences(sentence, text,
+                   to_lower = FALSE)
 
 rr_sentences %>%
-  slice_sample(n = 10) %>%
+  slice_sample(n = 5) %>%
   kable()
 ```
 
-That worked reasonably well, though citations at the end of sentences confused it (possible to fix with a regex), footnotes need to be addressed separately (they are sentences beginning with numbers, once the aforementioned sentence problem has been fixed), and it probably doesn't deal with sentences which cross pages - definitely not when there's a footnote on the first page (possible to fix by removing footnotes then gluing all the sentences together and unnesting again).
+That worked reasonably well, though citations at the end of sentences confused it (possible to fix using `unnest_regex`), footnotes need to be addressed separately (they are sentences beginning with numbers, once the aforementioned sentence problem has been fixed), and it probably doesn't deal with sentences which cross pages - definitely not when there's a footnote splitting them too (possible to fix this problem by removing footnotes, gluing all the sentences together, and unnesting again).
 
 Next: code whether sentences mention one of the big three intel agencies.
 
@@ -168,6 +150,8 @@ rr_sentences <- rr_sentences %>%
 
 The `mentioned_code` is a three-bit string: 000 means no agency was mentioned, 100 is MI5 (and no others), 010 is MI6 (and no others), 001 is GCHQ (and no others). All combinations are also captured, e.g., 011 would be MI6 and GCHQ.
 
+This next bit could be automated...
+
 ```{r}
 service_mentions <- tibble(
   mentioned_code = c("000", "111", "001", "010",
@@ -180,7 +164,7 @@ service_mentions <- tibble(
                         "MI6 & GCHQ",
                         "MI5 & GCHQ",
                         "MI5 & MI6")
-                        )
+)
 rr_sentences <- left_join(rr_sentences, service_mentions)
 ```
 
@@ -194,7 +178,7 @@ rr_sentences %>%
   kable(col.names = c("Service(s) mentioned", "n"))
 ```
 
-Does mentioning an intel agency (any of them) in a sentence make it more likely that the sentence will have a reaction?
+Does mentioning an intel agency (any of them) in a sentence make it more likely that the sentence will have a redaction?
 
 ```{r message=FALSE}
 any_redact_tab <- rr_sentences %>%
@@ -204,7 +188,8 @@ any_redact_tab <- rr_sentences %>%
                                     "One or more"))
 
 any_redact_tab %>%
-  kable(col.names = c("Mentioned", "% of sentences redacted"),
+  kable(col.names = c("Mentioned",
+                      "% of sentences redacted"),
         digits = c(0,1))
 ```
 
@@ -217,7 +202,8 @@ rr_sentences %>%
   group_by(mentioned_services) %>%
   summarise(percentage_redacted = 100*mean(redacted)) %>%
   arrange(desc(percentage_redacted)) %>%
-  kable(col.names = c("Mentioned services", "% of sentences redacted"),
+  kable(col.names = c("Mentioned services",
+                      "% of sentences redacted"),
         digits = c(0,1))
 ```
 
@@ -234,7 +220,7 @@ rr_sentences %>%
   mutate(nice_sentence = gsub(pattern = "\\*\\*\\*",
          replace = "\\*\\*\\*[redacted]\\*\\*\\*",
          x = sentence)
-     ) %>%
+  ) %>%
   select(page, mentioned_services, nice_sentence) %>%
   kable()
 ```
@@ -250,7 +236,7 @@ rr_sentences %>%
   mutate(nice_sentence = gsub(pattern = "\\*\\*\\*",
          replace = "\\*\\*\\*[redacted]\\*\\*\\*",
          x = sentence)
-     ) %>%
+  ) %>%
   select(page, mentioned_services, nice_sentence) %>%
   kable()
 ```
@@ -268,7 +254,7 @@ rr_sentences %>%
   mutate(nice_sentence = gsub(pattern = "\\*\\*\\*",
          replace = "\\*\\*\\*[redacted]\\*\\*\\*",
          x = sentence)
-     ) %>%
+  ) %>%
   select(page, nice_sentence) %>%
   kable()
 ```
