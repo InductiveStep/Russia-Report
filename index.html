@@ -11,7 +11,7 @@
 
 <meta name="author" content="Andi Fugard (almost@gmail.com, @inductivestep)" />
 
-<meta name="date" content="2020-07-22" />
+<meta name="date" content="2020-07-23" />
 
 <title>Analysing the Russia Report</title>
 
@@ -256,7 +256,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Analysing the Russia Report</h1>
 <h4 class="author">Andi Fugard (<a href="mailto:almost@gmail.com" class="email">almost@gmail.com</a>, @<a href="https://twitter.com/InductiveStep">inductivestep</a>)</h4>
-<h4 class="date">22 July 2020</h4>
+<h4 class="date">23 July 2020</h4>
 
 </div>
 
@@ -507,7 +507,7 @@ rr_sentences %&gt;%
 <colgroup>
 <col width="1%" />
 <col width="3%" />
-<col width="95%" />
+<col width="94%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -518,29 +518,29 @@ rr_sentences %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">42</td>
-<td align="right">0</td>
-<td align="left">Economic Area (EEA), someone involved in serious crime, or an individual or entity connected to such people.</td>
-</tr>
-<tr class="even">
-<td align="right">20</td>
-<td align="right">15</td>
-<td align="left">49,50 ***.</td>
-</tr>
-<tr class="odd">
-<td align="right">43</td>
+<td align="right">23</td>
 <td align="right">2</td>
-<td align="left">The NCA explained: The Computer Misuse Act … is very outdated legislation.</td>
+<td align="left">A ‘Foreign Agents Registration Act’ (an issue which is addressed in the section on Legislation) would also be helpful in this respect.</td>
 </tr>
 <tr class="even">
-<td align="right">27</td>
-<td align="right">11</td>
-<td align="left">MI5 66.</td>
+<td align="right">15</td>
+<td align="right">0</td>
+<td align="left">While the UN has agreed that international law, and in particular the UN Charter, applies in cyberspace, there is still a need for a greater global understanding of how this should work in practice.</td>
 </tr>
 <tr class="odd">
-<td align="right">19</td>
-<td align="right">3</td>
-<td align="left">In the Committee’s view, a foreign power seeking to interfere in our democratic processes – whether it is successful or not – cannot be taken lightly; our democracy is intrinsic to our country’s success and well-being and any threat to it must be treated as a serious national security issue by those tasked with defending us.</td>
+<td align="right">22</td>
+<td align="right">0</td>
+<td align="left">As a result, UK actors have to deal with Russian criminal interests masked as state interests, and Russian state interests masked by their Western agents.</td>
+</tr>
+<tr class="even">
+<td align="right">18</td>
+<td align="right">2</td>
+<td align="left">Such a protocol could, usefully, be expanded to encompass the other areas in which action is required from the social media companies, since this issue is not unique to Hostile State Activity.</td>
+</tr>
+<tr class="odd">
+<td align="right">40</td>
+<td align="right">2</td>
+<td align="left">Additionally, US legislation requires agents, other than diplomats, performing non-political activities under the control of foreign governments or foreign officials, to notify the Attorney General (registration under FARA serves as the 121 Oral evidence – Home Secretary, 31 January 2019.</td>
 </tr>
 </tbody>
 </table>
@@ -651,7 +651,7 @@ any_redact_tab %&gt;%
 </tr>
 </tbody>
 </table>
-<p>Yes. Sentences mentioning any service are `r round(with(any_redact_tab, n_redacted[2] / n_redacted[1]),1)’ times more likely to contain a redaction.</p>
+<p>Yes. Sentences mentioning any service are 3.5 times more likely to contain a redaction.</p>
 <p>How about the various patterns of mention versus no mention?</p>
 <pre class="r"><code>rr_sentences %&gt;%
   group_by(mentioned_services) %&gt;%
@@ -1679,6 +1679,27 @@ any_redact_tab %&gt;%
 </table>
 </div>
 </div>
+</div>
+<div id="sentiment-analysis" class="section level2">
+<h2>Sentiment analysis</h2>
+<p>Okay, so here’s the plan:</p>
+<ol style="list-style-type: decimal">
+<li>Take the sentence level analysis from above.</li>
+<li>Go further to the word level.</li>
+<li>Explore some of relationships with sentiment.</li>
+</ol>
+<p>I’ll use the word-emotion lexicon by <a href="https://doi.org/10.1111/j.1467-8640.2012.00460.x">Saif M. Mohammad and Peter D. Turney (2013)</a>:</p>
+<pre class="r"><code>library(textdata)
+nrc_sentiments &lt;- get_sentiments(&quot;nrc&quot;)</code></pre>
+<pre class="r"><code>rr_sentiment &lt;- rr_sentences %&gt;%
+  mutate(sentence_i = 1:nrow(rr_sentences)) %&gt;%
+  unnest_tokens(word,
+                sentence)
+
+rr_sentiment$word_i &lt;- 1:nrow(rr_sentiment)
+
+rr_sentiment &lt;- rr_sentiment %&gt;%
+  inner_join(nrc_sentiments, by = &quot;word&quot;)</code></pre>
 </div>
 
 

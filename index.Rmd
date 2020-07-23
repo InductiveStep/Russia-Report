@@ -193,7 +193,7 @@ any_redact_tab %>%
         digits = c(0,1))
 ```
 
-Yes. Sentences mentioning any service are `r round(with(any_redact_tab, n_redacted[2] / n_redacted[1]),1)' times more likely to contain a redaction.
+Yes. Sentences mentioning any service are `r round(with(any_redact_tab, n_redacted[2] / n_redacted[1]),1)` times more likely to contain a redaction.
 
 How about the various patterns of mention versus no mention?
 
@@ -258,5 +258,39 @@ rr_sentences %>%
   select(page, nice_sentence) %>%
   kable()
 ```
+
+## Sentiment analysis
+
+Okay, so here's the plan:
+
+1. Take the sentence level analysis from above.
+2. Go further to the word level.
+3. Explore some of relationships with sentiment.
+
+I'll use the word-emotion lexicon by [Saif M. Mohammad and Peter D. Turney (2013)](https://doi.org/10.1111/j.1467-8640.2012.00460.x):
+
+```{r}
+library(textdata)
+nrc_sentiments <- get_sentiments("nrc")
+```
+
+
+```{r}
+rr_sentiment <- rr_sentences %>%
+  mutate(sentence_i = 1:nrow(rr_sentences)) %>%
+  unnest_tokens(word,
+                sentence)
+
+rr_sentiment$word_i <- 1:nrow(rr_sentiment)
+
+rr_sentiment <- rr_sentiment %>%
+  inner_join(nrc_sentiments, by = "word")
+```
+
+
+
+
+
+
 
 
