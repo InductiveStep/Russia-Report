@@ -508,8 +508,8 @@ rr_sentences %&gt;%
   kable()</code></pre>
 <table>
 <colgroup>
-<col width="0%" />
-<col width="99%" />
+<col width="2%" />
+<col width="97%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -519,24 +519,24 @@ rr_sentences %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">22</td>
-<td align="left">What is now clear is that it was in fact counter-productive, in that it offered ideal mechanisms by which illicit finance could be recycled through what has been referred to as the London ‘laundromat’.</td>
+<td align="right">9</td>
+<td align="left">1 There is, of course, also a long history of hostile engagement between the Russian – and previously Soviet – intelligence services and their UK counterparts.</td>
 </tr>
 <tr class="even">
-<td align="right">13</td>
-<td align="left">Indeed, there are a number of other Ministers with some form of responsibility for cyber – the Defence Secretary has overall responsibility for Offensive Cyber as a ‘warfighting tool’ and for the National Offensive Cyber Programme, while the Secretary of State for the Department for Digital, Culture, Media and Sport (DCMS) leads on digital matters, with the Chancellor of the Duchy of Lancaster being responsible for the National Cyber Security Strategy and the National Cyber Security Programme.</td>
+<td align="right">41</td>
+<td align="left">128 Oral evidence – MI5, *** January 2019.</td>
 </tr>
 <tr class="odd">
-<td align="right">9</td>
-<td align="left">1 7.</td>
+<td align="right">45</td>
+<td align="left">In terms of its ‘near abroad’, Russia clearly intends keeping these countries within its ‘sphere of influence’, and conducts cyber activity and pursues economic policy to that end in ***.</td>
 </tr>
 <tr class="even">
 <td align="right">32</td>
-<td align="left">The Home Secretary holds ministerial responsibility for MI5, the Foreign Secretary for SIS and GCHQ, and the Defence Secretary for Defence Intelligence.</td>
+<td align="left">However, we understand that no direct lessons have been drawn from CONTEST in drawing up and implementing the Strategy.</td>
 </tr>
 <tr class="odd">
-<td align="right">25</td>
-<td align="left">The Salisbury attack has highlighted the vulnerability of former Russian intelligence officers who have settled in the UK.</td>
+<td align="right">20</td>
+<td align="left">49,50 ***.</td>
 </tr>
 </tbody>
 </table>
@@ -1704,7 +1704,7 @@ rr_sentiment &lt;- rr_sentiment %&gt;%
     filter(sentiment == theSentiment) %&gt;%
     group_by(word) %&gt;%
     count() %&gt;%
-    filter(n &gt;= 10) %&gt;%
+    filter(n &gt;= 2) %&gt;%
     ggplot(aes(label = word, size = n)) +
     scale_size_area(max_size = 15) +
     geom_text_wordcloud() +
