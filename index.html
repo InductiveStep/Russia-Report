@@ -11,7 +11,7 @@
 
 <meta name="author" content="Andi Fugard (almost@gmail.com, @inductivestep)" />
 
-<meta name="date" content="2020-07-23" />
+<meta name="date" content="2020-07-24" />
 
 <title>Analysing the Russia Report</title>
 
@@ -256,11 +256,12 @@ div.tocify {
 
 <h1 class="title toc-ignore">Analysing the Russia Report</h1>
 <h4 class="author">Andi Fugard (<a href="mailto:almost@gmail.com" class="email">almost@gmail.com</a>, @<a href="https://twitter.com/InductiveStep">inductivestep</a>)</h4>
-<h4 class="date">23 July 2020</h4>
+<h4 class="date">24 July 2020</h4>
 
 </div>
 
 
+<p><strong><em>WORK IN PROGRESS</em></strong></p>
 <p>(See the github repo <a href="https://github.com/InductiveStep/Russia-Report">here</a>.)</p>
 <p>The report is available on the <a href="http://isc.independent.gov.uk/news-archive/21july2020">ISC website</a> and <a href="20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf">in this github repository</a>.</p>
 <p>First, load it into R.</p>
@@ -341,6 +342,7 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
   select(page,text) %&gt;%
   unnest_tokens(word, # name of the new column
                 text) # column with text
+
 rr_words %&gt;%
   head(10) %&gt;%
   kable()</code></pre>
@@ -498,49 +500,43 @@ rr_words %&gt;%
 <p>Again use <code>tidytext</code>, but this time at the sentence level.</p>
 <pre class="r"><code>rr_sentences &lt;- rr_tib %&gt;%
   unnest_sentences(sentence, text,
-                   to_lower = FALSE)
+                   to_lower = FALSE) %&gt;%
+  select(-redactions) # nuke the page-level count of redactions
 
 rr_sentences %&gt;%
   slice_sample(n = 5) %&gt;%
   kable()</code></pre>
 <table>
 <colgroup>
-<col width="1%" />
-<col width="3%" />
-<col width="94%" />
+<col width="0%" />
+<col width="99%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th align="right">page</th>
-<th align="right">redactions</th>
 <th align="left">sentence</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">23</td>
-<td align="right">2</td>
-<td align="left">A ‘Foreign Agents Registration Act’ (an issue which is addressed in the section on Legislation) would also be helpful in this respect.</td>
-</tr>
-<tr class="even">
-<td align="right">15</td>
-<td align="right">0</td>
-<td align="left">While the UN has agreed that international law, and in particular the UN Charter, applies in cyberspace, there is still a need for a greater global understanding of how this should work in practice.</td>
-</tr>
-<tr class="odd">
 <td align="right">22</td>
-<td align="right">0</td>
-<td align="left">As a result, UK actors have to deal with Russian criminal interests masked as state interests, and Russian state interests masked by their Western agents.</td>
+<td align="left">What is now clear is that it was in fact counter-productive, in that it offered ideal mechanisms by which illicit finance could be recycled through what has been referred to as the London ‘laundromat’.</td>
 </tr>
 <tr class="even">
-<td align="right">18</td>
-<td align="right">2</td>
-<td align="left">Such a protocol could, usefully, be expanded to encompass the other areas in which action is required from the social media companies, since this issue is not unique to Hostile State Activity.</td>
+<td align="right">13</td>
+<td align="left">Indeed, there are a number of other Ministers with some form of responsibility for cyber – the Defence Secretary has overall responsibility for Offensive Cyber as a ‘warfighting tool’ and for the National Offensive Cyber Programme, while the Secretary of State for the Department for Digital, Culture, Media and Sport (DCMS) leads on digital matters, with the Chancellor of the Duchy of Lancaster being responsible for the National Cyber Security Strategy and the National Cyber Security Programme.</td>
 </tr>
 <tr class="odd">
-<td align="right">40</td>
-<td align="right">2</td>
-<td align="left">Additionally, US legislation requires agents, other than diplomats, performing non-political activities under the control of foreign governments or foreign officials, to notify the Attorney General (registration under FARA serves as the 121 Oral evidence – Home Secretary, 31 January 2019.</td>
+<td align="right">9</td>
+<td align="left">1 7.</td>
+</tr>
+<tr class="even">
+<td align="right">32</td>
+<td align="left">The Home Secretary holds ministerial responsibility for MI5, the Foreign Secretary for SIS and GCHQ, and the Defence Secretary for Defence Intelligence.</td>
+</tr>
+<tr class="odd">
+<td align="right">25</td>
+<td align="left">The Salisbury attack has highlighted the vulnerability of former Russian intelligence officers who have settled in the UK.</td>
 </tr>
 </tbody>
 </table>
@@ -573,7 +569,8 @@ rr_sentences %&gt;%
                         &quot;MI5 &amp; GCHQ&quot;,
                         &quot;MI5 &amp; MI6&quot;)
 )
-rr_sentences &lt;- left_join(rr_sentences, service_mentions)</code></pre>
+rr_sentences &lt;- left_join(rr_sentences, service_mentions) %&gt;%
+  select(-mentioned_code)</code></pre>
 <pre><code>## Joining, by = &quot;mentioned_code&quot;</code></pre>
 <p>Let’s count them:</p>
 <pre class="r"><code>rr_sentences %&gt;%
@@ -625,7 +622,7 @@ rr_sentences &lt;- left_join(rr_sentences, service_mentions)</code></pre>
 <p>Does mentioning an intel agency (any of them) in a sentence make it more likely that the sentence will have a redaction?</p>
 <pre class="r"><code>any_redact_tab &lt;- rr_sentences %&gt;%
   group_by(mentioned_intel_agency) %&gt;%
-  summarise(n_redacted = 100*mean(redacted)) %&gt;%
+  summarise(perc_redacted = 100*mean(redacted)) %&gt;%
   mutate(mentioned_intel_agency = c(&quot;No intel service&quot;,
                                     &quot;One or more&quot;))
 
@@ -1682,10 +1679,10 @@ any_redact_tab %&gt;%
 </div>
 <div id="sentiment-analysis" class="section level2">
 <h2>Sentiment analysis</h2>
-<p>Okay, so here’s the plan:</p>
+<p>Here’s the plan:</p>
 <ol style="list-style-type: decimal">
 <li>Take the sentence level analysis from above.</li>
-<li>Go further to the word level.</li>
+<li>Unnest further to the word level.</li>
 <li>Explore some of relationships with sentiment.</li>
 </ol>
 <p>I’ll use the word-emotion lexicon by <a href="https://doi.org/10.1111/j.1467-8640.2012.00460.x">Saif M. Mohammad and Peter D. Turney (2013)</a>:</p>
@@ -1694,12 +1691,113 @@ nrc_sentiments &lt;- get_sentiments(&quot;nrc&quot;)</code></pre>
 <pre class="r"><code>rr_sentiment &lt;- rr_sentences %&gt;%
   mutate(sentence_i = 1:nrow(rr_sentences)) %&gt;%
   unnest_tokens(word,
-                sentence)
+                sentence, drop = F)
 
 rr_sentiment$word_i &lt;- 1:nrow(rr_sentiment)
 
 rr_sentiment &lt;- rr_sentiment %&gt;%
-  inner_join(nrc_sentiments, by = &quot;word&quot;)</code></pre>
+  left_join(nrc_sentiments, by = &quot;word&quot;)</code></pre>
+<p>Let’s see which words appear by sentiment:</p>
+<pre class="r"><code>library(ggwordcloud)</code></pre>
+<pre class="r"><code>makeWordCloud &lt;- function(theSentiment) {
+  rr_sentiment %&gt;%
+    filter(sentiment == theSentiment) %&gt;%
+    group_by(word) %&gt;%
+    count() %&gt;%
+    filter(n &gt;= 10) %&gt;%
+    ggplot(aes(label = word, size = n)) +
+    scale_size_area(max_size = 15) +
+    geom_text_wordcloud() +
+    theme_minimal() + 
+    labs(title = theSentiment)
+}
+
+allTheClouds &lt;- map(unique(rr_sentiment$sentiment)
+                      %&gt;% na.omit(), makeWordCloud)
+allTheClouds</code></pre>
+<pre><code>## [[1]]</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<pre><code>## 
+## [[2]]</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-2.png" width="672" /></p>
+<pre><code>## 
+## [[3]]</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-3.png" width="672" /></p>
+<pre><code>## 
+## [[4]]</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-4.png" width="672" /></p>
+<pre><code>## 
+## [[5]]</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-5.png" width="672" /></p>
+<pre><code>## 
+## [[6]]</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-6.png" width="672" /></p>
+<pre><code>## 
+## [[7]]</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-7.png" width="672" /></p>
+<pre><code>## 
+## [[8]]</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-8.png" width="672" /></p>
+<pre><code>## 
+## [[9]]</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-9.png" width="672" /></p>
+<pre><code>## 
+## [[10]]</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-22-10.png" width="672" /></p>
+<div id="back-to-sentences" class="section level3">
+<h3>Back to sentences</h3>
+<pre class="r"><code>sentiment_counts &lt;- rr_sentiment %&gt;%
+  group_by(sentence_i, sentiment) %&gt;%
+  summarise(n = n()) %&gt;%
+  mutate(b = as.numeric(n &gt; 0)) %&gt;%
+  pivot_wider(names_from = sentiment,
+              values_from = c(n, b),
+              values_fill = 0)</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;sentence_i&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>sentiment_counts &lt;- rr_sentences %&gt;%
+  mutate(sentence_i = 1:nrow(rr_sentences)) %&gt;%
+  left_join(sentiment_counts, by = &quot;sentence_i&quot;)
+sentiment_counts </code></pre>
+<pre><code>## # A tibble: 902 x 31
+##     page sentence redacted mentioned_MI5 mentioned_MI6 mentioned_GCHQ
+##    &lt;int&gt; &lt;chr&gt;       &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;          &lt;dbl&gt;
+##  1     1 Intelli~        0             0             0              0
+##  2     2 Intelli~        0             0             0              0
+##  3     3 © Intel~        0             0             0              0
+##  4     3 Where t~        0             0             0              0
+##  5     3 This pu~        0             0             0              0
+##  6     3 To view~        0             0             0              0
+##  7     4 THE INT~        0             0             0              0
+##  8     4 Dr Juli~        0             0             0              0
+##  9     4 Chris G~        0             0             0              0
+## 10     4 Kevan J~        0             0             0              0
+## # ... with 892 more rows, and 25 more variables: mentioned_intel_agency &lt;dbl&gt;,
+## #   mentioned_services &lt;chr&gt;, sentence_i &lt;int&gt;, n_fear &lt;int&gt;, n_joy &lt;int&gt;,
+## #   n_positive &lt;int&gt;, n_trust &lt;int&gt;, n_NA &lt;int&gt;, n_negative &lt;int&gt;,
+## #   n_disgust &lt;int&gt;, n_anger &lt;int&gt;, n_anticipation &lt;int&gt;, n_sadness &lt;int&gt;,
+## #   n_surprise &lt;int&gt;, b_fear &lt;dbl&gt;, b_joy &lt;dbl&gt;, b_positive &lt;dbl&gt;,
+## #   b_trust &lt;dbl&gt;, b_NA &lt;dbl&gt;, b_negative &lt;dbl&gt;, b_disgust &lt;dbl&gt;,
+## #   b_anger &lt;dbl&gt;, b_anticipation &lt;dbl&gt;, b_sadness &lt;dbl&gt;, b_surprise &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<div id="word-cloud-of-redactions" class="section level2">
+<h2>Word cloud of redactions</h2>
+<p>Now word cloud comparing words in sentences which do versus don’t contain redactions.</p>
+<pre class="r"><code>rr_sentiment %&gt;%
+  anti_join(stop_words) %&gt;%
+  mutate(redacted = recode(redacted,
+                           `0` = &quot;No&quot;,
+                           `1` = &quot;Yes&quot;)) %&gt;%
+  group_by(redacted, word) %&gt;%
+  summarise(n = n()) %&gt;%
+  mutate(prop = n/sum(n)) %&gt;%
+  filter(prop &gt; .002) %&gt;%
+  ggplot(aes(label = word, size = prop, color = redacted)) +
+    scale_size_area(max_size = 12) +
+    geom_text_wordcloud() +
+    theme_minimal() + 
+    facet_grid(rows = vars(redacted))</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
 </div>
 
 

@@ -10,6 +10,8 @@ output:
     collapsed: false
 ---
 
+***WORK IN PROGRESS***
+
 (See the github repo [here](https://github.com/InductiveStep/Russia-Report).)
 
 
@@ -95,6 +97,7 @@ rr_words <- rr_tib %>%
   select(page,text) %>%
   unnest_tokens(word, # name of the new column
                 text) # column with text
+
 rr_words %>%
   head(10) %>%
   kable()
@@ -121,7 +124,8 @@ Again use `tidytext`, but this time at the sentence level.
 ```{r}
 rr_sentences <- rr_tib %>%
   unnest_sentences(sentence, text,
-                   to_lower = FALSE)
+                   to_lower = FALSE) %>%
+  select(-redactions) # nuke the page-level count of redactions
 
 rr_sentences %>%
   slice_sample(n = 5) %>%
@@ -165,7 +169,8 @@ service_mentions <- tibble(
                         "MI5 & GCHQ",
                         "MI5 & MI6")
 )
-rr_sentences <- left_join(rr_sentences, service_mentions)
+rr_sentences <- left_join(rr_sentences, service_mentions) %>%
+  select(-mentioned_code)
 ```
 
 
@@ -183,7 +188,7 @@ Does mentioning an intel agency (any of them) in a sentence make it more likely 
 ```{r message=FALSE}
 any_redact_tab <- rr_sentences %>%
   group_by(mentioned_intel_agency) %>%
-  summarise(n_redacted = 100*mean(redacted)) %>%
+  summarise(perc_redacted = 100*mean(redacted)) %>%
   mutate(mentioned_intel_agency = c("No intel service",
                                     "One or more"))
 
@@ -193,7 +198,7 @@ any_redact_tab %>%
         digits = c(0,1))
 ```
 
-Yes. Sentences mentioning any service are `r round(with(any_redact_tab, n_redacted[2] / n_redacted[1]),1)` times more likely to contain a redaction.
+Yes. Sentences mentioning any service are `r round(with(any_redact_tab, perc_redacted[2] / perc_redacted[1]),1)` times more likely to contain a redaction.
 
 How about the various patterns of mention versus no mention?
 
@@ -261,10 +266,10 @@ rr_sentences %>%
 
 ## Sentiment analysis
 
-Okay, so here's the plan:
+Here's the plan:
 
 1. Take the sentence level analysis from above.
-2. Go further to the word level.
+2. Unnest further to the word level.
 3. Explore some of relationships with sentiment.
 
 I'll use the word-emotion lexicon by [Saif M. Mohammad and Peter D. Turney (2013)](https://doi.org/10.1111/j.1467-8640.2012.00460.x):
@@ -274,17 +279,42 @@ library(textdata)
 nrc_sentiments <- get_sentiments("nrc")
 ```
 
-
 ```{r}
 rr_sentiment <- rr_sentences %>%
   mutate(sentence_i = 1:nrow(rr_sentences)) %>%
   unnest_tokens(word,
-                sentence)
+                sentence, drop = F)
 
 rr_sentiment$word_i <- 1:nrow(rr_sentiment)
 
 rr_sentiment <- rr_sentiment %>%
-  inner_join(nrc_sentiments, by = "word")
+  left_join(nrc_sentiments, by = "word")
+```
+
+Let's see which words appear by sentiment:
+
+```{r}
+library(ggwordcloud)
+```
+
+
+```{r}
+makeWordCloud <- function(theSentiment) {
+  rr_sentiment %>%
+    filter(sentiment == theSentiment) %>%
+    group_by(word) %>%
+    count() %>%
+    filter(n >= 10) %>%
+    ggplot(aes(label = word, size = n)) +
+    scale_size_area(max_size = 15) +
+    geom_text_wordcloud() +
+    theme_minimal() + 
+    labs(title = theSentiment)
+}
+
+allTheClouds <- map(unique(rr_sentiment$sentiment)
+                      %>% na.omit(), makeWordCloud)
+allTheClouds
 ```
 
 
@@ -293,4 +323,47 @@ rr_sentiment <- rr_sentiment %>%
 
 
 
+
+
+
+
+### Back to sentences
+
+```{r}
+sentiment_counts <- rr_sentiment %>%
+  group_by(sentence_i, sentiment) %>%
+  summarise(n = n()) %>%
+  mutate(b = as.numeric(n > 0)) %>%
+  pivot_wider(names_from = sentiment,
+              values_from = c(n, b),
+              values_fill = 0)
+
+sentiment_counts <- rr_sentences %>%
+  mutate(sentence_i = 1:nrow(rr_sentences)) %>%
+  left_join(sentiment_counts, by = "sentence_i")
+sentiment_counts 
+```
+
+
+
+## Word cloud of redactions
+
+Now word cloud comparing words in sentences which do versus don't contain redactions.
+
+```{r message=FALSE, warning=FALSE}
+rr_sentiment %>%
+  anti_join(stop_words) %>%
+  mutate(redacted = recode(redacted,
+                           `0` = "No",
+                           `1` = "Yes")) %>%
+  group_by(redacted, word) %>%
+  summarise(n = n()) %>%
+  mutate(prop = n/sum(n)) %>%
+  filter(prop > .002) %>%
+  ggplot(aes(label = word, size = prop, color = redacted)) +
+    scale_size_area(max_size = 12) +
+    geom_text_wordcloud() +
+    theme_minimal() + 
+    facet_grid(rows = vars(redacted))
+```
 
