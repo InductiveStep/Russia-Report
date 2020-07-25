@@ -303,10 +303,11 @@ makeWordCloud <- function(theSentiment) {
   rr_sentiment %>%
     filter(sentiment == theSentiment) %>%
     group_by(word) %>%
-    count() %>%
-    filter(n >= 10) %>%
-    ggplot(aes(label = word, size = log1p(n), col = log1p(n))) +
-    scale_size_area(max_size = 10) +
+    summarise(n = n()) %>%
+    mutate(prop = n/sum(n)) %>%
+    #filter(n >= 10) %>%
+    ggplot(aes(label = word, size = log1p(prop), col = log1p(n))) +
+    scale_size_area(max_size = 12) +
     geom_text_wordcloud() +
     theme_minimal() + 
     labs(title = theSentiment)

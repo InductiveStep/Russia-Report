@@ -519,24 +519,24 @@ rr_sentences %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">30</td>
-<td align="left">SIS and GCHQ planned to change their operational effort against Russia still further – to <strong><em>% and </em></strong>% respectively by 2020.</td>
+<td align="right">17</td>
+<td align="left">28 ‘Wedge issues’ are highly divisive subjects which bifurcate a country’s population, often (but not always) into socially liberal and socially conservative camps, and which often to at least some degree transcend traditional political party boundaries.</td>
 </tr>
 <tr class="even">
-<td align="right">43</td>
-<td align="left">It is important to include local authorities ***.</td>
+<td align="right">46</td>
+<td align="left">Russia has also sought to expand its influence in the Middle East.</td>
 </tr>
 <tr class="odd">
 <td align="right">33</td>
-<td align="left">We have been informed that MI5 does, however, align its work on Russia with that of SIS and GCHQ in an agreed tri-Agency approach.</td>
+<td align="left">The Intelligence Coverage and Effects (ICE) process is the method by which SIS and GCHQ are tasked by the Government.</td>
 </tr>
 <tr class="even">
-<td align="right">42</td>
-<td align="left">136 However, the NCA also underlined that there are several ways in which the Sanctions and Anti-Money Laundering Act 2018 is too restrictive.</td>
+<td align="right">34</td>
+<td align="left">Less talk, more action?</td>
 </tr>
 <tr class="odd">
-<td align="right">30</td>
-<td align="left">The Foreign Secretary similarly recognised the importance of not ignoring other priorities: One of my concerns is that some of the short-term problems that Russia is causing us that we are having to address is actually crowding out thinking that we need to be doing on the longer-term changes to the international order, namely the rise of China.</td>
+<td align="right">14</td>
+<td align="left">24.</td>
 </tr>
 </tbody>
 </table>
@@ -1703,10 +1703,11 @@ rr_sentiment &lt;- rr_sentiment %&gt;%
   rr_sentiment %&gt;%
     filter(sentiment == theSentiment) %&gt;%
     group_by(word) %&gt;%
-    count() %&gt;%
-    filter(n &gt;= 10) %&gt;%
-    ggplot(aes(label = word, size = log1p(n), col = log1p(n))) +
-    scale_size_area(max_size = 10) +
+    summarise(n = n()) %&gt;%
+    mutate(prop = n/sum(n)) %&gt;%
+    #filter(n &gt;= 10) %&gt;%
+    ggplot(aes(label = word, size = log1p(prop), col = log1p(n))) +
+    scale_size_area(max_size = 12) +
     geom_text_wordcloud() +
     theme_minimal() + 
     labs(title = theSentiment)
