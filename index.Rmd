@@ -347,11 +347,14 @@ sentiment_counts
 
 
 
+
+
+
 ## Word cloud of redactions
 
-Now word cloud comparing words in sentences which do versus don't contain redactions.
+Now we have data labelled in various ways, it's easy to make a word cloud comparing words in sentences which do with those which don't contain redactions.
 
-```{r message=FALSE, warning=FALSE}
+```{r fig.height=3, fig.width=6, message=FALSE, warning=FALSE}
 rr_sentiment %>%
   anti_join(stop_words) %>%
   mutate(redacted = recode(redacted,

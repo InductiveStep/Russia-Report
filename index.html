@@ -508,8 +508,8 @@ rr_sentences %&gt;%
   kable()</code></pre>
 <table>
 <colgroup>
-<col width="1%" />
-<col width="98%" />
+<col width="0%" />
+<col width="99%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -519,24 +519,24 @@ rr_sentences %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">17</td>
-<td align="left">28 ‘Wedge issues’ are highly divisive subjects which bifurcate a country’s population, often (but not always) into socially liberal and socially conservative camps, and which often to at least some degree transcend traditional political party boundaries.</td>
+<td align="right">12</td>
+<td align="left">GCHQ assesses that Russia is a highly capable cyber actor with a proven capability to carry out operations which can deliver a range of impacts across any sector: • Since 2014, Russia has carried out malicious cyber activity in order to assert itself aggressively in a number of spheres, including attempting to influence the democratic elections of other countries – for example, it has been widely reported that the Russians were behind the cyber-enabled ‘hack and leak’ operation to compromise the accounts of members of the French political party En Marche!</td>
 </tr>
 <tr class="even">
-<td align="right">46</td>
-<td align="left">Russia has also sought to expand its influence in the Middle East.</td>
+<td align="right">24</td>
+<td align="left">We have been told that ***.</td>
 </tr>
 <tr class="odd">
-<td align="right">33</td>
-<td align="left">The Intelligence Coverage and Effects (ICE) process is the method by which SIS and GCHQ are tasked by the Government.</td>
+<td align="right">28</td>
+<td align="left">86 Written evidence – SIS, 17 December 2018; Intelligence and Security Committee of Parliament Annual Report 2007–2008 Cm 7542.</td>
 </tr>
 <tr class="even">
-<td align="right">34</td>
-<td align="left">Less talk, more action?</td>
+<td align="right">8</td>
+<td align="left">What does Russia want?</td>
 </tr>
 <tr class="odd">
-<td align="right">14</td>
-<td align="left">24.</td>
+<td align="right">42</td>
+<td align="left">135 120.</td>
 </tr>
 </tbody>
 </table>
@@ -1783,7 +1783,7 @@ sentiment_counts </code></pre>
 </div>
 <div id="word-cloud-of-redactions" class="section level2">
 <h2>Word cloud of redactions</h2>
-<p>Now word cloud comparing words in sentences which do versus don’t contain redactions.</p>
+<p>Now we have data labelled in various ways, it’s easy to make a word cloud comparing words in sentences which do with those which don’t contain redactions.</p>
 <pre class="r"><code>rr_sentiment %&gt;%
   anti_join(stop_words) %&gt;%
   mutate(redacted = recode(redacted,
@@ -1798,7 +1798,7 @@ sentiment_counts </code></pre>
     geom_text_wordcloud() +
     theme_minimal() + 
     facet_grid(cols = vars(redacted))</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-24-1.png" width="576" /></p>
 </div>
 
 
