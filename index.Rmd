@@ -161,7 +161,7 @@ service_mentions <- tibble(
   mentioned_code = c("000", "111", "001", "010",
                      "100", "011", "101", "110"),
   mentioned_services = c("None mentioned",
-                        "All",
+                        "All services mentioned",
                         "GCHQ",
                         "MI6/SIS",
                         "MI5",
@@ -371,3 +371,25 @@ rr_sentiment %>%
     facet_grid(cols = vars(redacted))
 ```
 
+
+
+```{r fig.height=24, fig.width=6, message=FALSE, warning=FALSE}
+excluded_words <- c("gchq", "mi6", "mi5", "sis",
+                    "intelligence", "www.mi5")
+
+rr_sentiment %>%
+  anti_join(stop_words) %>%
+  mutate(redacted = recode(redacted,
+                           `0` = "No redactions",
+                           `1` = "One or more redactions")) %>%
+  group_by(redacted, mentioned_services, word) %>%
+  summarise(n = n()) %>%
+  mutate(prop = n/sum(n)) %>%
+  filter(prop > .005 & !(word %in% excluded_words)) %>%
+  ggplot(aes(label = word, size = log1p(prop), color = redacted)) +
+    scale_size_area(max_size = 10) +
+    geom_text_wordcloud() +
+    theme_minimal() + 
+    facet_grid(cols = vars(redacted),
+               rows = vars(mentioned_services))
+```
