@@ -11,7 +11,7 @@
 
 <meta name="author" content="Andi Fugard (almost@gmail.com, @inductivestep)" />
 
-<meta name="date" content="2020-07-24" />
+<meta name="date" content="2020-07-25" />
 
 <title>Analysing the Russia Report</title>
 
@@ -256,7 +256,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Analysing the Russia Report</h1>
 <h4 class="author">Andi Fugard (<a href="mailto:almost@gmail.com" class="email">almost@gmail.com</a>, @<a href="https://twitter.com/InductiveStep">inductivestep</a>)</h4>
-<h4 class="date">24 July 2020</h4>
+<h4 class="date">25 July 2020</h4>
 
 </div>
 
@@ -508,8 +508,8 @@ rr_sentences %&gt;%
   kable()</code></pre>
 <table>
 <colgroup>
-<col width="2%" />
-<col width="97%" />
+<col width="1%" />
+<col width="98%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -519,24 +519,24 @@ rr_sentences %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">9</td>
-<td align="left">1 There is, of course, also a long history of hostile engagement between the Russian – and previously Soviet – intelligence services and their UK counterparts.</td>
+<td align="right">30</td>
+<td align="left">SIS and GCHQ planned to change their operational effort against Russia still further – to <strong><em>% and </em></strong>% respectively by 2020.</td>
 </tr>
 <tr class="even">
-<td align="right">41</td>
-<td align="left">128 Oral evidence – MI5, *** January 2019.</td>
+<td align="right">43</td>
+<td align="left">It is important to include local authorities ***.</td>
 </tr>
 <tr class="odd">
-<td align="right">45</td>
-<td align="left">In terms of its ‘near abroad’, Russia clearly intends keeping these countries within its ‘sphere of influence’, and conducts cyber activity and pursues economic policy to that end in ***.</td>
+<td align="right">33</td>
+<td align="left">We have been informed that MI5 does, however, align its work on Russia with that of SIS and GCHQ in an agreed tri-Agency approach.</td>
 </tr>
 <tr class="even">
-<td align="right">32</td>
-<td align="left">However, we understand that no direct lessons have been drawn from CONTEST in drawing up and implementing the Strategy.</td>
+<td align="right">42</td>
+<td align="left">136 However, the NCA also underlined that there are several ways in which the Sanctions and Anti-Money Laundering Act 2018 is too restrictive.</td>
 </tr>
 <tr class="odd">
-<td align="right">20</td>
-<td align="left">49,50 ***.</td>
+<td align="right">30</td>
+<td align="left">The Foreign Secretary similarly recognised the importance of not ignoring other priorities: One of my concerns is that some of the short-term problems that Russia is causing us that we are having to address is actually crowding out thinking that we need to be doing on the longer-term changes to the international order, namely the rise of China.</td>
 </tr>
 </tbody>
 </table>
@@ -1704,9 +1704,9 @@ rr_sentiment &lt;- rr_sentiment %&gt;%
     filter(sentiment == theSentiment) %&gt;%
     group_by(word) %&gt;%
     count() %&gt;%
-    filter(n &gt;= 2) %&gt;%
-    ggplot(aes(label = word, size = n)) +
-    scale_size_area(max_size = 15) +
+    filter(n &gt;= 10) %&gt;%
+    ggplot(aes(label = word, size = log1p(n), col = log1p(n))) +
+    scale_size_area(max_size = 10) +
     geom_text_wordcloud() +
     theme_minimal() + 
     labs(title = theSentiment)
@@ -1786,17 +1786,17 @@ sentiment_counts </code></pre>
 <pre class="r"><code>rr_sentiment %&gt;%
   anti_join(stop_words) %&gt;%
   mutate(redacted = recode(redacted,
-                           `0` = &quot;No&quot;,
-                           `1` = &quot;Yes&quot;)) %&gt;%
+                           `0` = &quot;No redactions&quot;,
+                           `1` = &quot;One or more redactions&quot;)) %&gt;%
   group_by(redacted, word) %&gt;%
   summarise(n = n()) %&gt;%
   mutate(prop = n/sum(n)) %&gt;%
   filter(prop &gt; .002) %&gt;%
-  ggplot(aes(label = word, size = prop, color = redacted)) +
-    scale_size_area(max_size = 12) +
+  ggplot(aes(label = word, size = log1p(prop), color = redacted)) +
+    scale_size_area(max_size = 13) +
     geom_text_wordcloud() +
     theme_minimal() + 
-    facet_grid(rows = vars(redacted))</code></pre>
+    facet_grid(cols = vars(redacted))</code></pre>
 <p><img src="index_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
 </div>
 

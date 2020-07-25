@@ -298,15 +298,15 @@ library(ggwordcloud)
 ```
 
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 makeWordCloud <- function(theSentiment) {
   rr_sentiment %>%
     filter(sentiment == theSentiment) %>%
     group_by(word) %>%
     count() %>%
-    filter(n >= 2) %>%
-    ggplot(aes(label = word, size = n)) +
-    scale_size_area(max_size = 15) +
+    filter(n >= 10) %>%
+    ggplot(aes(label = word, size = log1p(n), col = log1p(n))) +
+    scale_size_area(max_size = 10) +
     geom_text_wordcloud() +
     theme_minimal() + 
     labs(title = theSentiment)
@@ -354,16 +354,16 @@ Now word cloud comparing words in sentences which do versus don't contain redact
 rr_sentiment %>%
   anti_join(stop_words) %>%
   mutate(redacted = recode(redacted,
-                           `0` = "No",
-                           `1` = "Yes")) %>%
+                           `0` = "No redactions",
+                           `1` = "One or more redactions")) %>%
   group_by(redacted, word) %>%
   summarise(n = n()) %>%
   mutate(prop = n/sum(n)) %>%
   filter(prop > .002) %>%
-  ggplot(aes(label = word, size = prop, color = redacted)) +
-    scale_size_area(max_size = 12) +
+  ggplot(aes(label = word, size = log1p(prop), color = redacted)) +
+    scale_size_area(max_size = 13) +
     geom_text_wordcloud() +
     theme_minimal() + 
-    facet_grid(rows = vars(redacted))
+    facet_grid(cols = vars(redacted))
 ```
 
