@@ -20,6 +20,8 @@ The report is available on the [ISC website](http://isc.independent.gov.uk/news-
 First, load it into R.
 
 ```{r message=FALSE, warning=FALSE}
+devtools::install_github("inductivestep/handbag")
+library(handbag)
 library(tidyverse)
 library(knitr)
 library(pdftools)
@@ -27,6 +29,9 @@ library(stringr)
 rr_text <- pdf_text("20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf")
 ```
 The `pdf_text` command returns a character vector with one element per PDF page. The main report text is on pages 8-42.
+
+
+# First go
 
 
 ## Finding the juiciest pages
@@ -67,19 +72,7 @@ rr_tib %>%
   arrange(redactions)
 ```
 
-The section on PDF pages 37 and 38 (printed page nums 30 and 31) is the winner: "Rising to the challenge".
-
-### The most redacted pages (pp. 30-32 in the printed report)
-
-Here's a link to the [pdf pages](https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=37).
-
-```{r results='asis'}
-gsub(pattern = "\\*\\*\\*",
-     replace = "\\*\\*\\*[redacted]\\*\\*\\*",
-     x = rr_tib$text[37:39]) %>%
-  writeLines()
-```
-
+The section on PDF pages 37 and 38 (printed page nums 30 and 31) is the winner: "Rising to the challenge". Here's a link to the [pdf pages](https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=37).
 
 
 ## Word counts
@@ -98,20 +91,24 @@ rr_words <- rr_tib %>%
   unnest_tokens(word, # name of the new column
                 text) # column with text
 
-rr_words %>%
-  head(10) %>%
-  kable()
 ```
 
 And the top 20 most common words:
 
-```{r}
+```{r fig.height=6, fig.width=6}
 rr_words %>%
   anti_join(stop_words, by = "word") %>%
   count(word) %>%
   arrange(desc(n)) %>%
   head(20) %>%
-  kable()
+  ggplot(aes(x = reorder(word, n),
+             y = n,
+             fill = n)) +
+    geom_bar(stat = "identity") + 
+    coord_flip() +
+    labs(y = "Count",
+         x = "Word") + 
+    theme(legend.position = "none")
 ```
 
 
@@ -125,54 +122,61 @@ Again use `tidytext`, but this time at the sentence level.
 rr_sentences <- rr_tib %>%
   unnest_sentences(sentence, text,
                    to_lower = FALSE) %>%
-  select(-redactions) # nuke the page-level count of redactions
+  select(-redactions) # remove page-level count of redactions
 
-rr_sentences %>%
-  slice_sample(n = 5) %>%
-  kable()
+rr_sentences$sentence_i <- 1:nrow(rr_sentences)
 ```
 
-That worked reasonably well, though citations at the end of sentences confused it (possible to fix using `unnest_regex`), footnotes need to be addressed separately (they are sentences beginning with numbers, once the aforementioned sentence problem has been fixed), and it probably doesn't deal with sentences which cross pages - definitely not when there's a footnote splitting them too (possible to fix this problem by removing footnotes, gluing all the sentences together, and unnesting again).
+That worked reasonably well, though:
 
-Next: code whether sentences mention one of the big three intel agencies.
+* citations at the end of sentences confused it (possible to fix this using `unnest_regex`),
+* footnotes need to be addressed separately (they are sentences beginning with numbers, once the aforementioned sentence problem has been fixed), and
+* it doesn't deal with sentences which cross pages - definitely not when there's a footnote splitting them too (it may be possible to fix this problem by removing footnotes, gluing all the sentences together, and unnesting again).
 
-```{r}
-rr_sentences <- rr_sentences %>%
-  mutate(
-    redacted       = 0+str_detect(sentence, "\\*\\*\\*"),
-    mentioned_MI5  = 0+str_detect(sentence, "MI5"),
-    mentioned_MI6  = 0+str_detect(sentence, "(MI6|SIS)"),
-    mentioned_GCHQ = 0+str_detect(sentence, "GCHQ"),
-    mentioned_intel_agency = pmax(mentioned_MI5,
-                                  mentioned_MI6,
-                                  mentioned_GCHQ),
-    mentioned_code = paste0(mentioned_MI5,
-                            mentioned_MI6,
-                            mentioned_GCHQ)
-  )
-```
+Next: code redactions and whether sentences mention one of the big three intel agencies.
 
-The `mentioned_code` is a three-bit string: 000 means no agency was mentioned, 100 is MI5 (and no others), 010 is MI6 (and no others), 001 is GCHQ (and no others). All combinations are also captured, e.g., 011 would be MI6 and GCHQ.
-
-This next bit could be automated...
+I'll use `fuzzyjoin` for this, which joins two tables based on a regular expression.
 
 ```{r}
-service_mentions <- tibble(
-  mentioned_code = c("000", "111", "001", "010",
-                     "100", "011", "101", "110"),
-  mentioned_services = c("None mentioned",
-                        "All services mentioned",
-                        "GCHQ",
-                        "MI6/SIS",
-                        "MI5",
-                        "MI6 & GCHQ",
-                        "MI5 & GCHQ",
-                        "MI5 & MI6")
+library(fuzzyjoin)
+
+mapping <- tribble(
+  ~regex, ~code,
+  "MI5|[s|S]ecurity [s|S]ervice",         "intel_MI5",
+  "MI6|SIS|Secret Intelligence Service",   "intel_MI6",
+  "GCHQ",                                  "intel_GCHQ",
+  "Defence Intelligence",                  "intel_DI",
+  "GRU",                                   "intel_GRU",
+  "\\*\\*\\*",                             "redacted"
 )
-rr_sentences <- left_join(rr_sentences, service_mentions) %>%
-  select(-mentioned_code)
+```
+Now, reshape so that there's a binary predictor matrix.
+
+```{r}
+rr_mentions <- rr_sentences %>%
+  regex_left_join(mapping,
+                  by = c(sentence = "regex")) %>%
+  group_by(sentence_i, code) %>%
+  count() %>%
+  pivot_wider(names_from = code,
+              values_from = n,
+              values_fill = 0) %>%
+  rowwise() %>%
+  mutate(any_intel_agency = 
+           max(c_across(starts_with("intel_")))) %>%
+  select(-"NA")
+
+rr_sentences <- rr_sentences %>%
+  left_join(rr_mentions, by = "sentence_i")
 ```
 
+Now make a summary variable of the services mentioned.
+
+```{r}
+rr_sentences$mentioned_services <- rr_sentences %>%
+  select(starts_with("intel_")) %>%
+  handbag::binary_patterns_var(strip_prefix = "intel_")
+```
 
 Let's count them:
 
@@ -187,15 +191,20 @@ Does mentioning an intel agency (any of them) in a sentence make it more likely 
 
 ```{r message=FALSE}
 any_redact_tab <- rr_sentences %>%
-  group_by(mentioned_intel_agency) %>%
+  group_by(any_intel_agency) %>%
   summarise(perc_redacted = 100*mean(redacted)) %>%
-  mutate(mentioned_intel_agency = c("No intel service",
-                                    "One or more"))
+  mutate(any_intel_agency = c("None mentioned",
+                              "One or more"))
 
 any_redact_tab %>%
-  kable(col.names = c("Mentioned",
-                      "% of sentences redacted"),
-        digits = c(0,1))
+  ggplot(aes(x = any_intel_agency,
+             y = perc_redacted,
+             fill = any_intel_agency)) +
+    geom_col() +
+    labs(x = "Any intel agency mentioned",
+         y = "% sentences redacted") +
+    expand_limits(y = 100) +
+    theme(legend.position = "none")
 ```
 
 Yes. Sentences mentioning any service are `r round(with(any_redact_tab, perc_redacted[2] / perc_redacted[1]),1)` times more likely to contain a redaction.
@@ -203,14 +212,45 @@ Yes. Sentences mentioning any service are `r round(with(any_redact_tab, perc_red
 How about the various patterns of mention versus no mention?
 
 ```{r message=FALSE}
-rr_sentences %>%
-  group_by(mentioned_services) %>%
-  summarise(percentage_redacted = 100*mean(redacted)) %>%
-  arrange(desc(percentage_redacted)) %>%
-  kable(col.names = c("Mentioned services",
-                      "% of sentences redacted"),
-        digits = c(0,1))
+redacted_tab <- rr_sentences %>%
+  group_by(mentioned_services, redacted) %>%
+  summarise(n = n()) %>%
+  mutate(perc = 100*n/sum(n)) %>%
+  pivot_wider(names_from   = redacted,
+              values_from  = c(n,perc),
+              values_fill  = 0,
+              names_prefix = "redact_")
+
+redacted_tab %>%
+  select(-perc_redact_0) %>%
+  arrange(desc(perc_redact_1)) %>%
+  kable(col.names = c("", "Unredacted (n)",
+                      "Redacted (n)",
+                      "Redacted (%)"),
+        digits = 0)
 ```
+
+
+```{r message=FALSE}
+redacted_tab %>%
+  mutate(percentage_redacted = perc_redact_1) %>%
+  ggplot(aes(x = reorder(mentioned_services, percentage_redacted),
+             y = percentage_redacted,
+             fill = mentioned_services)) +
+    geom_col() + 
+    coord_flip() +
+    labs(x = "Services mentioned in sentence",
+         y = "% of sentences with a redaction",
+         title = "Predictors of redacted sentences") + 
+    expand_limits(y = 105) +
+    theme(legend.position = "none") +
+    geom_text(aes(label = round(percentage_redacted,0),
+                  y = percentage_redacted+1,
+                  hjust = 0))
+```
+
+(The winner there, GCHQ and GRU, is only one sentence!)
+
 
 ### Some text
 
@@ -221,7 +261,7 @@ rr_sentences %>%
 
 ```{r}
 rr_sentences %>%
-  filter(mentioned_intel_agency == 1 & redacted == 1) %>%
+  filter(any_intel_agency == 1 & redacted == 1) %>%
   mutate(nice_sentence = gsub(pattern = "\\*\\*\\*",
          replace = "\\*\\*\\*[redacted]\\*\\*\\*",
          x = sentence)
@@ -237,7 +277,7 @@ rr_sentences %>%
 
 ```{r}
 rr_sentences %>%
-  filter(mentioned_intel_agency == 1 & redacted == 0) %>%
+  filter(any_intel_agency == 1 & redacted == 0) %>%
   mutate(nice_sentence = gsub(pattern = "\\*\\*\\*",
          replace = "\\*\\*\\*[redacted]\\*\\*\\*",
          x = sentence)
@@ -255,7 +295,7 @@ rr_sentences %>%
 
 ```{r}
 rr_sentences %>%
-  filter(mentioned_intel_agency == 0 & redacted == 1) %>%
+  filter(any_intel_agency == 0 & redacted == 1) %>%
   mutate(nice_sentence = gsub(pattern = "\\*\\*\\*",
          replace = "\\*\\*\\*[redacted]\\*\\*\\*",
          x = sentence)
@@ -281,14 +321,13 @@ nrc_sentiments <- get_sentiments("nrc")
 
 ```{r}
 rr_sentiment <- rr_sentences %>%
-  mutate(sentence_i = 1:nrow(rr_sentences)) %>%
   unnest_tokens(word,
                 sentence, drop = F)
 
 rr_sentiment$word_i <- 1:nrow(rr_sentiment)
 
 rr_sentiment <- rr_sentiment %>%
-  left_join(nrc_sentiments, by = "word")
+  inner_join(nrc_sentiments, by = "word")
 ```
 
 Let's see which words appear by sentiment:
@@ -297,7 +336,6 @@ Let's see which words appear by sentiment:
 library(ggwordcloud)
 ```
 
-
 ```{r message=FALSE, warning=FALSE}
 makeWordCloud <- function(theSentiment) {
   rr_sentiment %>%
@@ -305,7 +343,7 @@ makeWordCloud <- function(theSentiment) {
     group_by(word) %>%
     summarise(n = n()) %>%
     mutate(prop = n/sum(n)) %>%
-    #filter(n >= 10) %>%
+    filter(n >= 5) %>%
     ggplot(aes(label = word, size = log1p(prop), col = log1p(n))) +
     scale_size_area(max_size = 12) +
     geom_text_wordcloud() +
@@ -320,32 +358,56 @@ allTheClouds
 
 
 
+I'm not entirely convinced by the words picked out for each of those sentiments - maybe anger, disgust, and sadness show something interesting.
 
+```{r}
+toView = c("anger", "disgust", "sadness")
+```
 
+First glue the word-level analysis back to the sentences.
 
-
-
-
-
-
-### Back to sentences
+I just want to know if a sentiment has been expressed at least once per sentence (the `b` below is for Boolean).
 
 ```{r}
 sentiment_counts <- rr_sentiment %>%
   group_by(sentence_i, sentiment) %>%
   summarise(n = n()) %>%
-  mutate(b = as.numeric(n > 0)) %>%
-  pivot_wider(names_from = sentiment,
-              values_from = c(n, b),
-              values_fill = 0)
+  mutate(b = as.numeric(n > 0))
 
 sentiment_counts <- rr_sentences %>%
-  mutate(sentence_i = 1:nrow(rr_sentences)) %>%
-  left_join(sentiment_counts, by = "sentence_i")
-sentiment_counts 
+  inner_join(sentiment_counts, by = "sentence_i")
 ```
 
+Plot by page as a proportion of words which have a sentiment coded.
 
+```{r fig.height=3, fig.width=6}
+emo_by_page <- sentiment_counts %>%
+  group_by(page, sentiment) %>%
+  filter(sentiment != "NA") %>%
+  summarise(n = n()) %>%
+  mutate(p = n/sum(n))
+
+emo_by_page %>%
+  filter(sentiment %in% toView) %>%
+  ggplot(aes(x = page, y = n, color = sentiment)) +
+    geom_line() +
+    labs(x = "Page", y = "Count")
+```
+
+Looks like a spike for "anger" there on PDF [page 18](https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=18).
+
+```{r}
+emo_by_page %>%
+  filter (n > 10 & sentiment %in% toView) %>%
+  kable(col.names = c("Page", "Sentiment", "N", "Proportion"))
+```
+
+```{r}
+sentiment_counts %>%
+  filter(page == 18 & sentiment %in% toView) %>%
+  select(sentiment, sentence) %>%
+  kable()
+```
 
 
 
@@ -365,7 +427,7 @@ rr_sentiment %>%
   mutate(prop = n/sum(n)) %>%
   filter(prop > .002) %>%
   ggplot(aes(label = word, size = log1p(prop), color = redacted)) +
-    scale_size_area(max_size = 13) +
+    scale_size_area(max_size = 11) +
     geom_text_wordcloud() +
     theme_minimal() + 
     facet_grid(cols = vars(redacted))
@@ -387,9 +449,10 @@ rr_sentiment %>%
   mutate(prop = n/sum(n)) %>%
   filter(prop > .005 & !(word %in% excluded_words)) %>%
   ggplot(aes(label = word, size = log1p(prop), color = redacted)) +
-    scale_size_area(max_size = 10) +
+    scale_size_area(max_size = 9) +
     geom_text_wordcloud() +
     theme_minimal() + 
     facet_grid(cols = vars(redacted),
                rows = vars(mentioned_services))
 ```
+
