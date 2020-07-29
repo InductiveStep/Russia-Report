@@ -297,6 +297,7 @@ viewSentences <- function(the_sentences) {
            x = sentence)
     ) %>%
     select(page, mentioned_services, nice_sentence) %>%
+    arrange(mentioned_services) %>%
     kable(col.names = c("Page", "Services", "Sentence"))
 }
 ```

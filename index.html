@@ -1379,6 +1379,7 @@ redacted_tab %&gt;%
            x = sentence)
     ) %&gt;%
     select(page, mentioned_services, nice_sentence) %&gt;%
+    arrange(mentioned_services) %&gt;%
     kable(col.names = c(&quot;Page&quot;, &quot;Services&quot;, &quot;Sentence&quot;))
 }</code></pre>
 <p><strong>Note be careful interpreting the numbers - they’re mostly superscript citations!</strong></p>
@@ -1402,49 +1403,9 @@ redacted_tab %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">12</td>
-<td align="left">NCSC</td>
-<td align="left">5 The National Cyber Security Centre (NCSC) has advised that there is <strong><em>[redacted]</em></strong> Russian cyber intrusion into the UK’s CNI – particularly marked in the <strong><em>[redacted]</em></strong> sectors.</td>
-</tr>
-<tr class="even">
-<td align="right">12</td>
-<td align="left">GCHQ, FCO &amp; GRU</td>
-<td align="left">• GCHQ has also advised that Russian GRU 6 actors have orchestrated phishing 7 attempts against Government departments – to take one example, there were attempts against <strong><em>[redacted]</em></strong>, 8 the Foreign and Commonwealth Office (FCO) and the Defence Science and Technology Laboratory (DSTL) during the early stages of the investigation into the Salisbury attacks.</td>
-</tr>
-<tr class="odd">
-<td align="right">12</td>
-<td align="left">GCHQ</td>
-<td align="left">10 GCHQ told the Committee that there is “a quite considerable balance of intelligence now which shows the links between serious and organised crime groups and Russian state activity” and that “we’ve seen more evidence of <strong><em>[redacted]</em></strong> serious and organised crime <strong><em>[redacted]</em></strong> being connected at high levels of Russian state and Russian intelligence”, in what it described as a “symbiotic relationship”.</td>
-</tr>
-<tr class="even">
-<td align="right">12</td>
-<td align="left">ISC &amp; GCHQ</td>
-<td align="left">8 <strong><em>[redacted]</em></strong> 9 GCHQ, Quarterly Report to the ISC, July–September 2018.</td>
-</tr>
-<tr class="odd">
-<td align="right">12</td>
-<td align="left">MI6</td>
-<td align="left">10 Oral evidence – SIS, <strong><em>[redacted]</em></strong> February 2019.</td>
-</tr>
-<tr class="even">
-<td align="right">12</td>
-<td align="left">GCHQ</td>
-<td align="left">11 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
-</tr>
-<tr class="odd">
-<td align="right">13</td>
-<td align="left">NSS</td>
-<td align="left">When attacks can be traced back – and we accept 12 Oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
-</tr>
-<tr class="even">
-<td align="right">14</td>
-<td align="left">GCHQ</td>
-<td align="left"><strong><em>[redacted]</em></strong> – GCHQ acknowledged that <strong><em>[redacted]</em></strong> it would have to broaden its recruitment base, with a shift towards recruiting on aptitude rather than on pre-existing skills.</td>
-</tr>
-<tr class="odd">
-<td align="right">14</td>
-<td align="left">GCHQ</td>
-<td align="left">17 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">With that said, we note that – as with so many other issues currently – it is the social media companies which hold the key and yet are failing to play their part; DCMS informed us that <strong><em>[redacted]</em></strong>.</td>
 </tr>
 <tr class="even">
 <td align="right">14</td>
@@ -1452,89 +1413,9 @@ redacted_tab %&gt;%
 <td align="left">18 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> February 2019.</td>
 </tr>
 <tr class="odd">
-<td align="right">17</td>
-<td align="left">GCHQ</td>
-<td align="left">31 Nonetheless, GCHQ informed us that “<strong><em>[redacted]</em></strong>”, 32 and the Deputy National Security Adviser noted that “there is a lot of work going on [in relation to electoral mechanics] to map the end-to-end processes … <strong><em>[redacted]</em></strong> and to make sure where we can we are mitigating the risks there”.</td>
-</tr>
-<tr class="even">
-<td align="right">17</td>
-<td align="left">JIC</td>
-<td align="left">33 This was reflected in the Joint Intelligence Committee (JIC) judgement in May 2017 that “the UK paper-based voting process is protected from cyber operations but <strong><em>[redacted]</em></strong>”.</td>
-</tr>
-<tr class="odd">
-<td align="right">17</td>
-<td align="left">GCHQ &amp; NSS</td>
-<td align="left">31 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018; oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
-</tr>
-<tr class="even">
-<td align="right">17</td>
-<td align="left">GCHQ</td>
-<td align="left">32 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
-</tr>
-<tr class="odd">
-<td align="right">17</td>
-<td align="left">NSS</td>
-<td align="left">33 Oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
-</tr>
-<tr class="even">
-<td align="right">18</td>
-<td align="left">DCMS</td>
-<td align="left">With that said, we note that – as with so many other issues currently – it is the social media companies which hold the key and yet are failing to play their part; DCMS informed us that <strong><em>[redacted]</em></strong>.</td>
-</tr>
-<tr class="odd">
-<td align="right">18</td>
-<td align="left">MI5</td>
-<td align="left">This matter is, in our 38 Section 1(2), Security Service Act 1989; MI5 has informed us that it currently has a role to (i) “investigate leads to any of this sort of clandestine activity by foreign states”; (ii) “translate [the] intelligence picture into protective advice to defend our systems”; and (iii) “provide assessed intelligence reporting into the policy system to assist in policy formulation” (oral evidence – MI5, <strong><em>[redacted]</em></strong> December 2018).</td>
-</tr>
-<tr class="even">
-<td align="right">20</td>
-<td align="left">JIC</td>
-<td align="left">In May 2017, the Joint Intelligence Committee (JIC) concluded that “<strong><em>[redacted]</em></strong>” and that “<strong><em>[redacted]</em></strong>”.</td>
-</tr>
-<tr class="odd">
-<td align="right">20</td>
-<td align="left">GCHQ</td>
-<td align="left">45 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018 <strong><em>[redacted]</em></strong>.</td>
-</tr>
-<tr class="even">
-<td align="right">20</td>
-<td align="left">JIC</td>
-<td align="left">46 <strong><em>[redacted]</em></strong> 47 <strong><em>[redacted]</em></strong> 48 JIC Key Judgement, <strong><em>[redacted]</em></strong>, 26 May 2017. 49 <strong><em>[redacted]</em></strong> (written evidence – HMG, 29 June 2018).</td>
-</tr>
-<tr class="odd">
-<td align="right">24</td>
-<td align="left">MI5</td>
-<td align="left">We welcomed this process, but questioned whether the Intelligence Community has a clear picture of how many Russians there are in the UK who are at risk – for example, would MI5 or any other relevant agency <strong><em>[redacted]</em></strong>?</td>
-</tr>
-<tr class="even">
-<td align="right">27</td>
-<td align="left">MI6</td>
-<td align="left">Areas of intelligence coverage work that SIS undertakes in relation to Russia include cultivating agents who are in a position to pass on secret information, particularly in relation to the capabilities and intent of the Russian government, and its intelligence effects work includes <strong><em>[redacted]</em></strong>.</td>
-</tr>
-<tr class="odd">
-<td align="right">27</td>
-<td align="left">MI6</td>
-<td align="left">In 2001, SIS’s operational effort against Russia was <strong><em>[redacted]</em></strong>%.</td>
-</tr>
-<tr class="even">
-<td align="right">27</td>
-<td align="left">MI5</td>
-<td align="left">76 Written evidence – MI5, 12 March 2019; MI5’s overall resource has increased significantly over this period. <strong><em>[redacted]</em></strong> allocation of effort on Hostile State Activity has <strong><em>[redacted]</em></strong>, spending on Hostile State Activity has <strong><em>[redacted]</em></strong>.</td>
-</tr>
-<tr class="odd">
-<td align="right">28</td>
-<td align="left">GCHQ</td>
-<td align="left">81 Approximately <strong><em>[redacted]</em></strong>% of GCHQ’s current operational effort is on Russia.</td>
-</tr>
-<tr class="even">
 <td align="right">28</td>
 <td align="left">DI</td>
 <td align="left">Defence Intelligence has advised that currently <strong><em>[redacted]</em></strong> of its All Source analysts spend more than 50% of their time on Russia and a further <strong><em>[redacted]</em></strong> spend less than 50% of their time on Russia.</td>
-</tr>
-<tr class="odd">
-<td align="right">28</td>
-<td align="left">GCHQ</td>
-<td align="left">This is understandable: the 80 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
 <tr class="even">
 <td align="right">28</td>
@@ -1543,48 +1424,8 @@ redacted_tab %&gt;%
 </tr>
 <tr class="odd">
 <td align="right">29</td>
-<td align="left">MI5</td>
-<td align="left">87 Oral evidence – MI5, <strong><em>[redacted]</em></strong> December 2018.</td>
-</tr>
-<tr class="even">
-<td align="right">29</td>
 <td align="left">DI</td>
 <td align="left">88 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
-</tr>
-<tr class="odd">
-<td align="right">29</td>
-<td align="left">MI6</td>
-<td align="left">89 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
-</tr>
-<tr class="even">
-<td align="right">29</td>
-<td align="left">GCHQ</td>
-<td align="left">90 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018.</td>
-</tr>
-<tr class="odd">
-<td align="right">30</td>
-<td align="left">GCHQ &amp; MI6</td>
-<td align="left">SIS and GCHQ planned to change their operational effort against Russia still further – to <strong><em>[redacted]</em></strong>% and <strong><em>[redacted]</em></strong>% respectively by 2020.</td>
-</tr>
-<tr class="even">
-<td align="right">30</td>
-<td align="left">MI5</td>
-<td align="left">92 MI5 is <strong><em>[redacted]</em></strong> and seeking to <strong><em>[redacted]</em></strong> on Hostile State Activity.</td>
-</tr>
-<tr class="odd">
-<td align="right">30</td>
-<td align="left">MI5</td>
-<td align="left">For example, MI5 told us that: We quite frequently find ourselves quarter on quarter taking <strong><em>[redacted]</em></strong> decisions about … how we will <strong><em>[redacted]</em></strong> across these different subject areas and at the moment we have stuck with some of the resourcing that’s surged towards hostile state work after Salisbury, despite the fact that our CT [Counter-Terrorism] investigations suspensions rate remains higher than we want it to be.</td>
-</tr>
-<tr class="even">
-<td align="right">30</td>
-<td align="left">MI5</td>
-<td align="left">93 Oral evidence – MI5, <strong><em>[redacted]</em></strong> November 2018.</td>
-</tr>
-<tr class="odd">
-<td align="right">32</td>
-<td align="left">GCHQ, MI5 &amp; MI6</td>
-<td align="left">However, it is clear that Russia is a high ministerial priority: the Home Secretary has informed us that he meets the Director-General of MI5 “at least once a week, sometimes more, and … in … <strong><em>[redacted]</em></strong> … there has been some discussion around Russia”, 98 and, when asked about how much he speaks to the Chief of SIS and the Director of GCHQ about Russia, the Foreign Secretary replied “<strong><em>[redacted]</em></strong>”, 99 explaining his concern that Russia-related problems – whilst serious – risk crowding out broader global issues.</td>
 </tr>
 <tr class="even">
 <td align="right">33</td>
@@ -1612,49 +1453,9 @@ redacted_tab %&gt;%
 <td align="left">105 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> January 2019.</td>
 </tr>
 <tr class="odd">
-<td align="right">34</td>
-<td align="left">MI6</td>
-<td align="left">106 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
-</tr>
-<tr class="even">
-<td align="right">37</td>
-<td align="left">GCHQ</td>
-<td align="left">increasing privacy protection – including ubiquitous encryption – presents particular problems for GCHQ, and in the case of Russia it faces a real SIGINT challenge with the use by the Russian government of <strong><em>[redacted]</em></strong>.</td>
-</tr>
-<tr class="odd">
 <td align="right">37</td>
 <td align="left">DI</td>
 <td align="left">The Agencies and Defence Intelligence must therefore be particularly discerning <strong><em>[redacted]</em></strong>.</td>
-</tr>
-<tr class="even">
-<td align="right">37</td>
-<td align="left">MI6</td>
-<td align="left">111 Whilst there are a <strong><em>[redacted]</em></strong> group of staff working on this issue, SIS was clear that a sudden surge in numbers would not yield results more quickly.</td>
-</tr>
-<tr class="odd">
-<td align="right">37</td>
-<td align="left">GCHQ</td>
-<td align="left">108 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018.</td>
-</tr>
-<tr class="even">
-<td align="right">37</td>
-<td align="left">MI5</td>
-<td align="left">109 Oral evidence – MI5, <strong><em>[redacted]</em></strong> November 2018.</td>
-</tr>
-<tr class="odd">
-<td align="right">37</td>
-<td align="left">MI6</td>
-<td align="left">111 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
-</tr>
-<tr class="even">
-<td align="right">37</td>
-<td align="left">MI6</td>
-<td align="left">112 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018; we note that SIS <strong><em>[redacted]</em></strong> and has a “series of protections” around the people who do go into the team.</td>
-</tr>
-<tr class="odd">
-<td align="right">38</td>
-<td align="left">GCHQ</td>
-<td align="left">116 In relation to SIGINT, GCHQ has focused on not only deploying a broad range of capabilities against Russia, but in joining up with others to use their capabilities in tandem, allowing them to <strong><em>[redacted]</em></strong>.</td>
 </tr>
 <tr class="even">
 <td align="right">38</td>
@@ -1663,33 +1464,193 @@ redacted_tab %&gt;%
 </tr>
 <tr class="odd">
 <td align="right">38</td>
-<td align="left">GCHQ &amp; MI6</td>
-<td align="left">For example, SIS usually deploys only <strong><em>[redacted]</em></strong> of its overall operational Russia effort in support of <strong><em>[redacted]</em></strong>, whilst GCHQ uses approximately <strong><em>[redacted]</em></strong>.</td>
-</tr>
-<tr class="even">
-<td align="right">38</td>
-<td align="left">DI &amp; GCHQ</td>
-<td align="left">120 This raises the question of whether return now to a ‘normal’, relatively low, level of <strong><em>[redacted]</em></strong> effort against Russia would undermine this, or whether it would now be more 113 GCHQ and Defence Intelligence staff working on Russia are UK based.</td>
-</tr>
-<tr class="odd">
-<td align="right">38</td>
-<td align="left">MI6</td>
-<td align="left">114 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
-</tr>
-<tr class="even">
-<td align="right">38</td>
 <td align="left">DI</td>
 <td align="left">115 <strong><em>[redacted]</em></strong> 116 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">38</td>
 <td align="left">DI</td>
 <td align="left">117 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
+<tr class="odd">
+<td align="right">44</td>
+<td align="left">DI</td>
+<td align="left">The Agencies and Defence Intelligence are increasingly working with <strong><em>[redacted]</em></strong> on the Russian threat.</td>
+</tr>
+<tr class="even">
+<td align="right">45</td>
+<td align="left">DI</td>
+<td align="left">147 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> January 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="left">DI &amp; GCHQ</td>
+<td align="left">120 This raises the question of whether return now to a ‘normal’, relatively low, level of <strong><em>[redacted]</em></strong> effort against Russia would undermine this, or whether it would now be more 113 GCHQ and Defence Intelligence staff working on Russia are UK based.</td>
+</tr>
+<tr class="even">
+<td align="right">45</td>
+<td align="left">DI &amp; NATO</td>
+<td align="left">Defence Intelligence also observed that the impact of the Salisbury attack on the NATO intelligence community had “been significant in terms of bolstering individuals”, noting that <strong><em>[redacted]</em></strong> (oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> February 2019).</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="left">GCHQ</td>
+<td align="left">10 GCHQ told the Committee that there is “a quite considerable balance of intelligence now which shows the links between serious and organised crime groups and Russian state activity” and that “we’ve seen more evidence of <strong><em>[redacted]</em></strong> serious and organised crime <strong><em>[redacted]</em></strong> being connected at high levels of Russian state and Russian intelligence”, in what it described as a “symbiotic relationship”.</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="left">GCHQ</td>
+<td align="left">11 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">14</td>
+<td align="left">GCHQ</td>
+<td align="left"><strong><em>[redacted]</em></strong> – GCHQ acknowledged that <strong><em>[redacted]</em></strong> it would have to broaden its recruitment base, with a shift towards recruiting on aptitude rather than on pre-existing skills.</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="left">GCHQ</td>
+<td align="left">17 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="left">GCHQ</td>
+<td align="left">31 Nonetheless, GCHQ informed us that “<strong><em>[redacted]</em></strong>”, 32 and the Deputy National Security Adviser noted that “there is a lot of work going on [in relation to electoral mechanics] to map the end-to-end processes … <strong><em>[redacted]</em></strong> and to make sure where we can we are mitigating the risks there”.</td>
+</tr>
+<tr class="even">
+<td align="right">17</td>
+<td align="left">GCHQ</td>
+<td align="left">32 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="left">GCHQ</td>
+<td align="left">45 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018 <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="left">GCHQ</td>
+<td align="left">81 Approximately <strong><em>[redacted]</em></strong>% of GCHQ’s current operational effort is on Russia.</td>
+</tr>
+<tr class="odd">
+<td align="right">28</td>
+<td align="left">GCHQ</td>
+<td align="left">This is understandable: the 80 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="even">
+<td align="right">29</td>
+<td align="left">GCHQ</td>
+<td align="left">90 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">37</td>
+<td align="left">GCHQ</td>
+<td align="left">increasing privacy protection – including ubiquitous encryption – presents particular problems for GCHQ, and in the case of Russia it faces a real SIGINT challenge with the use by the Russian government of <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">37</td>
+<td align="left">GCHQ</td>
+<td align="left">108 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="left">GCHQ</td>
+<td align="left">116 In relation to SIGINT, GCHQ has focused on not only deploying a broad range of capabilities against Russia, but in joining up with others to use their capabilities in tandem, allowing them to <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">43</td>
+<td align="left">GCHQ</td>
+<td align="left">143 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">30</td>
+<td align="left">GCHQ &amp; MI6</td>
+<td align="left">SIS and GCHQ planned to change their operational effort against Russia still further – to <strong><em>[redacted]</em></strong>% and <strong><em>[redacted]</em></strong>% respectively by 2020.</td>
+</tr>
 <tr class="even">
 <td align="right">38</td>
 <td align="left">GCHQ &amp; MI6</td>
+<td align="left">For example, SIS usually deploys only <strong><em>[redacted]</em></strong> of its overall operational Russia effort in support of <strong><em>[redacted]</em></strong>, whilst GCHQ uses approximately <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="left">GCHQ &amp; MI6</td>
 <td align="left">118 Oral evidence – SIS and GCHQ, <strong><em>[redacted]</em></strong> January 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">17</td>
+<td align="left">GCHQ &amp; NSS</td>
+<td align="left">31 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018; oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="left">GCHQ, FCO &amp; GRU</td>
+<td align="left">• GCHQ has also advised that Russian GRU 6 actors have orchestrated phishing 7 attempts against Government departments – to take one example, there were attempts against <strong><em>[redacted]</em></strong>, 8 the Foreign and Commonwealth Office (FCO) and the Defence Science and Technology Laboratory (DSTL) during the early stages of the investigation into the Salisbury attacks.</td>
+</tr>
+<tr class="even">
+<td align="right">32</td>
+<td align="left">GCHQ, MI5 &amp; MI6</td>
+<td align="left">However, it is clear that Russia is a high ministerial priority: the Home Secretary has informed us that he meets the Director-General of MI5 “at least once a week, sometimes more, and … in … <strong><em>[redacted]</em></strong> … there has been some discussion around Russia”, 98 and, when asked about how much he speaks to the Chief of SIS and the Director of GCHQ about Russia, the Foreign Secretary replied “<strong><em>[redacted]</em></strong>”, 99 explaining his concern that Russia-related problems – whilst serious – risk crowding out broader global issues.</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="left">ISC &amp; GCHQ</td>
+<td align="left">8 <strong><em>[redacted]</em></strong> 9 GCHQ, Quarterly Report to the ISC, July–September 2018.</td>
+</tr>
+<tr class="even">
+<td align="right">17</td>
+<td align="left">JIC</td>
+<td align="left">33 This was reflected in the Joint Intelligence Committee (JIC) judgement in May 2017 that “the UK paper-based voting process is protected from cyber operations but <strong><em>[redacted]</em></strong>”.</td>
+</tr>
+<tr class="odd">
+<td align="right">20</td>
+<td align="left">JIC</td>
+<td align="left">In May 2017, the Joint Intelligence Committee (JIC) concluded that “<strong><em>[redacted]</em></strong>” and that “<strong><em>[redacted]</em></strong>”.</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="left">JIC</td>
+<td align="left">46 <strong><em>[redacted]</em></strong> 47 <strong><em>[redacted]</em></strong> 48 JIC Key Judgement, <strong><em>[redacted]</em></strong>, 26 May 2017. 49 <strong><em>[redacted]</em></strong> (written evidence – HMG, 29 June 2018).</td>
+</tr>
+<tr class="odd">
+<td align="right">18</td>
+<td align="left">MI5</td>
+<td align="left">This matter is, in our 38 Section 1(2), Security Service Act 1989; MI5 has informed us that it currently has a role to (i) “investigate leads to any of this sort of clandestine activity by foreign states”; (ii) “translate [the] intelligence picture into protective advice to defend our systems”; and (iii) “provide assessed intelligence reporting into the policy system to assist in policy formulation” (oral evidence – MI5, <strong><em>[redacted]</em></strong> December 2018).</td>
+</tr>
+<tr class="even">
+<td align="right">24</td>
+<td align="left">MI5</td>
+<td align="left">We welcomed this process, but questioned whether the Intelligence Community has a clear picture of how many Russians there are in the UK who are at risk – for example, would MI5 or any other relevant agency <strong><em>[redacted]</em></strong>?</td>
+</tr>
+<tr class="odd">
+<td align="right">27</td>
+<td align="left">MI5</td>
+<td align="left">76 Written evidence – MI5, 12 March 2019; MI5’s overall resource has increased significantly over this period. <strong><em>[redacted]</em></strong> allocation of effort on Hostile State Activity has <strong><em>[redacted]</em></strong>, spending on Hostile State Activity has <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="even">
+<td align="right">29</td>
+<td align="left">MI5</td>
+<td align="left">87 Oral evidence – MI5, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">30</td>
+<td align="left">MI5</td>
+<td align="left">92 MI5 is <strong><em>[redacted]</em></strong> and seeking to <strong><em>[redacted]</em></strong> on Hostile State Activity.</td>
+</tr>
+<tr class="even">
+<td align="right">30</td>
+<td align="left">MI5</td>
+<td align="left">For example, MI5 told us that: We quite frequently find ourselves quarter on quarter taking <strong><em>[redacted]</em></strong> decisions about … how we will <strong><em>[redacted]</em></strong> across these different subject areas and at the moment we have stuck with some of the resourcing that’s surged towards hostile state work after Salisbury, despite the fact that our CT [Counter-Terrorism] investigations suspensions rate remains higher than we want it to be.</td>
+</tr>
+<tr class="odd">
+<td align="right">30</td>
+<td align="left">MI5</td>
+<td align="left">93 Oral evidence – MI5, <strong><em>[redacted]</em></strong> November 2018.</td>
+</tr>
+<tr class="even">
+<td align="right">37</td>
+<td align="left">MI5</td>
+<td align="left">109 Oral evidence – MI5, <strong><em>[redacted]</em></strong> November 2018.</td>
 </tr>
 <tr class="odd">
 <td align="right">40</td>
@@ -1707,19 +1668,49 @@ redacted_tab %&gt;%
 <td align="left">128 Oral evidence – MI5, <strong><em>[redacted]</em></strong> January 2019.</td>
 </tr>
 <tr class="even">
-<td align="right">43</td>
-<td align="left">GCHQ</td>
-<td align="left">143 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
+<td align="right">12</td>
+<td align="left">MI6</td>
+<td align="left">10 Oral evidence – SIS, <strong><em>[redacted]</em></strong> February 2019.</td>
 </tr>
 <tr class="odd">
-<td align="right">44</td>
-<td align="left">DI</td>
-<td align="left">The Agencies and Defence Intelligence are increasingly working with <strong><em>[redacted]</em></strong> on the Russian threat.</td>
+<td align="right">27</td>
+<td align="left">MI6</td>
+<td align="left">Areas of intelligence coverage work that SIS undertakes in relation to Russia include cultivating agents who are in a position to pass on secret information, particularly in relation to the capabilities and intent of the Russian government, and its intelligence effects work includes <strong><em>[redacted]</em></strong>.</td>
 </tr>
 <tr class="even">
-<td align="right">45</td>
-<td align="left">DI</td>
-<td align="left">147 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> January 2019.</td>
+<td align="right">27</td>
+<td align="left">MI6</td>
+<td align="left">In 2001, SIS’s operational effort against Russia was <strong><em>[redacted]</em></strong>%.</td>
+</tr>
+<tr class="odd">
+<td align="right">29</td>
+<td align="left">MI6</td>
+<td align="left">89 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="even">
+<td align="right">34</td>
+<td align="left">MI6</td>
+<td align="left">106 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">37</td>
+<td align="left">MI6</td>
+<td align="left">111 Whilst there are a <strong><em>[redacted]</em></strong> group of staff working on this issue, SIS was clear that a sudden surge in numbers would not yield results more quickly.</td>
+</tr>
+<tr class="even">
+<td align="right">37</td>
+<td align="left">MI6</td>
+<td align="left">111 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">37</td>
+<td align="left">MI6</td>
+<td align="left">112 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018; we note that SIS <strong><em>[redacted]</em></strong> and has a “series of protections” around the people who do go into the team.</td>
+</tr>
+<tr class="even">
+<td align="right">38</td>
+<td align="left">MI6</td>
+<td align="left">114 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
 <tr class="odd">
 <td align="right">45</td>
@@ -1727,9 +1718,19 @@ redacted_tab %&gt;%
 <td align="left">150 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
 <tr class="even">
-<td align="right">45</td>
-<td align="left">DI &amp; NATO</td>
-<td align="left">Defence Intelligence also observed that the impact of the Salisbury attack on the NATO intelligence community had “been significant in terms of bolstering individuals”, noting that <strong><em>[redacted]</em></strong> (oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> February 2019).</td>
+<td align="right">12</td>
+<td align="left">NCSC</td>
+<td align="left">5 The National Cyber Security Centre (NCSC) has advised that there is <strong><em>[redacted]</em></strong> Russian cyber intrusion into the UK’s CNI – particularly marked in the <strong><em>[redacted]</em></strong> sectors.</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="left">NSS</td>
+<td align="left">When attacks can be traced back – and we accept 12 Oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">17</td>
+<td align="left">NSS</td>
+<td align="left">33 Oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
 </tr>
 </tbody>
 </table>
@@ -1754,99 +1755,259 @@ redacted_tab %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">4</td>
-<td align="left">ISC</td>
-<td align="left">Keith Simpson MP The Intelligence and Security Committee of Parliament (ISC) is a statutory committee of Parliament that has responsibility for oversight of the UK Intelligence Community.</td>
-</tr>
-<tr class="even">
-<td align="right">4</td>
-<td align="left">DI, GCHQ, MI5, MI6, NSS &amp; OSCT</td>
-<td align="left">The Committee oversees the intelligence and security activities of the UK Intelligence Community, including the policies, expenditure, administration and operations of MI5 (the Security Service), MI6 (the Secret Intelligence Service or SIS) and GCHQ (the Government Communications Headquarters)* and the work of the Joint Intelligence Organisation (JIO) and the National Security Secretariat (NSS) in the Cabinet Office; Defence Intelligence (DI) in the Ministry of Defence; and the Office for Security and Counter-Terrorism (OSCT) in the Home Office.</td>
-</tr>
-<tr class="odd">
-<td align="right">6</td>
-<td align="left">DI</td>
-<td align="left">5 A sophisticated player ……………………………………………………………………………………………5 Leading the response ……………………………………………………………………………………………..6 Attribution: a new approach ……………………………………………………………………………………6 HMG as a player: Offensive Cyber………………………………………………………………………….7 International actions ………………………………………………………………………………………………7 DISINFORMATION AND INFLUENCE ……………………………………………………………..</td>
-</tr>
-<tr class="even">
-<td align="right">6</td>
-<td align="left">DI</td>
-<td align="left">19 Coverage ……………………………………………………………………………………………………………19 Did HMG take its eye off the ball? ………………………………………………………………………..21 Future resourcing ………………………………………………………………………………………………..23 STRATEGY, CO-ORDINATION AND TASKING ……………………………………………..</td>
-</tr>
-<tr class="odd">
-<td align="right">8</td>
-<td align="left">UN</td>
-<td align="left">The strengths which Russia retains are largely its inheritances from the USSR and its status as a victor of the Second World War: nuclear weapons, a space presence and a permanent seat on the UN Security Council.</td>
-</tr>
-<tr class="even">
-<td align="right">8</td>
-<td align="left">NATO</td>
-<td align="left">It is also seemingly fed by paranoia, believing that Western institutions such as NATO and the EU have a far more aggressive posture towards it than they do in reality.</td>
-</tr>
-<tr class="odd">
-<td align="right">8</td>
-<td align="left">NATO</td>
-<td align="left">It appears that Russia considers the UK one of its top Western intelligence targets: while we may not experience the level and type of threat that countries on Russia’s borders suffer, witnesses have suggested that we would sit just behind the US and NATO in any 1</td>
-</tr>
-<tr class="even">
-<td align="right">9</td>
-<td align="left">NATO</td>
-<td align="left">This perception will have been reinforced by the UK’s firm stance recently in response to Russian aggression: following the UK-led international response to the Salisbury attack – which saw an unprecedented 153 Russian intelligence officers and diplomats expelled from 29 countries and NATO – it appears to the Committee that Putin considers the UK to be a key diplomatic adversary.</td>
-</tr>
-<tr class="odd">
-<td align="right">9</td>
-<td align="left">DI</td>
-<td align="left">We have been told, repeatedly, that the Russian Intelligence Services will analyse whatever we put in the public domain and therefore, on this subject more than any other, the potential to damage the capabilities of the intelligence and security Agencies and Defence Intelligence was both real and significant.</td>
-</tr>
-<tr class="even">
-<td align="right">9</td>
-<td align="left">DI</td>
-<td align="left">The Report covers aspects of the Russian threat to the UK (Cyber; Disinformation and Influence; and Russian Expatriates) followed by an examination of how the UK Government – in particular the Agencies and Defence Intelligence – has responded (Allocation of Effort; Strategy, Co-ordination and Tasking; A Hard Target; Legislation; International Partnerships; and Engagement with Russia).</td>
-</tr>
-<tr class="odd">
-<td align="right">9</td>
-<td align="left">DI, GCHQ, MI5, MI6, NSS &amp; OSCT</td>
-<td align="left">2 Throughout this report the term ‘Intelligence Community’ is used to refer to the seven organisations that the Committee oversees: the intelligence and security Agencies (MI5, SIS and GCHQ); Defence Intelligence in the Ministry of Defence; the Office for Security and Counter-Terrorism (OSCT) in the Home Office; and the National Security Secretariat (NSS) and Joint Intelligence Organisation (JIO) in the Cabinet Office.</td>
-</tr>
-<tr class="even">
-<td align="right">12</td>
-<td align="left">GCHQ</td>
-<td align="left">GCHQ assesses that Russia is a highly capable cyber actor with a proven capability to carry out operations which can deliver a range of impacts across any sector: • Since 2014, Russia has carried out malicious cyber activity in order to assert itself aggressively in a number of spheres, including attempting to influence the democratic elections of other countries – for example, it has been widely reported that the Russians were behind the cyber-enabled ‘hack and leak’ operation to compromise the accounts of members of the French political party En Marche!</td>
-</tr>
-<tr class="odd">
-<td align="right">12</td>
-<td align="left">MI6</td>
-<td align="left">Russia has sought to employ organised crime groups to supplement its cyber skills: SIS has observed that “this comes to the very muddy nexus between business and corruption and state power in Russia”.</td>
-</tr>
-<tr class="even">
-<td align="right">12</td>
-<td align="left">GRU</td>
-<td align="left">6 The GRU is the Main Intelligence Directorate of the General Staff of the Russian Armed Forces.</td>
-</tr>
-<tr class="odd">
-<td align="right">13</td>
-<td align="left">GCHQ &amp; NCSC</td>
-<td align="left">The NCSC – part of GCHQ – leads on protecting the UK from cyber attack and, as the authority on the UK’s cyber security environment, sharing knowledge and addressing systemic vulnerabilities.</td>
-</tr>
-<tr class="even">
-<td align="right">13</td>
-<td align="left">NCSC</td>
-<td align="left">Accountability is an issue in particular – whilst the Foreign Secretary has responsibility for the NCSC, which is responsible for incident response, the Home Secretary leads on the response to major cyber incidents.</td>
-</tr>
-<tr class="odd">
 <td align="right">13</td>
 <td align="left">DCMS</td>
 <td align="left">Indeed, there are a number of other Ministers with some form of responsibility for cyber – the Defence Secretary has overall responsibility for Offensive Cyber as a ‘warfighting tool’ and for the National Offensive Cyber Programme, while the Secretary of State for the Department for Digital, Culture, Media and Sport (DCMS) leads on digital matters, with the Chancellor of the Duchy of Lancaster being responsible for the National Cyber Security Strategy and the National Cyber Security Programme.</td>
 </tr>
 <tr class="even">
-<td align="right">13</td>
-<td align="left">GRU</td>
-<td align="left">This new approach was indicated first by the response to the November 2017 WannaCry attack (with a statement by Foreign Office Minister Lord Ahmad condemning the attack) and the subsequent response to the February 2018 NotPetya attack, then more recently when the Foreign Secretary took the step, on 3 October 2018, of announcing publicly that the UK and its allies had identified a campaign by the GRU of indiscriminate and reckless cyber attacks targeting public institutions, businesses, media and sport 14 – including attribution of the attempted hacking of the Organisation for the Prohibition of Chemical Weapons (OPCW) in the Hague.</td>
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">They informed us that the Department for Digital, Culture, Media and Sport (DCMS) holds primary responsibility for disinformation campaigns, and that the Electoral Commission has responsibility for the overall security of democratic processes.</td>
 </tr>
 <tr class="odd">
-<td align="right">13</td>
-<td align="left">NCSC</td>
-<td align="left">14 NCSC, Reckless campaign of cyber attacks by Russian military intelligence service exposed, 3 October 2018, (www.ncsc.gov.uk/news/reckless-campaign-cyber-attacks-russian-military-intelligence-service- exposed).</td>
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">However, DCMS told us that its function is largely confined to the broad HMG policy regarding the use of disinformation rather than an assessment of, or operations against, hostile state campaigns.</td>
+</tr>
+<tr class="even">
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">And without seeking in any way to imply that DCMS is not capable, or that the Electoral Commission is not a staunch defender of democracy, it is a question of scale and access.</td>
+</tr>
+<tr class="odd">
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">DCMS is a small Whitehall policy department and the Electoral Commission is an arm’s length body; neither is in the central position required to tackle a major hostile state threat to our democracy.</td>
+</tr>
+<tr class="even">
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">39 Written evidence – DCMS, 13 February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">19</td>
+<td align="left">DCMS</td>
+<td align="left">We agree, however, with the DCMS Select Committee’s conclusion that the regulatory framework needs urgent review if it is to be fit for purpose in the age of widespread social media.</td>
+</tr>
+<tr class="even">
+<td align="right">19</td>
+<td align="left">DCMS</td>
+<td align="left">41 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">19</td>
+<td align="left">DCMS</td>
+<td align="left">42 The DCMS Select Committee’s report Disinformation and ‘Fake News’ (HC 1791, 18 February 2019) surveys and comments on some of these studies.</td>
+</tr>
+<tr class="even">
+<td align="right">21</td>
+<td align="left">DCMS</td>
+<td align="left">55 We note that the DCMS Select Committee has called on the Government to launch an independent investigation into foreign influence, disinformation, funding, voter manipulation and the sharing of data in relation to the Scottish independence referendum, the EU referendum and the 2017 General Election.</td>
+</tr>
+<tr class="odd">
+<td align="right">21</td>
+<td align="left">DCMS</td>
+<td align="left">If the Government were to take up this recommendation for a wider investigation, the assessment we recommend should take place could feed into it (DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019, recommendation 39).</td>
+</tr>
+<tr class="even">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">The Digital, Culture, Media and Sport (DCMS) Select Committee has already asked the Government “whether current legislation to protect the electoral process from malign interference is sufficient.</td>
+</tr>
+<tr class="odd">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">We note that physical interference in the UK’s democratic processes is less likely given the use of a paper-based system – however, we support the DCMS Select Committee’s calls for the Electoral Commission to be given power to “stop someone acting illegally in a campaign if they live outside the UK”.</td>
+</tr>
+<tr class="even">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">141 We note – and, again, agree with the DCMS Select Committee – that “the UK is clearly vulnerable to covert digital influence campaigns”.</td>
+</tr>
+<tr class="odd">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">140 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">141 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">142 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">DI</td>
+<td align="left">5 A sophisticated player ……………………………………………………………………………………………5 Leading the response ……………………………………………………………………………………………..6 Attribution: a new approach ……………………………………………………………………………………6 HMG as a player: Offensive Cyber………………………………………………………………………….7 International actions ………………………………………………………………………………………………7 DISINFORMATION AND INFLUENCE ……………………………………………………………..</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">DI</td>
+<td align="left">19 Coverage ……………………………………………………………………………………………………………19 Did HMG take its eye off the ball? ………………………………………………………………………..21 Future resourcing ………………………………………………………………………………………………..23 STRATEGY, CO-ORDINATION AND TASKING ……………………………………………..</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="left">DI</td>
+<td align="left">We have been told, repeatedly, that the Russian Intelligence Services will analyse whatever we put in the public domain and therefore, on this subject more than any other, the potential to damage the capabilities of the intelligence and security Agencies and Defence Intelligence was both real and significant.</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="left">DI</td>
+<td align="left">The Report covers aspects of the Russian threat to the UK (Cyber; Disinformation and Influence; and Russian Expatriates) followed by an examination of how the UK Government – in particular the Agencies and Defence Intelligence – has responded (Allocation of Effort; Strategy, Co-ordination and Tasking; A Hard Target; Legislation; International Partnerships; and Engagement with Russia).</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="left">DI</td>
+<td align="left">It was also interesting to hear that Defence Intelligence is taking steps to develop and retain these skills through revision of the military resourcing model, which will mean military personnel remaining in cyber roles for longer than the current one to two years.</td>
+</tr>
+<tr class="odd">
+<td align="right">14</td>
+<td align="left">DI</td>
+<td align="left">We commend Defence Intelligence for being the first to recognise this problem and take action.</td>
+</tr>
+<tr class="even">
+<td align="right">16</td>
+<td align="left">DI</td>
+<td align="left">DISINFORMATION AND INFLUENCE 27.</td>
+</tr>
+<tr class="odd">
+<td align="right">28</td>
+<td align="left">DI</td>
+<td align="left">82 Defence Intelligence 71.</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="left">DI</td>
+<td align="left">Defence Intelligence has wide-ranging responsibilities for intelligence collection and analysis, and a key role within Government in the preparation of All Source intelligence on Russia.</td>
+</tr>
+<tr class="odd">
+<td align="right">28</td>
+<td align="left">DI</td>
+<td align="left">Defence Intelligence effort on Russia also underwent significant reduction in the early 2000s.</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="left">DI</td>
+<td align="left">Although Defence Intelligence has been unable to provide figures for its allocation of effort over the past 20 years, we have been told that in 2013 there were relatively few All Source analysts in the Russia/Eurasia team (in addition to Russia-focused analysts in other teams).</td>
+</tr>
+<tr class="odd">
+<td align="right">28</td>
+<td align="left">DI</td>
+<td align="left">Defence Intelligence told us that it seconded its analytical effort on counter- terrorism to the Joint Terrorism Analysis Centre (JTAC) when it was established in 2003.</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="left">DI</td>
+<td align="left">This was estimated to be 20 posts by 2006/07 – just 1% of its then workforce (written evidence – Defence Intelligence, 21 March 2019).</td>
+</tr>
+<tr class="odd">
+<td align="right">29</td>
+<td align="left">DI</td>
+<td align="left">87 Defence Intelligence viewed it similarly: So in terms of relative prioritisation, rather than losing focus … our coverage of Russia undoubtedly suffered as a consequence of that prioritisation, which was necessary for the conduct of military operations.</td>
+</tr>
+<tr class="even">
+<td align="right">32</td>
+<td align="left">DI</td>
+<td align="left">STRATEGY, CO-ORDINATION AND TASKING The cross-Whitehall Russia Strategy 78.</td>
+</tr>
+<tr class="odd">
+<td align="right">33</td>
+<td align="left">DI</td>
+<td align="left">Defence Intelligence is tasked by a separate Ministry of Defence process.</td>
+</tr>
+<tr class="even">
+<td align="right">33</td>
+<td align="left">DI</td>
+<td align="left">102 Intelligence coverage is the collection of information (or acquisition of information from allied intelligence services) by the Agencies and Defence Intelligence.</td>
+</tr>
+<tr class="odd">
+<td align="right">34</td>
+<td align="left">DI</td>
+<td align="left">The Chief of Defence Intelligence recognised that “there is an absolute need for Defence Intelligence to be closely co-ordinated and potentially synchronised with the activity that is going on in ICE” but caveated that “whether we go fully into the ICE process I think is a much harder question to deal with”.</td>
+</tr>
+<tr class="even">
+<td align="right">34</td>
+<td align="left">DI</td>
+<td align="left">There appears to be a plethora of plans and strategies with direct relevance to the work on Russia by the organisations we oversee: the cross-Whitehall Russia Strategy, the ICE Plan requirements for Russia, the tri-Agency joint approach for Russia, a separate tasking and prioritisation process for Defence Intelligence, and the Fusion Doctrine overlaying them all.</td>
+</tr>
+<tr class="odd">
+<td align="right">34</td>
+<td align="left">DI</td>
+<td align="left">We asked the Agencies and Defence Intelligence to assess their current performance against the strategic objectives and plans in place in relation to the Russian threat.</td>
+</tr>
+<tr class="even">
+<td align="right">38</td>
+<td align="left">DI</td>
+<td align="left">Defence Intelligence brings to the table a range of specialised geospatial intelligence (GEOINT) and measurement and signature intelligence (MASINT) capabilities, which can be used to observe Russian targets at a distance, with a focus on military capabilities and organisations.</td>
+</tr>
+<tr class="odd">
+<td align="right">38</td>
+<td align="left">DI</td>
+<td align="left">117 Defence Intelligence is also involved in the expansion of HMG’s open source intelligence capabilities (i.e. the analysis of information that can be accessed freely on the internet, or bought through commercial providers) through the Defence Intelligence Open Source Hub.</td>
+</tr>
+<tr class="even">
+<td align="right">38</td>
+<td align="left">DI</td>
+<td align="left">Analysis of open source information is being increasingly used by the Agencies and Defence Intelligence to enhance their overall situational awareness, and can be fused with a smaller proportion of secret intelligence to provide a richer picture. (iii) Real-world threat, real-world outcomes 107.</td>
+</tr>
+<tr class="odd">
+<td align="right">44</td>
+<td align="left">DI</td>
+<td align="left">The West is strongest when acting in coalition, and therefore the Agencies and Defence Intelligence have a role to play in encouraging their international partners to draw together.</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="left">DI &amp; GCHQ</td>
+<td align="left">The Committee was assured by the Chief of Defence Intelligence that: By executing a joint mission, we [the Ministry of Defence and GCHQ] can move seamlessly between one set of authorisations and another, making sure we’re acting appropriately, but those that are managing the capability are able to make that switch and run those operations effectively.</td>
+</tr>
+<tr class="odd">
+<td align="right">44</td>
+<td align="left">DI &amp; NATO</td>
+<td align="left">We are encouraged to note that Defence Intelligence shares its intelligence assessments with NATO, which we were told aim to try “to ensure as common an understanding of the nature of the Russian threat and situation that we face”.</td>
+</tr>
+<tr class="even">
+<td align="right">33</td>
+<td align="left">DI, GCHQ &amp; MI6</td>
+<td align="left">Given the differences between Defence Intelligence’s work and that of the Agencies – including the fact that, in its assessment function, it is a customer for SIS and GCHQ intelligence products 100 HMG, National Security Capability Review, March 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">29</td>
+<td align="left">DI, GCHQ, MI5 &amp; MI6</td>
+<td align="left">On figures alone, it could be said that they took their eye off the ball; nevertheless, the Heads of MI5, SIS, GCHQ and Defence Intelligence all sought to defend against this suggestion.</td>
+</tr>
+<tr class="even">
+<td align="right">32</td>
+<td align="left">DI, GCHQ, MI5 &amp; MI6</td>
+<td align="left">The Home Secretary holds ministerial responsibility for MI5, the Foreign Secretary for SIS and GCHQ, and the Defence Secretary for Defence Intelligence.</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="left">DI, GCHQ, MI5, MI6, NSS &amp; OSCT</td>
+<td align="left">The Committee oversees the intelligence and security activities of the UK Intelligence Community, including the policies, expenditure, administration and operations of MI5 (the Security Service), MI6 (the Secret Intelligence Service or SIS) and GCHQ (the Government Communications Headquarters)* and the work of the Joint Intelligence Organisation (JIO) and the National Security Secretariat (NSS) in the Cabinet Office; Defence Intelligence (DI) in the Ministry of Defence; and the Office for Security and Counter-Terrorism (OSCT) in the Home Office.</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="left">DI, GCHQ, MI5, MI6, NSS &amp; OSCT</td>
+<td align="left">2 Throughout this report the term ‘Intelligence Community’ is used to refer to the seven organisations that the Committee oversees: the intelligence and security Agencies (MI5, SIS and GCHQ); Defence Intelligence in the Ministry of Defence; the Office for Security and Counter-Terrorism (OSCT) in the Home Office; and the National Security Secretariat (NSS) and Joint Intelligence Organisation (JIO) in the Cabinet Office.</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="left">DI, GCHQ, OSCT, UN, FCO &amp; RIS</td>
+<td align="left">Jim Hockenhull OBE – Chief of Defence Intelligence Other officials FOREIGN AND COMMONWEALTH OFFICE Sir Philip Barton KCMG OBE – then Director-General Consular and Security, FCO, and cross-Government Senior Responsible Owner for Russia Other officials GOVERNMENT COMMUNICATIONS HEADQUARTERS Mr Jeremy Fleming – Director, GCHQ Other officials NATIONAL CRIME AGENCY Ms Lynne Owens CBE QPM – Director-General, NCA Other officials OFFICE FOR SECURITY AND COUNTER-TERRORISM Mr Tom Hurd OBE – Director-General, OSCT Other officials 43</td>
+</tr>
+<tr class="even">
+<td align="right">32</td>
+<td align="left">FCO</td>
+<td align="left">This Implementation Group is co-ordinated by the HMG Russia Unit in the Foreign and Commonwealth Office (FCO), and chaired by the Senior Responsible Owner for implementing the Strategy (currently the FCO’s Director-General Consular and Security).</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="left">GCHQ</td>
+<td align="left">GCHQ assesses that Russia is a highly capable cyber actor with a proven capability to carry out operations which can deliver a range of impacts across any sector: • Since 2014, Russia has carried out malicious cyber activity in order to assert itself aggressively in a number of spheres, including attempting to influence the democratic elections of other countries – for example, it has been widely reported that the Russians were behind the cyber-enabled ‘hack and leak’ operation to compromise the accounts of members of the French political party En Marche!</td>
 </tr>
 <tr class="even">
 <td align="right">14</td>
@@ -1860,43 +2021,13 @@ redacted_tab %&gt;%
 </tr>
 <tr class="even">
 <td align="right">14</td>
-<td align="left">DI &amp; GCHQ</td>
-<td align="left">The Committee was assured by the Chief of Defence Intelligence that: By executing a joint mission, we [the Ministry of Defence and GCHQ] can move seamlessly between one set of authorisations and another, making sure we’re acting appropriately, but those that are managing the capability are able to make that switch and run those operations effectively.</td>
-</tr>
-<tr class="odd">
-<td align="right">14</td>
 <td align="left">GCHQ</td>
 <td align="left">GCHQ and the Ministry of Defence have in recent years adopted a more open posture on Offensive Cyber, 19 for example with public references to the successful prosecution of a major Offensive Cyber campaign against Daesh.</td>
 </tr>
-<tr class="even">
-<td align="right">14</td>
-<td align="left">DI</td>
-<td align="left">It was also interesting to hear that Defence Intelligence is taking steps to develop and retain these skills through revision of the military resourcing model, which will mean military personnel remaining in cyber roles for longer than the current one to two years.</td>
-</tr>
 <tr class="odd">
-<td align="right">14</td>
-<td align="left">DI</td>
-<td align="left">We commend Defence Intelligence for being the first to recognise this problem and take action.</td>
-</tr>
-<tr class="even">
 <td align="right">14</td>
 <td align="left">GCHQ</td>
 <td align="left">19 The Director of GCHQ referenced the cyber campaign against Daesh in a speech at CyberUK on 21 April 2018.</td>
-</tr>
-<tr class="odd">
-<td align="right">15</td>
-<td align="left">UN</td>
-<td align="left">While the UN has agreed that international law, and in particular the UN Charter, applies in cyberspace, there is still a need for a greater global understanding of how this should work in practice.</td>
-</tr>
-<tr class="even">
-<td align="right">16</td>
-<td align="left">DI</td>
-<td align="left">DISINFORMATION AND INFLUENCE 27.</td>
-</tr>
-<tr class="odd">
-<td align="right">16</td>
-<td align="left">NATO &amp; GRU</td>
-<td align="left">23 Examples include: • use of state-owned traditional media: open source studies have shown serious distortions in the coverage provided by Russian state-owned international broadcasters such as RT and Sputnik; 24 • ‘bots’ and ‘trolls’: open source studies have identified significant activity on social media; • ‘hack and leak’: the US has publicly avowed that Russia conducted ‘hack and leak’ operations in relation to its presidential election in 2016, and it has been widely alleged that Russia was responsible for a similar attack on the French presidential election in 2017; and • ‘real life’ political interference: it has been widely reported that Kremlin-linked entities have made ‘soft loans’ to the (then) Front National in France, seemingly at least in part as a reward for the party having supported Russia’s annexation of Crimea, 25 and the GRU sponsored a failed coup in Montenegro in October 2016 26 – an astonishingly bold move in a country just a few months from its accession to NATO.</td>
 </tr>
 <tr class="even">
 <td align="right">17</td>
@@ -1904,54 +2035,144 @@ redacted_tab %&gt;%
 <td align="left">In terms of the direct threat to elections, we have been informed that the mechanics of the UK’s voting system are deemed largely sound: the use of a highly dispersed paper- based voting and counting system makes any significant interference difficult, and we understand that GCHQ has undertaken a great deal of work to help ensure that the online voter registration system is safe.</td>
 </tr>
 <tr class="odd">
+<td align="right">27</td>
+<td align="left">GCHQ</td>
+<td align="left">GCHQ is the UK’s signals intelligence (SIGINT) agency – also focusing on intelligence gathering.</td>
+</tr>
+<tr class="even">
+<td align="right">27</td>
+<td align="left">GCHQ</td>
+<td align="left">79 GCHQ’s intelligence effects work primarily comprises Offensive Cyber.</td>
+</tr>
+<tr class="odd">
+<td align="right">28</td>
+<td align="left">GCHQ</td>
+<td align="left">At the height of the Cold War, 70% of GCHQ’s effort was focused on the Soviet bloc.</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="left">GCHQ</td>
+<td align="left">Alongside GCHQ, it also has a major role in the UK’s Offensive Cyber capability.</td>
+</tr>
+<tr class="odd">
+<td align="right">28</td>
+<td align="left">GCHQ</td>
+<td align="left">81 Written evidence – GCHQ, 8 March 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="left">GCHQ</td>
+<td align="left">82 Written evidence – GCHQ, 14 December 2018.</td>
+</tr>
+<tr class="odd">
+<td align="right">27</td>
+<td align="left">GCHQ &amp; MI5</td>
+<td align="left">Areas of intelligence coverage work that GCHQ undertakes include: applying selectors to emails obtained by bulk interception; targeted interception of the phone calls of 70 Section 1(2) of the Security Service Act 1989. 71 www.mi5.gov.uk/espionage 72 Written evidence – MI5, 31 October 2018.</td>
+</tr>
+<tr class="even">
+<td align="right">21</td>
+<td align="left">GCHQ &amp; MI6</td>
+<td align="left">Whilst it may be true that some issues highlighted in open source did not require the secret investigative capabilities of the intelligence and security Agencies or were at the periphery of their remits, the Agencies nonetheless have capabilities which allow them to ‘stand on the shoulders’ of open source coverage: for example, GCHQ might attempt to look behind the suspicious social media accounts which open source analysis has identified to uncover their true operators (and even disrupt their use), or SIS might specifically task an agent to provide information on the extent and nature of any Russian influence campaigns.</td>
+</tr>
+<tr class="odd">
+<td align="right">27</td>
+<td align="left">GCHQ &amp; MI6</td>
+<td align="left">76 SIS and GCHQ 68.</td>
+</tr>
+<tr class="even">
+<td align="right">29</td>
+<td align="left">GCHQ &amp; MI6</td>
+<td align="left">88 By comparison, SIS and GCHQ saw it as due to the longer lead time required for work on Russia.</td>
+</tr>
+<tr class="odd">
+<td align="right">29</td>
+<td align="left">GCHQ &amp; MI6</td>
+<td align="left">89 And GCHQ agreed: A bit like [SIS’s] point, some of the kind of hardcore capabilities that were necessary to keep in the business we maintained and then, really, as the reviews and the discussion around what happened in Crimea really brought minds more to the fore again on Russia, that then led us to move in ramping up again.</td>
+</tr>
+<tr class="even">
+<td align="right">33</td>
+<td align="left">GCHQ &amp; MI6</td>
+<td align="left">The Intelligence Coverage and Effects (ICE) process is the method by which SIS and GCHQ are tasked by the Government.</td>
+</tr>
+<tr class="odd">
+<td align="right">33</td>
+<td align="left">GCHQ &amp; MI6</td>
+<td align="left">On Russia, the ICE requirements represent SIS and GCHQ’s tasking in relation to the cross-Whitehall Russia Strategy.</td>
+</tr>
+<tr class="even">
+<td align="right">34</td>
+<td align="left">GCHQ &amp; MI6</td>
+<td align="left">It does not appear that they measure their performance in quite such a developed way: GCHQ and SIS informed us that their assessment of their performance against the ICE Plan was in a comparatively less granular format (which broadly assesses whether or not they had exceeded, met or not met each requirement) and SIS told us that “the question of performance management and metrication … this is a process which is in evolution”.</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="left">GCHQ &amp; NCSC</td>
+<td align="left">The NCSC – part of GCHQ – leads on protecting the UK from cyber attack and, as the authority on the UK’s cyber security environment, sharing knowledge and addressing systemic vulnerabilities.</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="left">GCHQ, MI5 &amp; MI6</td>
+<td align="left">However, by 2006, operational effort was being directed to the fight against international terrorism: in 2006/07, MI5 devoted 92% of its effort to counter-terrorism work, 85 with SIS and GCHQ at 33%.</td>
+</tr>
+<tr class="odd">
+<td align="right">33</td>
+<td align="left">GCHQ, MI5 &amp; MI6</td>
+<td align="left">In contrast to SIS and GCHQ, MI5 is self-tasking: it prioritises its work against threats to the UK based on its assessment of their severity.</td>
+</tr>
+<tr class="even">
+<td align="right">33</td>
+<td align="left">GCHQ, MI5 &amp; MI6</td>
+<td align="left">We have been informed that MI5 does, however, align its work on Russia with that of SIS and GCHQ in an agreed tri-Agency approach.</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="left">GRU</td>
+<td align="left">6 The GRU is the Main Intelligence Directorate of the General Staff of the Russian Armed Forces.</td>
+</tr>
+<tr class="even">
+<td align="right">13</td>
+<td align="left">GRU</td>
+<td align="left">This new approach was indicated first by the response to the November 2017 WannaCry attack (with a statement by Foreign Office Minister Lord Ahmad condemning the attack) and the subsequent response to the February 2018 NotPetya attack, then more recently when the Foreign Secretary took the step, on 3 October 2018, of announcing publicly that the UK and its allies had identified a campaign by the GRU of indiscriminate and reckless cyber attacks targeting public institutions, businesses, media and sport 14 – including attribution of the attempted hacking of the Organisation for the Prohibition of Chemical Weapons (OPCW) in the Hague.</td>
+</tr>
+<tr class="odd">
+<td align="right">45</td>
+<td align="left">GRU</td>
+<td align="left">Following the GRU attack in Salisbury, the UK’s goal was to respond quickly, and – understanding that Russia is not overly concerned about individual reprisal – to ‘internationalise’ any action against Russia by building as broad a coalition as possible.</td>
+</tr>
+<tr class="even">
+<td align="right">45</td>
+<td align="left">GRU</td>
+<td align="left">This diplomatic response, and the subsequent exposure of the responsible GRU agents, sent a strong message to Russia that such actions would not be tolerated, and provides a platform for the future.</td>
+</tr>
+<tr class="odd">
+<td align="right">36</td>
+<td align="left">GRU &amp; RIS</td>
+<td align="left">The well- publicised mistakes Russian operatives made in Salisbury, and later in trying to infiltrate the Organisation for the Prohibition of Chemical Weapons (OPCW), have led to public speculation about the competence of the Russian Intelligence Services (RIS), and the GRU in particular.</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">ISC</td>
+<td align="left">Keith Simpson MP The Intelligence and Security Committee of Parliament (ISC) is a statutory committee of Parliament that has responsibility for oversight of the UK Intelligence Community.</td>
+</tr>
+<tr class="odd">
+<td align="right">23</td>
+<td align="left">ISC</td>
+<td align="left">The Committee does not oversee the NCA; its work and operations usually fall outside the remit of the ISC.</td>
+</tr>
+<tr class="even">
 <td align="right">17</td>
 <td align="left">JIC</td>
 <td align="left">34 JIC(17)053.</td>
 </tr>
-<tr class="even">
-<td align="right">17</td>
-<td align="left">NCSC</td>
-<td align="left">37 We note that the Centre for the Protection of National Infrastructure (CPNI) and the National Cyber Security Centre (NCSC) also support the Government security architecture and play a role in protecting the mechanics of elections, including informing improvements to electoral management software and through protective security advice to political parties.</td>
-</tr>
 <tr class="odd">
-<td align="right">18</td>
-<td align="left">DCMS</td>
-<td align="left">They informed us that the Department for Digital, Culture, Media and Sport (DCMS) holds primary responsibility for disinformation campaigns, and that the Electoral Commission has responsibility for the overall security of democratic processes.</td>
+<td align="right">26</td>
+<td align="left">JIC</td>
+<td align="left">This situation needs to be addressed and managed by Ministers and the JIC [Joint Intelligence Committee].</td>
 </tr>
 <tr class="even">
-<td align="right">18</td>
-<td align="left">DCMS</td>
-<td align="left">However, DCMS told us that its function is largely confined to the broad HMG policy regarding the use of disinformation rather than an assessment of, or operations against, hostile state campaigns.</td>
-</tr>
-<tr class="odd">
-<td align="right">18</td>
-<td align="left">DCMS</td>
-<td align="left">And without seeking in any way to imply that DCMS is not capable, or that the Electoral Commission is not a staunch defender of democracy, it is a question of scale and access.</td>
-</tr>
-<tr class="even">
-<td align="right">18</td>
-<td align="left">DCMS</td>
-<td align="left">DCMS is a small Whitehall policy department and the Electoral Commission is an arm’s length body; neither is in the central position required to tackle a major hostile state threat to our democracy.</td>
-</tr>
-<tr class="odd">
 <td align="right">18</td>
 <td align="left">MI5</td>
 <td align="left">In our opinion, the operational role must sit primarily with MI5, in line with its statutory responsibility for “the protection of national security and, in particular, its protection against threats from espionage, terrorism and sabotage, from the activities of agents of foreign powers and from actions intended to overthrow or undermine parliamentary democracy …”.</td>
-</tr>
-<tr class="even">
-<td align="right">18</td>
-<td align="left">MI5 &amp; OSCT</td>
-<td align="left">38 The policy role should sit with the Office for Security and Counter-Terrorism (OSCT) – primarily due to its ten years of experience in countering the terrorist threat and its position working closely with MI5 within the central Government machinery.</td>
-</tr>
-<tr class="odd">
-<td align="right">18</td>
-<td align="left">DCMS</td>
-<td align="left">39 Written evidence – DCMS, 13 February 2019.</td>
-</tr>
-<tr class="even">
-<td align="right">19</td>
-<td align="left">DCMS</td>
-<td align="left">We agree, however, with the DCMS Select Committee’s conclusion that the regulatory framework needs urgent review if it is to be fit for purpose in the age of widespread social media.</td>
 </tr>
 <tr class="odd">
 <td align="right">19</td>
@@ -1962,46 +2183,6 @@ redacted_tab %&gt;%
 <td align="right">19</td>
 <td align="left">MI5</td>
 <td align="left">In response to our request for written evidence at the outset of the Inquiry, MI5 initially provided just six lines of text.</td>
-</tr>
-<tr class="odd">
-<td align="right">19</td>
-<td align="left">DCMS</td>
-<td align="left">41 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
-</tr>
-<tr class="even">
-<td align="right">19</td>
-<td align="left">DCMS</td>
-<td align="left">42 The DCMS Select Committee’s report Disinformation and ‘Fake News’ (HC 1791, 18 February 2019) surveys and comments on some of these studies.</td>
-</tr>
-<tr class="odd">
-<td align="right">21</td>
-<td align="left">GCHQ &amp; MI6</td>
-<td align="left">Whilst it may be true that some issues highlighted in open source did not require the secret investigative capabilities of the intelligence and security Agencies or were at the periphery of their remits, the Agencies nonetheless have capabilities which allow them to ‘stand on the shoulders’ of open source coverage: for example, GCHQ might attempt to look behind the suspicious social media accounts which open source analysis has identified to uncover their true operators (and even disrupt their use), or SIS might specifically task an agent to provide information on the extent and nature of any Russian influence campaigns.</td>
-</tr>
-<tr class="even">
-<td align="right">21</td>
-<td align="left">DCMS</td>
-<td align="left">55 We note that the DCMS Select Committee has called on the Government to launch an independent investigation into foreign influence, disinformation, funding, voter manipulation and the sharing of data in relation to the Scottish independence referendum, the EU referendum and the 2017 General Election.</td>
-</tr>
-<tr class="odd">
-<td align="right">21</td>
-<td align="left">DCMS</td>
-<td align="left">If the Government were to take up this recommendation for a wider investigation, the assessment we recommend should take place could feed into it (DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019, recommendation 39).</td>
-</tr>
-<tr class="even">
-<td align="right">23</td>
-<td align="left">ISC</td>
-<td align="left">The Committee does not oversee the NCA; its work and operations usually fall outside the remit of the ISC.</td>
-</tr>
-<tr class="odd">
-<td align="right">24</td>
-<td align="left">RIS</td>
-<td align="left">61 They are of interest to the Russian Intelligence Services (RIS), which may seek to target them in a number of ways: • it is possible the RIS will seek to monitor some of these individuals using human sources (i.e. agents) and by technical means, for example by intercepting phone calls and hacking into their personal electronic devices; • RIS collection of intelligence could also be used in support of ‘influence operations’, with the objective of degrading an individual’s ability to encourage international or domestic Russian political opposition to Putin and his government; or • the RIS may seek to identify or engineer opportunities to arrange an individual’s arrest and transfer to Russia to stand trial, or indeed meet a worse fate.</td>
-</tr>
-<tr class="even">
-<td align="right">26</td>
-<td align="left">JIC</td>
-<td align="left">This situation needs to be addressed and managed by Ministers and the JIC [Joint Intelligence Committee].</td>
 </tr>
 <tr class="odd">
 <td align="right">26</td>
@@ -2040,258 +2221,28 @@ redacted_tab %&gt;%
 </tr>
 <tr class="even">
 <td align="right">27</td>
-<td align="left">GCHQ &amp; MI6</td>
-<td align="left">76 SIS and GCHQ 68.</td>
-</tr>
-<tr class="odd">
-<td align="right">27</td>
-<td align="left">MI6</td>
-<td align="left">SIS is the UK’s foreign human intelligence (HUMINT) agency, with a “global covert capability” 77 focusing on intelligence gathering.</td>
-</tr>
-<tr class="even">
-<td align="right">27</td>
-<td align="left">GCHQ</td>
-<td align="left">GCHQ is the UK’s signals intelligence (SIGINT) agency – also focusing on intelligence gathering.</td>
-</tr>
-<tr class="odd">
-<td align="right">27</td>
-<td align="left">GCHQ</td>
-<td align="left">79 GCHQ’s intelligence effects work primarily comprises Offensive Cyber.</td>
-</tr>
-<tr class="even">
-<td align="right">27</td>
-<td align="left">GCHQ &amp; MI5</td>
-<td align="left">Areas of intelligence coverage work that GCHQ undertakes include: applying selectors to emails obtained by bulk interception; targeted interception of the phone calls of 70 Section 1(2) of the Security Service Act 1989. 71 www.mi5.gov.uk/espionage 72 Written evidence – MI5, 31 October 2018.</td>
-</tr>
-<tr class="odd">
-<td align="right">27</td>
 <td align="left">MI5</td>
 <td align="left">74 Written evidence – MI5, 31 October 2018.</td>
 </tr>
-<tr class="even">
-<td align="right">27</td>
-<td align="left">MI5 &amp; MI6</td>
-<td align="left">This operational effort also benefits from the support of corporate and ‘enabling’ services across MI5 (which is not reflected in these figures). 77 www.sis.gov.uk 78 Written evidence – SIS, 17 December 2018.</td>
-</tr>
 <tr class="odd">
-<td align="right">28</td>
-<td align="left">GCHQ</td>
-<td align="left">At the height of the Cold War, 70% of GCHQ’s effort was focused on the Soviet bloc.</td>
-</tr>
-<tr class="even">
-<td align="right">28</td>
-<td align="left">DI</td>
-<td align="left">82 Defence Intelligence 71.</td>
-</tr>
-<tr class="odd">
-<td align="right">28</td>
-<td align="left">DI</td>
-<td align="left">Defence Intelligence has wide-ranging responsibilities for intelligence collection and analysis, and a key role within Government in the preparation of All Source intelligence on Russia.</td>
-</tr>
-<tr class="even">
-<td align="right">28</td>
-<td align="left">GCHQ</td>
-<td align="left">Alongside GCHQ, it also has a major role in the UK’s Offensive Cyber capability.</td>
-</tr>
-<tr class="odd">
-<td align="right">28</td>
-<td align="left">DI</td>
-<td align="left">Defence Intelligence effort on Russia also underwent significant reduction in the early 2000s.</td>
-</tr>
-<tr class="even">
-<td align="right">28</td>
-<td align="left">DI</td>
-<td align="left">Although Defence Intelligence has been unable to provide figures for its allocation of effort over the past 20 years, we have been told that in 2013 there were relatively few All Source analysts in the Russia/Eurasia team (in addition to Russia-focused analysts in other teams).</td>
-</tr>
-<tr class="odd">
-<td align="right">28</td>
-<td align="left">GCHQ, MI5 &amp; MI6</td>
-<td align="left">However, by 2006, operational effort was being directed to the fight against international terrorism: in 2006/07, MI5 devoted 92% of its effort to counter-terrorism work, 85 with SIS and GCHQ at 33%.</td>
-</tr>
-<tr class="even">
-<td align="right">28</td>
-<td align="left">GCHQ</td>
-<td align="left">81 Written evidence – GCHQ, 8 March 2019.</td>
-</tr>
-<tr class="odd">
-<td align="right">28</td>
-<td align="left">GCHQ</td>
-<td align="left">82 Written evidence – GCHQ, 14 December 2018.</td>
-</tr>
-<tr class="even">
 <td align="right">28</td>
 <td align="left">MI5</td>
 <td align="left">85 Written evidence – MI5, 31 October 2018.</td>
 </tr>
-<tr class="odd">
-<td align="right">28</td>
-<td align="left">MI6</td>
-<td align="left">86 Written evidence – SIS, 17 December 2018; Intelligence and Security Committee of Parliament Annual Report 2007–2008 Cm 7542.</td>
-</tr>
 <tr class="even">
-<td align="right">28</td>
-<td align="left">DI</td>
-<td align="left">Defence Intelligence told us that it seconded its analytical effort on counter- terrorism to the Joint Terrorism Analysis Centre (JTAC) when it was established in 2003.</td>
-</tr>
-<tr class="odd">
-<td align="right">28</td>
-<td align="left">DI</td>
-<td align="left">This was estimated to be 20 posts by 2006/07 – just 1% of its then workforce (written evidence – Defence Intelligence, 21 March 2019).</td>
-</tr>
-<tr class="even">
-<td align="right">29</td>
-<td align="left">DI, GCHQ, MI5 &amp; MI6</td>
-<td align="left">On figures alone, it could be said that they took their eye off the ball; nevertheless, the Heads of MI5, SIS, GCHQ and Defence Intelligence all sought to defend against this suggestion.</td>
-</tr>
-<tr class="odd">
 <td align="right">29</td>
 <td align="left">MI5</td>
 <td align="left">MI5 was clear that there was an inevitable reprioritisation due to the terrorist threat: … back then it’s how can we possibly do enough to get ahead of this appalling terrorism problem which … back then was larger than we could see the edges of and one of the things we used to say about it, at exactly the time you’re talking about, was we haven’t yet found the edges of this problem.</td>
 </tr>
-<tr class="even">
-<td align="right">29</td>
-<td align="left">DI</td>
-<td align="left">87 Defence Intelligence viewed it similarly: So in terms of relative prioritisation, rather than losing focus … our coverage of Russia undoubtedly suffered as a consequence of that prioritisation, which was necessary for the conduct of military operations.</td>
-</tr>
 <tr class="odd">
-<td align="right">29</td>
-<td align="left">GCHQ &amp; MI6</td>
-<td align="left">88 By comparison, SIS and GCHQ saw it as due to the longer lead time required for work on Russia.</td>
-</tr>
-<tr class="even">
-<td align="right">29</td>
-<td align="left">MI6</td>
-<td align="left">SIS said: I don’t think we did take our eye off the ball.</td>
-</tr>
-<tr class="odd">
-<td align="right">29</td>
-<td align="left">GCHQ &amp; MI6</td>
-<td align="left">89 And GCHQ agreed: A bit like [SIS’s] point, some of the kind of hardcore capabilities that were necessary to keep in the business we maintained and then, really, as the reviews and the discussion around what happened in Crimea really brought minds more to the fore again on Russia, that then led us to move in ramping up again.</td>
-</tr>
-<tr class="even">
-<td align="right">32</td>
-<td align="left">DI</td>
-<td align="left">STRATEGY, CO-ORDINATION AND TASKING The cross-Whitehall Russia Strategy 78.</td>
-</tr>
-<tr class="odd">
-<td align="right">32</td>
-<td align="left">FCO</td>
-<td align="left">This Implementation Group is co-ordinated by the HMG Russia Unit in the Foreign and Commonwealth Office (FCO), and chaired by the Senior Responsible Owner for implementing the Strategy (currently the FCO’s Director-General Consular and Security).</td>
-</tr>
-<tr class="even">
 <td align="right">32</td>
 <td align="left">MI5</td>
 <td align="left">In particular, it is our view that, whilst MI5 already works with the police regional Counter- Terrorism Units (which have responsibility for Hostile State Activity), there is scope for them to work more closely together in this area.</td>
-</tr>
-<tr class="odd">
-<td align="right">32</td>
-<td align="left">DI, GCHQ, MI5 &amp; MI6</td>
-<td align="left">The Home Secretary holds ministerial responsibility for MI5, the Foreign Secretary for SIS and GCHQ, and the Defence Secretary for Defence Intelligence.</td>
-</tr>
-<tr class="even">
-<td align="right">32</td>
-<td align="left">OSCT</td>
-<td align="left">This appears unusual: the Home Office might seem a more natural home for it, as it would allow the Office for Security and Counter-Terrorism’s (OSCT) experience on counter-terrorism matters to be brought to bear against the hostile state threat.</td>
-</tr>
-<tr class="odd">
-<td align="right">33</td>
-<td align="left">GCHQ &amp; MI6</td>
-<td align="left">The Intelligence Coverage and Effects (ICE) process is the method by which SIS and GCHQ are tasked by the Government.</td>
-</tr>
-<tr class="even">
-<td align="right">33</td>
-<td align="left">GCHQ &amp; MI6</td>
-<td align="left">On Russia, the ICE requirements represent SIS and GCHQ’s tasking in relation to the cross-Whitehall Russia Strategy.</td>
-</tr>
-<tr class="odd">
-<td align="right">33</td>
-<td align="left">GCHQ, MI5 &amp; MI6</td>
-<td align="left">In contrast to SIS and GCHQ, MI5 is self-tasking: it prioritises its work against threats to the UK based on its assessment of their severity.</td>
 </tr>
 <tr class="even">
 <td align="right">33</td>
 <td align="left">MI5</td>
 <td align="left">This is appropriate given the defensive focus of MI5’s role.</td>
-</tr>
-<tr class="odd">
-<td align="right">33</td>
-<td align="left">GCHQ, MI5 &amp; MI6</td>
-<td align="left">We have been informed that MI5 does, however, align its work on Russia with that of SIS and GCHQ in an agreed tri-Agency approach.</td>
-</tr>
-<tr class="even">
-<td align="right">33</td>
-<td align="left">DI</td>
-<td align="left">Defence Intelligence is tasked by a separate Ministry of Defence process.</td>
-</tr>
-<tr class="odd">
-<td align="right">33</td>
-<td align="left">DI, GCHQ &amp; MI6</td>
-<td align="left">Given the differences between Defence Intelligence’s work and that of the Agencies – including the fact that, in its assessment function, it is a customer for SIS and GCHQ intelligence products 100 HMG, National Security Capability Review, March 2018.</td>
-</tr>
-<tr class="even">
-<td align="right">33</td>
-<td align="left">DI</td>
-<td align="left">102 Intelligence coverage is the collection of information (or acquisition of information from allied intelligence services) by the Agencies and Defence Intelligence.</td>
-</tr>
-<tr class="odd">
-<td align="right">34</td>
-<td align="left">DI</td>
-<td align="left">The Chief of Defence Intelligence recognised that “there is an absolute need for Defence Intelligence to be closely co-ordinated and potentially synchronised with the activity that is going on in ICE” but caveated that “whether we go fully into the ICE process I think is a much harder question to deal with”.</td>
-</tr>
-<tr class="even">
-<td align="right">34</td>
-<td align="left">DI</td>
-<td align="left">There appears to be a plethora of plans and strategies with direct relevance to the work on Russia by the organisations we oversee: the cross-Whitehall Russia Strategy, the ICE Plan requirements for Russia, the tri-Agency joint approach for Russia, a separate tasking and prioritisation process for Defence Intelligence, and the Fusion Doctrine overlaying them all.</td>
-</tr>
-<tr class="odd">
-<td align="right">34</td>
-<td align="left">DI</td>
-<td align="left">We asked the Agencies and Defence Intelligence to assess their current performance against the strategic objectives and plans in place in relation to the Russian threat.</td>
-</tr>
-<tr class="even">
-<td align="right">34</td>
-<td align="left">GCHQ &amp; MI6</td>
-<td align="left">It does not appear that they measure their performance in quite such a developed way: GCHQ and SIS informed us that their assessment of their performance against the ICE Plan was in a comparatively less granular format (which broadly assesses whether or not they had exceeded, met or not met each requirement) and SIS told us that “the question of performance management and metrication … this is a process which is in evolution”.</td>
-</tr>
-<tr class="odd">
-<td align="right">36</td>
-<td align="left">GRU &amp; RIS</td>
-<td align="left">The well- publicised mistakes Russian operatives made in Salisbury, and later in trying to infiltrate the Organisation for the Prohibition of Chemical Weapons (OPCW), have led to public speculation about the competence of the Russian Intelligence Services (RIS), and the GRU in particular.</td>
-</tr>
-<tr class="even">
-<td align="right">36</td>
-<td align="left">RIS</td>
-<td align="left">Whilst these attacks demonstrate that the RIS are not infallible, it would be foolhardy to think that they are any less dangerous because of these mistakes.</td>
-</tr>
-<tr class="odd">
-<td align="right">36</td>
-<td align="left">RIS</td>
-<td align="left">Indeed, the likelihood is that the RIS will learn from their errors, and become more difficult to detect and protect against as a result.</td>
-</tr>
-<tr class="even">
-<td align="right">36</td>
-<td align="left">RIS</td>
-<td align="left">The Russian decision-making apparatus is concentrated on Putin and a small group of trusted and secretive advisers (many of whom share Putin’s background in the RIS).</td>
-</tr>
-<tr class="odd">
-<td align="right">37</td>
-<td align="left">MI6</td>
-<td align="left">SIS told us that this means operating with “strategic patience” in terms of both recruiting agents and increasing staff.</td>
-</tr>
-<tr class="even">
-<td align="right">38</td>
-<td align="left">DI</td>
-<td align="left">Defence Intelligence brings to the table a range of specialised geospatial intelligence (GEOINT) and measurement and signature intelligence (MASINT) capabilities, which can be used to observe Russian targets at a distance, with a focus on military capabilities and organisations.</td>
-</tr>
-<tr class="odd">
-<td align="right">38</td>
-<td align="left">DI</td>
-<td align="left">117 Defence Intelligence is also involved in the expansion of HMG’s open source intelligence capabilities (i.e. the analysis of information that can be accessed freely on the internet, or bought through commercial providers) through the Defence Intelligence Open Source Hub.</td>
-</tr>
-<tr class="even">
-<td align="right">38</td>
-<td align="left">DI</td>
-<td align="left">Analysis of open source information is being increasingly used by the Agencies and Defence Intelligence to enhance their overall situational awareness, and can be fused with a smaller proportion of secret intelligence to provide a richer picture. (iii) Real-world threat, real-world outcomes 107.</td>
 </tr>
 <tr class="odd">
 <td align="right">40</td>
@@ -2314,39 +2265,59 @@ redacted_tab %&gt;%
 <td align="left">It is essential that there is a clear commitment to bring forward new legislation to replace it (and a timetable within which it will be introduced) that can be used by MI5 to defend the UK against agents of a hostile foreign power such as Russia.</td>
 </tr>
 <tr class="odd">
-<td align="right">43</td>
-<td align="left">DCMS</td>
-<td align="left">The Digital, Culture, Media and Sport (DCMS) Select Committee has already asked the Government “whether current legislation to protect the electoral process from malign interference is sufficient.</td>
+<td align="right">27</td>
+<td align="left">MI5 &amp; MI6</td>
+<td align="left">This operational effort also benefits from the support of corporate and ‘enabling’ services across MI5 (which is not reflected in these figures). 77 www.sis.gov.uk 78 Written evidence – SIS, 17 December 2018.</td>
 </tr>
 <tr class="even">
-<td align="right">43</td>
-<td align="left">DCMS</td>
-<td align="left">We note that physical interference in the UK’s democratic processes is less likely given the use of a paper-based system – however, we support the DCMS Select Committee’s calls for the Electoral Commission to be given power to “stop someone acting illegally in a campaign if they live outside the UK”.</td>
+<td align="right">51</td>
+<td align="left">MI5 &amp; MI6</td>
+<td align="left">SECRET INTELLIGENCE SERVICE (MI6) Sir Alex Younger KCMG – Chief, SIS Other officials SECURITY SERVICE (MI5) Sir Andrew Parker KCB – then Director-General, Security Service Other officials Expert external witnesses Professor Anne Applebaum – Institute of Global Affairs Mr William Browder – Head of the Global Magnitsky Justice Movement Mr Christopher Donnelly CMG TD – Head of the Institute for Statecraft Mr Edward Lucas – Writer and consultant specialising in European and transatlantic security Mr Christopher Steele – Director, Orbis Business Intelligence Ltd 44</td>
 </tr>
 <tr class="odd">
-<td align="right">43</td>
-<td align="left">DCMS</td>
-<td align="left">141 We note – and, again, agree with the DCMS Select Committee – that “the UK is clearly vulnerable to covert digital influence campaigns”.</td>
+<td align="right">18</td>
+<td align="left">MI5 &amp; OSCT</td>
+<td align="left">38 The policy role should sit with the Office for Security and Counter-Terrorism (OSCT) – primarily due to its ten years of experience in countering the terrorist threat and its position working closely with MI5 within the central Government machinery.</td>
 </tr>
 <tr class="even">
-<td align="right">43</td>
-<td align="left">DCMS</td>
-<td align="left">140 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
+<td align="right">12</td>
+<td align="left">MI6</td>
+<td align="left">Russia has sought to employ organised crime groups to supplement its cyber skills: SIS has observed that “this comes to the very muddy nexus between business and corruption and state power in Russia”.</td>
 </tr>
 <tr class="odd">
-<td align="right">43</td>
-<td align="left">DCMS</td>
-<td align="left">141 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
+<td align="right">27</td>
+<td align="left">MI6</td>
+<td align="left">SIS is the UK’s foreign human intelligence (HUMINT) agency, with a “global covert capability” 77 focusing on intelligence gathering.</td>
 </tr>
 <tr class="even">
-<td align="right">43</td>
-<td align="left">DCMS</td>
-<td align="left">142 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
+<td align="right">28</td>
+<td align="left">MI6</td>
+<td align="left">86 Written evidence – SIS, 17 December 2018; Intelligence and Security Committee of Parliament Annual Report 2007–2008 Cm 7542.</td>
 </tr>
 <tr class="odd">
-<td align="right">44</td>
-<td align="left">DI</td>
-<td align="left">The West is strongest when acting in coalition, and therefore the Agencies and Defence Intelligence have a role to play in encouraging their international partners to draw together.</td>
+<td align="right">29</td>
+<td align="left">MI6</td>
+<td align="left">SIS said: I don’t think we did take our eye off the ball.</td>
+</tr>
+<tr class="even">
+<td align="right">37</td>
+<td align="left">MI6</td>
+<td align="left">SIS told us that this means operating with “strategic patience” in terms of both recruiting agents and increasing staff.</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">NATO</td>
+<td align="left">It is also seemingly fed by paranoia, believing that Western institutions such as NATO and the EU have a far more aggressive posture towards it than they do in reality.</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">NATO</td>
+<td align="left">It appears that Russia considers the UK one of its top Western intelligence targets: while we may not experience the level and type of threat that countries on Russia’s borders suffer, witnesses have suggested that we would sit just behind the US and NATO in any 1</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="left">NATO</td>
+<td align="left">This perception will have been reinforced by the UK’s firm stance recently in response to Russian aggression: following the UK-led international response to the Salisbury attack – which saw an unprecedented 153 Russian intelligence officers and diplomats expelled from 29 countries and NATO – it appears to the Committee that Putin considers the UK to be a key diplomatic adversary.</td>
 </tr>
 <tr class="even">
 <td align="right">44</td>
@@ -2360,48 +2331,78 @@ redacted_tab %&gt;%
 </tr>
 <tr class="even">
 <td align="right">44</td>
-<td align="left">DI &amp; NATO</td>
-<td align="left">We are encouraged to note that Defence Intelligence shares its intelligence assessments with NATO, which we were told aim to try “to ensure as common an understanding of the nature of the Russian threat and situation that we face”.</td>
-</tr>
-<tr class="odd">
-<td align="right">44</td>
 <td align="left">NATO</td>
 <td align="left">Defence Intelligence highlighted several “really important part[s] of how we feed into the NATO 144 ‘Rise of far-right in Italy and Austria gives Putin some friends in the west’, The Guardian, 7 June 2018.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">44</td>
 <td align="left">NATO</td>
 <td align="left">146 Article V of the 1949 North Atlantic Treaty concerns the principle of ‘collective self-defence’, and states that an armed attack against one or more NATO Members will be considered an attack against them all, and that all NATO Members will act to repel the attack against the affected Member State(s).</td>
 </tr>
-<tr class="odd">
-<td align="right">45</td>
-<td align="left">NATO &amp; RAF</td>
-<td align="left">system”, including “working very closely with NATO colleagues, putting assessments into NATO, [and] working very closely with the NATO Intelligence Fusion Cell at RAF Molesworth”.</td>
-</tr>
 <tr class="even">
-<td align="right">45</td>
-<td align="left">GRU</td>
-<td align="left">Following the GRU attack in Salisbury, the UK’s goal was to respond quickly, and – understanding that Russia is not overly concerned about individual reprisal – to ‘internationalise’ any action against Russia by building as broad a coalition as possible.</td>
-</tr>
-<tr class="odd">
 <td align="right">45</td>
 <td align="left">NATO</td>
 <td align="left">As mentioned previously, the resulting expulsion of 153 Russian intelligence officers and diplomats from 29 countries and NATO was an unprecedented international response.</td>
 </tr>
+<tr class="odd">
+<td align="right">16</td>
+<td align="left">NATO &amp; GRU</td>
+<td align="left">23 Examples include: • use of state-owned traditional media: open source studies have shown serious distortions in the coverage provided by Russian state-owned international broadcasters such as RT and Sputnik; 24 • ‘bots’ and ‘trolls’: open source studies have identified significant activity on social media; • ‘hack and leak’: the US has publicly avowed that Russia conducted ‘hack and leak’ operations in relation to its presidential election in 2016, and it has been widely alleged that Russia was responsible for a similar attack on the French presidential election in 2017; and • ‘real life’ political interference: it has been widely reported that Kremlin-linked entities have made ‘soft loans’ to the (then) Front National in France, seemingly at least in part as a reward for the party having supported Russia’s annexation of Crimea, 25 and the GRU sponsored a failed coup in Montenegro in October 2016 26 – an astonishingly bold move in a country just a few months from its accession to NATO.</td>
+</tr>
 <tr class="even">
 <td align="right">45</td>
-<td align="left">GRU</td>
-<td align="left">This diplomatic response, and the subsequent exposure of the responsible GRU agents, sent a strong message to Russia that such actions would not be tolerated, and provides a platform for the future.</td>
+<td align="left">NATO &amp; RAF</td>
+<td align="left">system”, including “working very closely with NATO colleagues, putting assessments into NATO, [and] working very closely with the NATO Intelligence Fusion Cell at RAF Molesworth”.</td>
 </tr>
 <tr class="odd">
-<td align="right">50</td>
-<td align="left">DI, GCHQ, OSCT, UN, FCO &amp; RIS</td>
-<td align="left">Jim Hockenhull OBE – Chief of Defence Intelligence Other officials FOREIGN AND COMMONWEALTH OFFICE Sir Philip Barton KCMG OBE – then Director-General Consular and Security, FCO, and cross-Government Senior Responsible Owner for Russia Other officials GOVERNMENT COMMUNICATIONS HEADQUARTERS Mr Jeremy Fleming – Director, GCHQ Other officials NATIONAL CRIME AGENCY Ms Lynne Owens CBE QPM – Director-General, NCA Other officials OFFICE FOR SECURITY AND COUNTER-TERRORISM Mr Tom Hurd OBE – Director-General, OSCT Other officials 43</td>
+<td align="right">13</td>
+<td align="left">NCSC</td>
+<td align="left">Accountability is an issue in particular – whilst the Foreign Secretary has responsibility for the NCSC, which is responsible for incident response, the Home Secretary leads on the response to major cyber incidents.</td>
 </tr>
 <tr class="even">
-<td align="right">51</td>
-<td align="left">MI5 &amp; MI6</td>
-<td align="left">SECRET INTELLIGENCE SERVICE (MI6) Sir Alex Younger KCMG – Chief, SIS Other officials SECURITY SERVICE (MI5) Sir Andrew Parker KCB – then Director-General, Security Service Other officials Expert external witnesses Professor Anne Applebaum – Institute of Global Affairs Mr William Browder – Head of the Global Magnitsky Justice Movement Mr Christopher Donnelly CMG TD – Head of the Institute for Statecraft Mr Edward Lucas – Writer and consultant specialising in European and transatlantic security Mr Christopher Steele – Director, Orbis Business Intelligence Ltd 44</td>
+<td align="right">13</td>
+<td align="left">NCSC</td>
+<td align="left">14 NCSC, Reckless campaign of cyber attacks by Russian military intelligence service exposed, 3 October 2018, (www.ncsc.gov.uk/news/reckless-campaign-cyber-attacks-russian-military-intelligence-service- exposed).</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="left">NCSC</td>
+<td align="left">37 We note that the Centre for the Protection of National Infrastructure (CPNI) and the National Cyber Security Centre (NCSC) also support the Government security architecture and play a role in protecting the mechanics of elections, including informing improvements to electoral management software and through protective security advice to political parties.</td>
+</tr>
+<tr class="even">
+<td align="right">32</td>
+<td align="left">OSCT</td>
+<td align="left">This appears unusual: the Home Office might seem a more natural home for it, as it would allow the Office for Security and Counter-Terrorism’s (OSCT) experience on counter-terrorism matters to be brought to bear against the hostile state threat.</td>
+</tr>
+<tr class="odd">
+<td align="right">24</td>
+<td align="left">RIS</td>
+<td align="left">61 They are of interest to the Russian Intelligence Services (RIS), which may seek to target them in a number of ways: • it is possible the RIS will seek to monitor some of these individuals using human sources (i.e. agents) and by technical means, for example by intercepting phone calls and hacking into their personal electronic devices; • RIS collection of intelligence could also be used in support of ‘influence operations’, with the objective of degrading an individual’s ability to encourage international or domestic Russian political opposition to Putin and his government; or • the RIS may seek to identify or engineer opportunities to arrange an individual’s arrest and transfer to Russia to stand trial, or indeed meet a worse fate.</td>
+</tr>
+<tr class="even">
+<td align="right">36</td>
+<td align="left">RIS</td>
+<td align="left">Whilst these attacks demonstrate that the RIS are not infallible, it would be foolhardy to think that they are any less dangerous because of these mistakes.</td>
+</tr>
+<tr class="odd">
+<td align="right">36</td>
+<td align="left">RIS</td>
+<td align="left">Indeed, the likelihood is that the RIS will learn from their errors, and become more difficult to detect and protect against as a result.</td>
+</tr>
+<tr class="even">
+<td align="right">36</td>
+<td align="left">RIS</td>
+<td align="left">The Russian decision-making apparatus is concentrated on Putin and a small group of trusted and secretive advisers (many of whom share Putin’s background in the RIS).</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">UN</td>
+<td align="left">The strengths which Russia retains are largely its inheritances from the USSR and its status as a victor of the Second World War: nuclear weapons, a space presence and a permanent seat on the UN Security Council.</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="left">UN</td>
+<td align="left">While the UN has agreed that international law, and in particular the UN Charter, applies in cyberspace, there is still a need for a greater global understanding of how this should work in practice.</td>
 </tr>
 </tbody>
 </table>
