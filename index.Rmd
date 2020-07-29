@@ -12,7 +12,7 @@ output:
 
 (See the github repo [here](https://github.com/InductiveStep/Russia-Report).)
 
-The UK’s Intelligence and Security Committee’s report into Russian activity in the UK was finally on the 21 July 2020.
+The UK’s Intelligence and Security Committee’s report into Russian activity in the UK was finally published on the 21 July 2020.
 
 The heavily-redacted text is available on the [ISC website](http://isc.independent.gov.uk/news-archive/21july2020) and [in this github repository](20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf).
 
