@@ -363,7 +363,7 @@ Let's see which report words appear by sentiment:
 library(ggwordcloud)
 ```
 
-```{r message=FALSE, warning=FALSE}
+```{r fig.height=25, fig.width=10, message=FALSE, warning=FALSE}
 makeWordCloud <- function(theSentiment) {
   rr_sentiment %>%
     filter(sentiment == theSentiment) %>%
@@ -382,9 +382,10 @@ makeWordCloud <- function(theSentiment) {
 
 allTheClouds <- map(unique(rr_sentiment$sentiment)
                       %>% na.omit(), makeWordCloud)
-allTheClouds
-```
 
+library(patchwork)
+wrap_plots(allTheClouds, ncol = 2)
+```
 
 
 I'm not entirely convinced by the words picked out for each of those sentiments - maybe anger, disgust, and sadness show something interesting.
@@ -478,8 +479,10 @@ excluded_words <- c("gchq",
 
 (Note below how stop words have been removed too with `anti_join`).
 
-```{r fig.height=36, fig.width=6, message=FALSE, warning=FALSE}
-rr_sentiment %>%
+```{r}
+library(stringr)
+
+dat4clouds <- rr_sentiment %>%
   anti_join(stop_words) %>%
   mutate(redacted = recode(redacted,
                            `0` = "No redactions",
@@ -487,13 +490,26 @@ rr_sentiment %>%
   group_by(redacted, mentioned_services, word) %>%
   summarise(n = n()) %>%
   mutate(prop = n/sum(n)) %>%
-  filter(prop > .01 & !(word %in% excluded_words)) %>%
-  mutate(services_wrapped = stringr::str_wrap(mentioned_services,5)) %>%
-  ggplot(aes(label = word, size = log1p(prop), color = redacted)) +
-    scale_size_area(max_size = 9) +
-    geom_text_wordcloud() +
-    theme_minimal() + 
-    facet_grid(cols = vars(redacted),
-               rows = vars(services_wrapped))
+  filter(n >= 2 & !(word %in% excluded_words)) %>%
+  mutate(services_wrapped = str_wrap(mentioned_services,
+                                     5))
+```
+
+```{r eval=FALSE, include=FALSE}
+View(dat4clouds)
+```
+
+Now plot it:
+
+```{r fig.height=36, fig.width=6, message=FALSE, warning=FALSE}
+dat4clouds %>%
+  ggplot(aes(label = word,
+             size = prop,
+             color = redacted)) +
+      scale_size_area(max_size = 10) +
+      geom_text_wordcloud() +
+      theme_minimal() + 
+      facet_grid(cols = vars(redacted),
+                 rows = vars(services_wrapped))
 ```
 

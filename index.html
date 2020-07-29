@@ -2843,36 +2843,10 @@ rr_sentiment &lt;- rr_sentiment %&gt;%
 
 allTheClouds &lt;- map(unique(rr_sentiment$sentiment)
                       %&gt;% na.omit(), makeWordCloud)
-allTheClouds</code></pre>
-<pre><code>## [[1]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
-<pre><code>## 
-## [[2]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-2.png" width="672" /></p>
-<pre><code>## 
-## [[3]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-3.png" width="672" /></p>
-<pre><code>## 
-## [[4]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-4.png" width="672" /></p>
-<pre><code>## 
-## [[5]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-5.png" width="672" /></p>
-<pre><code>## 
-## [[6]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-6.png" width="672" /></p>
-<pre><code>## 
-## [[7]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-7.png" width="672" /></p>
-<pre><code>## 
-## [[8]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-8.png" width="672" /></p>
-<pre><code>## 
-## [[9]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-9.png" width="672" /></p>
-<pre><code>## 
-## [[10]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-10.png" width="672" /></p>
+
+library(patchwork)
+wrap_plots(allTheClouds, ncol = 2)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" width="960" /></p>
 <p>I’m not entirely convinced by the words picked out for each of those sentiments - maybe anger, disgust, and sadness show something interesting.</p>
 <pre class="r"><code>toView &lt;- c(&quot;anger&quot;, &quot;disgust&quot;, &quot;sadness&quot;)</code></pre>
 <p>First glue the word-level analysis back onto the sentences.</p>
@@ -3087,7 +3061,9 @@ allTheClouds</code></pre>
                     &quot;intelligence&quot;,
                     &quot;www.mi5&quot;)</code></pre>
 <p>(Note below how stop words have been removed too with <code>anti_join</code>).</p>
-<pre class="r"><code>rr_sentiment %&gt;%
+<pre class="r"><code>library(stringr)
+
+dat4clouds &lt;- rr_sentiment %&gt;%
   anti_join(stop_words) %&gt;%
   mutate(redacted = recode(redacted,
                            `0` = &quot;No redactions&quot;,
@@ -3095,15 +3071,22 @@ allTheClouds</code></pre>
   group_by(redacted, mentioned_services, word) %&gt;%
   summarise(n = n()) %&gt;%
   mutate(prop = n/sum(n)) %&gt;%
-  filter(prop &gt; .01 &amp; !(word %in% excluded_words)) %&gt;%
-  mutate(services_wrapped = stringr::str_wrap(mentioned_services,5)) %&gt;%
-  ggplot(aes(label = word, size = log1p(prop), color = redacted)) +
-    scale_size_area(max_size = 9) +
-    geom_text_wordcloud() +
-    theme_minimal() + 
-    facet_grid(cols = vars(redacted),
-               rows = vars(services_wrapped))</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-34-1.png" width="576" /></p>
+  filter(n &gt;= 2 &amp; !(word %in% excluded_words)) %&gt;%
+  mutate(services_wrapped = str_wrap(mentioned_services,
+                                     5))</code></pre>
+<pre><code>## Joining, by = &quot;word&quot;</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;redacted&#39;, &#39;mentioned_services&#39; (override with `.groups` argument)</code></pre>
+<p>Now plot it:</p>
+<pre class="r"><code>dat4clouds %&gt;%
+  ggplot(aes(label = word,
+             size = prop,
+             color = redacted)) +
+      scale_size_area(max_size = 10) +
+      geom_text_wordcloud() +
+      theme_minimal() + 
+      facet_grid(cols = vars(redacted),
+                 rows = vars(services_wrapped))</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-36-1.png" width="576" /></p>
 </div>
 </div>
 
