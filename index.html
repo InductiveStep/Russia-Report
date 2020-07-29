@@ -923,7 +923,7 @@ rr_sentences$sentence_i &lt;- 1:nrow(rr_sentences)</code></pre>
 <pre class="r"><code>library(fuzzyjoin)</code></pre>
 <p>Here’s the mapping:</p>
 <pre class="r"><code>mapping &lt;- tribble(
-  ~regex, ~code,
+  ~regex,                                ~code,
   &quot;MI5|[s|S]ecurity [s|S]ervice&quot;,        &quot;org_MI5&quot;,
   &quot;MI6|SIS|Secret Intelligence Service&quot;, &quot;org_MI6&quot;,
   &quot;GCHQ&quot;,                                &quot;org_GCHQ&quot;,

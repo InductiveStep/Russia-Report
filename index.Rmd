@@ -177,7 +177,7 @@ Here's the mapping:
 
 ```{r}
 mapping <- tribble(
-  ~regex, ~code,
+  ~regex,                                ~code,
   "MI5|[s|S]ecurity [s|S]ervice",        "org_MI5",
   "MI6|SIS|Secret Intelligence Service", "org_MI6",
   "GCHQ",                                "org_GCHQ",
