@@ -123,21 +123,21 @@ The previous scan of all words reduced them to lower case, so let's go again usi
 initialism_regex <- "([A-Z]{2})|(([A-Z].){2})"
 
 rr_initialisms <- rr_tib %>%
+  filter((page >= 8) & (page <= 59)) %>%
   select(page,text) %>%
   unnest_tokens(word,
                 text,
                 to_lower = FALSE) %>%
   filter(str_detect(word, initialism_regex))
-
-head(rr_initialisms)
 ```
 
-It's apparent that this picks up too many, e.g., there are some upper case words like "INTELLIGENCE". I've selected a few interesting actual initialisms for later.
+It's apparent that this picks up too many, e.g., there are some upper case words like "INTELLIGENCE" in sectio headings. I've selected a few interesting actual initialisms for later.
 
 ```{r}
 rr_initialisms %>%
   group_by(word) %>%
   count() %>%
+  mutate(length = str_length(word)) %>%
   arrange(desc(n)) %>%
   kable()
 ```

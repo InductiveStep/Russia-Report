@@ -369,26 +369,17 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
 <pre class="r"><code>initialism_regex &lt;- &quot;([A-Z]{2})|(([A-Z].){2})&quot;
 
 rr_initialisms &lt;- rr_tib %&gt;%
+  filter((page &gt;= 8) &amp; (page &lt;= 59)) %&gt;%
   select(page,text) %&gt;%
   unnest_tokens(word,
                 text,
                 to_lower = FALSE) %&gt;%
-  filter(str_detect(word, initialism_regex))
-
-head(rr_initialisms)</code></pre>
-<pre><code>## # A tibble: 6 x 2
-##    page word         
-##   &lt;int&gt; &lt;chr&gt;        
-## 1     1 HC           
-## 2     2 HC           
-## 3     3 ISBN         
-## 4     3 CCS1019402408
-## 5     3 UK           
-## 6     3 APS</code></pre>
-<p>It’s apparent that this picks up too many, e.g., there are some upper case words like “INTELLIGENCE”. I’ve selected a few interesting actual initialisms for later.</p>
+  filter(str_detect(word, initialism_regex))</code></pre>
+<p>It’s apparent that this picks up too many, e.g., there are some upper case words like “INTELLIGENCE” in sectio headings. I’ve selected a few interesting actual initialisms for later.</p>
 <pre class="r"><code>rr_initialisms %&gt;%
   group_by(word) %&gt;%
   count() %&gt;%
+  mutate(length = str_length(word)) %&gt;%
   arrange(desc(n)) %&gt;%
   kable()</code></pre>
 <table>
@@ -396,508 +387,569 @@ head(rr_initialisms)</code></pre>
 <tr class="header">
 <th align="left">word</th>
 <th align="right">n</th>
+<th align="right">length</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">UK</td>
-<td align="right">103</td>
+<td align="right">99</td>
+<td align="right">2</td>
 </tr>
 <tr class="even">
 <td align="left">GCHQ</td>
-<td align="right">49</td>
+<td align="right">48</td>
+<td align="right">4</td>
 </tr>
 <tr class="odd">
 <td align="left">MI5</td>
-<td align="right">43</td>
+<td align="right">42</td>
+<td align="right">3</td>
 </tr>
 <tr class="even">
 <td align="left">SIS</td>
-<td align="right">36</td>
+<td align="right">35</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">UK’s</td>
 <td align="right">29</td>
+<td align="right">4</td>
 </tr>
 <tr class="even">
 <td align="left">HMG</td>
-<td align="right">25</td>
+<td align="right">23</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">US</td>
 <td align="right">22</td>
+<td align="right">2</td>
 </tr>
 <tr class="even">
-<td align="left">MP</td>
-<td align="right">20</td>
-</tr>
-<tr class="odd">
 <td align="left">NATO</td>
 <td align="right">19</td>
+<td align="right">4</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">DCMS</td>
 <td align="right">18</td>
+<td align="right">4</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">NCA</td>
 <td align="right">18</td>
-</tr>
-<tr class="even">
-<td align="left">EU</td>
-<td align="right">11</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
-<td align="left">HC</td>
-<td align="right">11</td>
+<td align="left">EU</td>
+<td align="right">10</td>
+<td align="right">2</td>
 </tr>
 <tr class="even">
-<td align="left">AND</td>
+<td align="left">HC</td>
 <td align="right">9</td>
+<td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="left">ICE</td>
 <td align="right">9</td>
+<td align="right">3</td>
 </tr>
 <tr class="even">
 <td align="left">RIS</td>
 <td align="right">8</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">SIGINT</td>
 <td align="right">8</td>
+<td align="right">6</td>
 </tr>
 <tr class="even">
 <td align="left">GRU</td>
 <td align="right">7</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">HUMINT</td>
 <td align="right">7</td>
+<td align="right">6</td>
 </tr>
 <tr class="even">
 <td align="left">RT</td>
 <td align="right">7</td>
+<td align="right">2</td>
 </tr>
 <tr class="odd">
+<td align="left">AND</td>
+<td align="right">5</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
 <td align="left">CNI</td>
 <td align="right">5</td>
-</tr>
-<tr class="even">
-<td align="left">GEOINT</td>
-<td align="right">5</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
-<td align="left">JIC</td>
+<td align="left">GEOINT</td>
 <td align="right">5</td>
+<td align="right">6</td>
 </tr>
 <tr class="even">
+<td align="left">JIC</td>
+<td align="right">5</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
 <td align="left">MASINT</td>
 <td align="right">5</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">MP</td>
+<td align="right">5</td>
+<td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="left">NCSC</td>
 <td align="right">5</td>
-</tr>
-<tr class="even">
-<td align="left">NSS</td>
-<td align="right">5</td>
-</tr>
-<tr class="odd">
-<td align="left">OSCT</td>
-<td align="right">5</td>
+<td align="right">4</td>
 </tr>
 <tr class="even">
 <td align="left">USSR</td>
 <td align="right">5</td>
+<td align="right">4</td>
 </tr>
 <tr class="odd">
 <td align="left">FARA</td>
+<td align="right">4</td>
 <td align="right">4</td>
 </tr>
 <tr class="even">
 <td align="left">GCHQ’s</td>
 <td align="right">4</td>
+<td align="right">6</td>
 </tr>
 <tr class="odd">
+<td align="left">NSS</td>
+<td align="right">4</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
 <td align="left">OBE</td>
+<td align="right">4</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">OSCT</td>
+<td align="right">4</td>
 <td align="right">4</td>
 </tr>
 <tr class="even">
 <td align="left">CMG</td>
 <td align="right">3</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">FCO</td>
 <td align="right">3</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">OFFICE</td>
+<td align="right">3</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">UN</td>
+<td align="right">3</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">CONTEST</td>
+<td align="right">2</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="left">HMG’s</td>
+<td align="right">2</td>
+<td align="right">5</td>
 </tr>
 <tr class="even">
 <td align="left">INTELLIGENCE</td>
-<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">12</td>
 </tr>
 <tr class="odd">
 <td align="left">ISC</td>
+<td align="right">2</td>
 <td align="right">3</td>
 </tr>
 <tr class="even">
-<td align="left">OF</td>
-<td align="right">3</td>
-</tr>
-<tr class="odd">
-<td align="left">OFFICE</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="left">QC</td>
-<td align="right">3</td>
-</tr>
-<tr class="odd">
-<td align="left">SECURITY</td>
-<td align="right">3</td>
-</tr>
-<tr class="even">
-<td align="left">UN</td>
-<td align="right">3</td>
-</tr>
-<tr class="odd">
-<td align="left">ALLOCATION</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">ANNEX</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">CBE</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">CCS1019402408</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">CLASSIFIED</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">CO</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">CONTEST</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">CYBER</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">DISINFORMATION</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">EFFORT</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">ENGAGEMENT</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">EVIDENCE</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">EXPATRIATES</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">GCB</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">HARD</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">HMG’s</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">INFLUENCE</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">INTERNATIONAL</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">INTRODUCTION</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">JIO</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
 <td align="left">KCMG</td>
 <td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">LEGISLATION</td>
-<td align="right">2</td>
+<td align="right">4</td>
 </tr>
 <tr class="odd">
-<td align="left">MI6</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
 <td align="left">MPs</td>
 <td align="right">2</td>
+<td align="right">3</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">OPCW</td>
 <td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">ORAL</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">ORDINATION</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">PARTNERSHIPS</td>
-<td align="right">2</td>
+<td align="right">4</td>
 </tr>
 <tr class="odd">
 <td align="left">PEP</td>
 <td align="right">2</td>
+<td align="right">3</td>
 </tr>
 <tr class="even">
 <td align="left">PR</td>
 <td align="right">2</td>
+<td align="right">2</td>
 </tr>
 <tr class="odd">
-<td align="left">RUSSIA</td>
+<td align="left">SECURITY</td>
 <td align="right">2</td>
+<td align="right">8</td>
 </tr>
 <tr class="even">
-<td align="left">RUSSIAN</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
 <td align="left">SERVICE</td>
 <td align="right">2</td>
+<td align="right">7</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">SIS’s</td>
 <td align="right">2</td>
+<td align="right">5</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">SOC</td>
 <td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">STRATEGY</td>
-<td align="right">2</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
-<td align="left">TARGET</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">TASKING</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">WITH</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="left">WITNESSES</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td align="left">WRITTEN</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
 <td align="left">AGENCY</td>
 <td align="right">1</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">ALLOCATION</td>
+<td align="right">1</td>
+<td align="right">10</td>
 </tr>
 <tr class="odd">
-<td align="left">APS</td>
+<td align="left">ANNEX</td>
 <td align="right">1</td>
+<td align="right">5</td>
 </tr>
 <tr class="even">
 <td align="left">CABINET</td>
 <td align="right">1</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="left">CBE</td>
+<td align="right">1</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">CCS1019402408</td>
+<td align="right">1</td>
+<td align="right">13</td>
 </tr>
 <tr class="odd">
 <td align="left">CCTV</td>
 <td align="right">1</td>
+<td align="right">4</td>
 </tr>
 <tr class="even">
-<td align="left">COMMITTEE</td>
+<td align="left">CLASSIFIED</td>
 <td align="right">1</td>
+<td align="right">10</td>
 </tr>
 <tr class="odd">
+<td align="left">CO</td>
+<td align="right">1</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
 <td align="left">COMMONWEALTH</td>
 <td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">COMMUNICATIONS</td>
-<td align="right">1</td>
+<td align="right">12</td>
 </tr>
 <tr class="odd">
-<td align="left">CONTENTS</td>
+<td align="left">COMMUNICATIONS</td>
 <td align="right">1</td>
+<td align="right">14</td>
 </tr>
 <tr class="even">
 <td align="left">COUNTER</td>
 <td align="right">1</td>
+<td align="right">7</td>
 </tr>
 <tr class="odd">
 <td align="left">CPNI</td>
 <td align="right">1</td>
+<td align="right">4</td>
 </tr>
 <tr class="even">
 <td align="left">CRIME</td>
 <td align="right">1</td>
+<td align="right">5</td>
 </tr>
 <tr class="odd">
 <td align="left">CT</td>
 <td align="right">1</td>
+<td align="right">2</td>
 </tr>
 <tr class="even">
-<td align="left">CyberUK</td>
+<td align="left">CYBER</td>
 <td align="right">1</td>
+<td align="right">5</td>
 </tr>
 <tr class="odd">
-<td align="left">DBE</td>
+<td align="left">CyberUK</td>
 <td align="right">1</td>
+<td align="right">7</td>
 </tr>
 <tr class="even">
 <td align="left">DEFENCE</td>
 <td align="right">1</td>
+<td align="right">7</td>
 </tr>
 <tr class="odd">
-<td align="left">DI</td>
+<td align="left">DISINFORMATION</td>
 <td align="right">1</td>
+<td align="right">14</td>
 </tr>
 <tr class="even">
-<td align="left">DSC</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
 <td align="left">DSTL</td>
 <td align="right">1</td>
+<td align="right">4</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">EEA</td>
 <td align="right">1</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">EFFORT</td>
+<td align="right">1</td>
+<td align="right">6</td>
 </tr>
 <tr class="odd">
+<td align="left">ENGAGEMENT</td>
+<td align="right">1</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">EVIDENCE</td>
+<td align="right">1</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">EXPATRIATES</td>
+<td align="right">1</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
 <td align="left">FCO’s</td>
 <td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">FOR</td>
-<td align="right">1</td>
+<td align="right">5</td>
 </tr>
 <tr class="odd">
-<td align="left">FOREIGN</td>
+<td align="left">FOR</td>
 <td align="right">1</td>
+<td align="right">3</td>
 </tr>
 <tr class="even">
-<td align="left">GCVO</td>
+<td align="left">FOREIGN</td>
 <td align="right">1</td>
+<td align="right">7</td>
 </tr>
 <tr class="odd">
 <td align="left">GOVERNMENT</td>
 <td align="right">1</td>
+<td align="right">10</td>
 </tr>
 <tr class="even">
-<td align="left">HEADQUARTERS</td>
+<td align="left">HARD</td>
 <td align="right">1</td>
+<td align="right">4</td>
 </tr>
 <tr class="odd">
-<td align="left">ISBN</td>
+<td align="left">HEADQUARTERS</td>
 <td align="right">1</td>
+<td align="right">12</td>
+</tr>
+<tr class="even">
+<td align="left">INFLUENCE</td>
+<td align="right">1</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="left">INTERNATIONAL</td>
+<td align="right">1</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="left">INTRODUCTION</td>
+<td align="right">1</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">JIO</td>
+<td align="right">1</td>
+<td align="right">3</td>
 </tr>
 <tr class="even">
 <td align="left">JTAC</td>
 <td align="right">1</td>
+<td align="right">4</td>
 </tr>
 <tr class="odd">
 <td align="left">KCB</td>
 <td align="right">1</td>
+<td align="right">3</td>
 </tr>
 <tr class="even">
 <td align="left">Leave.EU</td>
 <td align="right">1</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">LEGISLATION</td>
+<td align="right">1</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">MI6</td>
+<td align="right">1</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">NAC</td>
 <td align="right">1</td>
+<td align="right">3</td>
 </tr>
 <tr class="even">
 <td align="left">NATIONAL</td>
 <td align="right">1</td>
+<td align="right">8</td>
 </tr>
 <tr class="odd">
 <td align="left">NCA’s</td>
 <td align="right">1</td>
+<td align="right">5</td>
 </tr>
 <tr class="even">
 <td align="left">NOCP</td>
 <td align="right">1</td>
+<td align="right">4</td>
 </tr>
 <tr class="odd">
 <td align="left">NSC</td>
 <td align="right">1</td>
+<td align="right">3</td>
 </tr>
 <tr class="even">
-<td align="left">PARLIAMENT</td>
+<td align="left">OF</td>
 <td align="right">1</td>
+<td align="right">2</td>
 </tr>
 <tr class="odd">
-<td align="left">PC</td>
+<td align="left">ORAL</td>
 <td align="right">1</td>
+<td align="right">4</td>
 </tr>
 <tr class="even">
+<td align="left">ORDINATION</td>
+<td align="right">1</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">PARTNERSHIPS</td>
+<td align="right">1</td>
+<td align="right">12</td>
+</tr>
+<tr class="even">
+<td align="left">QC</td>
+<td align="right">1</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
 <td align="left">QPM</td>
 <td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">QSO</td>
-<td align="right">1</td>
+<td align="right">3</td>
 </tr>
 <tr class="even">
 <td align="left">RAF</td>
 <td align="right">1</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">RUSSIA</td>
+<td align="right">1</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">RUSSIAN</td>
+<td align="right">1</td>
+<td align="right">7</td>
 </tr>
 <tr class="odd">
 <td align="left">SECRET</td>
 <td align="right">1</td>
+<td align="right">6</td>
 </tr>
 <tr class="even">
-<td align="left">TD</td>
+<td align="left">STRATEGY</td>
 <td align="right">1</td>
+<td align="right">8</td>
 </tr>
 <tr class="odd">
-<td align="left">TERRORISM</td>
+<td align="left">TARGET</td>
 <td align="right">1</td>
+<td align="right">6</td>
 </tr>
 <tr class="even">
-<td align="left">THE</td>
+<td align="left">TASKING</td>
 <td align="right">1</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="left">TD</td>
+<td align="right">1</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">TERRORISM</td>
+<td align="right">1</td>
+<td align="right">9</td>
 </tr>
 <tr class="odd">
 <td align="left">VOSTOK</td>
 <td align="right">1</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">WITH</td>
+<td align="right">1</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">WITNESSES</td>
+<td align="right">1</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">WRITTEN</td>
+<td align="right">1</td>
+<td align="right">7</td>
 </tr>
 </tbody>
 </table>
