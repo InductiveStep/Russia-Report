@@ -11,7 +11,7 @@
 
 <meta name="author" content="Andi Fugard (almost@gmail.com, @inductivestep)" />
 
-<meta name="date" content="2020-07-28" />
+<meta name="date" content="2020-07-29" />
 
 <title>Analysing the Russia Report</title>
 
@@ -256,15 +256,16 @@ div.tocify {
 
 <h1 class="title toc-ignore">Analysing the Russia Report</h1>
 <h4 class="author">Andi Fugard (<a href="mailto:almost@gmail.com" class="email">almost@gmail.com</a>, @<a href="https://twitter.com/InductiveStep">inductivestep</a>)</h4>
-<h4 class="date">28 July 2020</h4>
+<h4 class="date">29 July 2020</h4>
 
 </div>
 
 
-<p><strong><em>WORK IN PROGRESS</em></strong></p>
 <p>(See the github repo <a href="https://github.com/InductiveStep/Russia-Report">here</a>.)</p>
-<p>The report is available on the <a href="http://isc.independent.gov.uk/news-archive/21july2020">ISC website</a> and <a href="20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf">in this github repository</a>.</p>
-<p>First, load it into R.</p>
+<p>The UK’s Intelligence and Security Committee’s report into Russian activity in the UK was finally on the 21 July 2020.</p>
+<p>The heavily-redacted text is available on the <a href="http://isc.independent.gov.uk/news-archive/21july2020">ISC website</a> and <a href="20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf">in this github repository</a>.</p>
+<p>I’m going to have a look with the aid of some tidyverse widgets.</p>
+<p>First, load packages and the text into R.</p>
 <pre class="r"><code>devtools::install_github(&quot;inductivestep/handbag&quot;)
 library(handbag)
 library(tidyverse)
@@ -277,50 +278,78 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
 <h1>First go</h1>
 <div id="finding-the-juiciest-pages" class="section level2">
 <h2>Finding the juiciest pages</h2>
-<p>I’d like to know where the juicy pages are - one way to count how many redactions there are, ***.</p>
+<p>I’d like to know where the juicy pages are - maybe it’s those with the most redactions, <code>***</code>?</p>
+<p>Let’s count redactions per page:</p>
 <pre class="r"><code>redact_n &lt;- str_count(rr_text, pattern = &quot;\\*\\*\\*&quot;)</code></pre>
-<p>Let’s stick these in a tibble, alongside the (pdf, as opposed to printed) page number and original page text.</p>
+<p>Now add these to a tibble, alongside the (pdf, as opposed to printed) page number and original page text for later analyses.</p>
 <pre class="r"><code>rr_tib &lt;- tibble(page = 1:length(rr_text),
                  text = rr_text,
                  redactions = redact_n)</code></pre>
 <div id="histogram" class="section level3">
 <h3>Histogram</h3>
-<p>Now a histogram of those redactions:</p>
+<p>A histogram of those redactions:</p>
 <pre class="r"><code>ggplot(rr_tib, aes(x=redactions)) +
   geom_histogram(binwidth = 1, fill = &quot;firebrick&quot;, color = &quot;white&quot;) +
   labs(x = &quot;Number of redactions&quot;,
        y = &quot;Count&quot;,
-       title = &quot;Histogram of redactions on each page of the Russia Report&quot;) +
+       title = &quot;Redactions per page in the Russia Report&quot;) +
   theme_classic()</code></pre>
 <p><img src="index_files/figure-html/unnamed-chunk-4-1.png" width="576" /></p>
 </div>
 <div id="which-pages-have-the-most-redactions" class="section level3">
 <h3>Which pages have the most redactions?</h3>
 <pre class="r"><code>rr_tib %&gt;%
-  filter(redactions &gt; 10) %&gt;%
+  filter(redactions &gt;= 10) %&gt;%
   select(page, redactions) %&gt;%
-  arrange(redactions)</code></pre>
-<pre><code>## # A tibble: 5 x 2
-##    page redactions
-##   &lt;int&gt;      &lt;int&gt;
-## 1    27         11
-## 2    45         11
-## 3    20         15
-## 4    37         15
-## 5    38         19</code></pre>
+  arrange(redactions) %&gt;%
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">page</th>
+<th align="right">redactions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="right">27</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="right">45</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="right">15</td>
+</tr>
+<tr class="odd">
+<td align="right">37</td>
+<td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="right">38</td>
+<td align="right">19</td>
+</tr>
+</tbody>
+</table>
 <p>The section on PDF pages 37 and 38 (printed page nums 30 and 31) is the winner: “Rising to the challenge”. Here’s a link to the <a href="https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=37">pdf pages</a>.</p>
 </div>
 </div>
 <div id="word-counts" class="section level2">
 <h2>Word counts</h2>
-<p>Let’s try the <code>tidytext</code> package, which is introduced in a <a href="https://www.tidytextmining.com/">great book</a> by <a href="https://juliasilge.com/">Julia Silge</a> and <a href="http://varianceexplained.org/">David Robinson</a>.</p>
+<p>For this, I’ll use the <code>tidytext</code> package, which is introduced in a <a href="https://www.tidytextmining.com/">great book</a> by <a href="https://juliasilge.com/">Julia Silge</a> and <a href="http://varianceexplained.org/">David Robinson</a>.</p>
 <pre class="r"><code>library(tidytext)</code></pre>
-<p>Here’s a tidy tibble with all the words:</p>
+<p>Here’s a tidy tibble with all the words, using <code>unnest_tokens</code>:</p>
 <pre class="r"><code>rr_words &lt;- rr_tib %&gt;%
   select(page,text) %&gt;%
   unnest_tokens(word, # name of the new column
                 text) # column with text</code></pre>
-<p>And the top 20 most common words:</p>
+<p>The top 20 most common words, excluding <a href="https://en.wikipedia.org/wiki/Stop_words">stop words</a>, are:</p>
 <pre class="r"><code>rr_words %&gt;%
   anti_join(stop_words, by = &quot;word&quot;) %&gt;%
   count(word) %&gt;%
@@ -335,10 +364,547 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
          x = &quot;Word&quot;) + 
     theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="index_files/figure-html/unnamed-chunk-8-1.png" width="576" /></p>
+<p>It might also be fun to find initialisms like MI5, etc. - we can do that with a regular expression.</p>
+<p>The previous scan of all words reduced them to lower case, so let’s go again using <code>unnest_tokens</code> with <code>to_lower = FALSE</code>:</p>
+<pre class="r"><code>initialism_regex &lt;- &quot;([A-Z]{2})|(([A-Z].){2})&quot;
+
+rr_initialisms &lt;- rr_tib %&gt;%
+  select(page,text) %&gt;%
+  unnest_tokens(word,
+                text,
+                to_lower = FALSE) %&gt;%
+  filter(str_detect(word, initialism_regex))
+
+head(rr_initialisms)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##    page word         
+##   &lt;int&gt; &lt;chr&gt;        
+## 1     1 HC           
+## 2     2 HC           
+## 3     3 ISBN         
+## 4     3 CCS1019402408
+## 5     3 UK           
+## 6     3 APS</code></pre>
+<p>It’s apparent that this picks up too many, e.g., there are some upper case words like “INTELLIGENCE”. I’ve selected a few interesting actual initialisms for later.</p>
+<pre class="r"><code>rr_initialisms %&gt;%
+  group_by(word) %&gt;%
+  count() %&gt;%
+  arrange(desc(n)) %&gt;%
+  kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">word</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">UK</td>
+<td align="right">103</td>
+</tr>
+<tr class="even">
+<td align="left">GCHQ</td>
+<td align="right">49</td>
+</tr>
+<tr class="odd">
+<td align="left">MI5</td>
+<td align="right">43</td>
+</tr>
+<tr class="even">
+<td align="left">SIS</td>
+<td align="right">36</td>
+</tr>
+<tr class="odd">
+<td align="left">UK’s</td>
+<td align="right">29</td>
+</tr>
+<tr class="even">
+<td align="left">HMG</td>
+<td align="right">25</td>
+</tr>
+<tr class="odd">
+<td align="left">US</td>
+<td align="right">22</td>
+</tr>
+<tr class="even">
+<td align="left">MP</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">NATO</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">DCMS</td>
+<td align="right">18</td>
+</tr>
+<tr class="odd">
+<td align="left">NCA</td>
+<td align="right">18</td>
+</tr>
+<tr class="even">
+<td align="left">EU</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="left">HC</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">AND</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="left">ICE</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">RIS</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">SIGINT</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="left">GRU</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="left">HUMINT</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">RT</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="left">CNI</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">GEOINT</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">JIC</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">MASINT</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">NCSC</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">NSS</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">OSCT</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">USSR</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">FARA</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">GCHQ’s</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">OBE</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">CMG</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">FCO</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">INTELLIGENCE</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">ISC</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">OF</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">OFFICE</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">QC</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">SECURITY</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">UN</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">ALLOCATION</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">ANNEX</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">CBE</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">CCS1019402408</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">CLASSIFIED</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">CO</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">CONTEST</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">CYBER</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">DISINFORMATION</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">EFFORT</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">ENGAGEMENT</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">EVIDENCE</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">EXPATRIATES</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">GCB</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">HARD</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">HMG’s</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">INFLUENCE</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">INTERNATIONAL</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">INTRODUCTION</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">JIO</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">KCMG</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">LEGISLATION</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">MI6</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">MPs</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">OPCW</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">ORAL</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">ORDINATION</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">PARTNERSHIPS</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">PEP</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">PR</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">RUSSIA</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">RUSSIAN</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">SERVICE</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">SIS’s</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">SOC</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">STRATEGY</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">TARGET</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">TASKING</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">WITH</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">WITNESSES</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">WRITTEN</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">AGENCY</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">APS</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">CABINET</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">CCTV</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">COMMITTEE</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">COMMONWEALTH</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">COMMUNICATIONS</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">CONTENTS</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">COUNTER</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">CPNI</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">CRIME</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">CT</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">CyberUK</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">DBE</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">DEFENCE</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">DI</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">DSC</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">DSTL</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">EEA</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">FCO’s</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">FOR</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">FOREIGN</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GCVO</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GOVERNMENT</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">HEADQUARTERS</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">ISBN</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">JTAC</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">KCB</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Leave.EU</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">NAC</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">NATIONAL</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">NCA’s</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">NOCP</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">NSC</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">PARLIAMENT</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">PC</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">QPM</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">QSO</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">RAF</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">SECRET</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">TD</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">TERRORISM</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">THE</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">VOSTOK</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="sentence-level-analysis" class="section level2">
 <h2>Sentence-level analysis</h2>
-<p>Is there a relationship between which intelligence service (MI5, MI6, or GCHQ) is mentioned and whether there is a redaction in that sentence?</p>
+<p>Is there a relationship between which intelligence service (e.g., MI5, MI6, or GCHQ) is mentioned and whether there is a redaction in that sentence?</p>
 <p>Again use <code>tidytext</code>, but this time at the sentence level.</p>
 <pre class="r"><code>rr_sentences &lt;- rr_tib %&gt;%
   unnest_sentences(sentence, text,
@@ -348,24 +914,36 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
 rr_sentences$sentence_i &lt;- 1:nrow(rr_sentences)</code></pre>
 <p>That worked reasonably well, though:</p>
 <ul>
-<li>citations at the end of sentences confused it (possible to fix this using <code>unnest_regex</code>),</li>
-<li>footnotes need to be addressed separately (they are sentences beginning with numbers, once the aforementioned sentence problem has been fixed), and</li>
-<li>it doesn’t deal with sentences which cross pages - definitely not when there’s a footnote splitting them too (it may be possible to fix this problem by removing footnotes, gluing all the sentences together, and unnesting again).</li>
+<li>Citations at the end of sentences confused it (possible to fix this by using <code>unnest_regex</code>).</li>
+<li>Footnotes need to be addressed separately (they are sentences beginning with numbers, once the aforementioned sentence problem has been fixed).</li>
+<li>It doesn’t deal with sentences which cross pages - definitely not when there’s a footnote splitting them too (it may be possible to fix this problem by removing footnotes, gluing all the sentences together, and unnesting again).</li>
 </ul>
-<p>Next: code redactions and whether sentences mention one of the big three intel agencies.</p>
-<p>I’ll use <code>fuzzyjoin</code> for this, which joins two tables based on a regular expression.</p>
-<pre class="r"><code>library(fuzzyjoin)
-
-mapping &lt;- tribble(
+<p>Next: code redactions and whether sentences mention one of the big three intel agencies (and some other organisations, for comparison).</p>
+<p>I’ll use (the fantastic!) <code>fuzzyjoin</code> for this, which joins two tables based on a regular expression.</p>
+<pre class="r"><code>library(fuzzyjoin)</code></pre>
+<p>Here’s the mapping:</p>
+<pre class="r"><code>mapping &lt;- tribble(
   ~regex, ~code,
-  &quot;MI5|[s|S]ecurity [s|S]ervice&quot;,         &quot;intel_MI5&quot;,
-  &quot;MI6|SIS|Secret Intelligence Service&quot;,   &quot;intel_MI6&quot;,
-  &quot;GCHQ&quot;,                                  &quot;intel_GCHQ&quot;,
-  &quot;Defence Intelligence&quot;,                  &quot;intel_DI&quot;,
-  &quot;GRU&quot;,                                   &quot;intel_GRU&quot;,
-  &quot;\\*\\*\\*&quot;,                             &quot;redacted&quot;
+  &quot;MI5|[s|S]ecurity [s|S]ervice&quot;,        &quot;org_MI5&quot;,
+  &quot;MI6|SIS|Secret Intelligence Service&quot;, &quot;org_MI6&quot;,
+  &quot;GCHQ&quot;,                                &quot;org_GCHQ&quot;,
+  &quot;Defence Intelligence|DI&quot;,             &quot;org_DI&quot;,
+  &quot;GRU&quot;,                                 &quot;org_GRU&quot;,
+  &quot;NATO&quot;,                                &quot;org_NATO&quot;,
+  &quot;RIS&quot;,                                 &quot;org_RIS&quot;,
+  &quot;NCSC&quot;,                                &quot;org_NCSC&quot;,
+  &quot;NSS&quot;,                                 &quot;org_NSS&quot;,
+  &quot;OSCT&quot;,                                &quot;org_OSCT&quot;,
+  &quot;ISC&quot;,                                 &quot;org_ISC&quot;,
+  &quot;FCO&quot;,                                 &quot;org_FCO&quot;,
+  &quot;UN&quot;,                                  &quot;org_UN&quot;,
+  &quot;RAF&quot;,                                 &quot;org_RAF&quot;,
+  &quot;JIC&quot;,                                 &quot;org_JIC&quot;,
+  &quot;DCMS&quot;,                                &quot;org_DCMS&quot;,
+  initialism_regex,                      &quot;initialism&quot;,
+  &quot;\\*\\*\\*&quot;,                           &quot;redacted&quot;
 )</code></pre>
-<p>Now, reshape so that there’s a binary predictor matrix.</p>
+<p>Now, fuzzyjoin and reshape so that there’s a binary variable for each feature:</p>
 <pre class="r"><code>rr_mentions &lt;- rr_sentences %&gt;%
   regex_left_join(mapping,
                   by = c(sentence = &quot;regex&quot;)) %&gt;%
@@ -375,16 +953,16 @@ mapping &lt;- tribble(
               values_from = n,
               values_fill = 0) %&gt;%
   rowwise() %&gt;%
-  mutate(any_intel_agency = 
-           max(c_across(starts_with(&quot;intel_&quot;)))) %&gt;%
+  mutate(any_org = 
+           max(c_across(starts_with(&quot;org_&quot;)))) %&gt;%
   select(-&quot;NA&quot;)
 
 rr_sentences &lt;- rr_sentences %&gt;%
   left_join(rr_mentions, by = &quot;sentence_i&quot;)</code></pre>
-<p>Now make a summary variable of the services mentioned.</p>
+<p>Make a summary variable of the services mentioned.</p>
 <pre class="r"><code>rr_sentences$mentioned_services &lt;- rr_sentences %&gt;%
-  select(starts_with(&quot;intel_&quot;)) %&gt;%
-  handbag::binary_patterns_var(strip_prefix = &quot;intel_&quot;)</code></pre>
+  select(starts_with(&quot;org_&quot;)) %&gt;%
+  handbag::binary_patterns_var(strip_prefix = &quot;org_&quot;)</code></pre>
 <p>Let’s count them:</p>
 <pre class="r"><code>rr_sentences %&gt;%
   count(mentioned_services) %&gt;%
@@ -400,46 +978,86 @@ rr_sentences &lt;- rr_sentences %&gt;%
 <tbody>
 <tr class="odd">
 <td align="left">(None)</td>
-<td align="right">758</td>
+<td align="right">706</td>
 </tr>
 <tr class="even">
 <td align="left">DI</td>
-<td align="right">37</td>
+<td align="right">39</td>
 </tr>
 <tr class="odd">
 <td align="left">MI5</td>
-<td align="right">31</td>
+<td align="right">30</td>
 </tr>
 <tr class="even">
 <td align="left">GCHQ</td>
-<td align="right">29</td>
+<td align="right">26</td>
 </tr>
 <tr class="odd">
+<td align="left">DCMS</td>
+<td align="right">18</td>
+</tr>
+<tr class="even">
 <td align="left">MI6</td>
 <td align="right">15</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">GCHQ &amp; MI6</td>
 <td align="right">10</td>
 </tr>
+<tr class="even">
+<td align="left">NATO</td>
+<td align="right">8</td>
+</tr>
 <tr class="odd">
-<td align="left">GRU</td>
-<td align="right">6</td>
+<td align="left">JIC</td>
+<td align="right">5</td>
 </tr>
 <tr class="even">
-<td align="left">DI, GCHQ, MI5 &amp; MI6</td>
+<td align="left">GCHQ, MI5 &amp; MI6</td>
 <td align="right">4</td>
 </tr>
 <tr class="odd">
-<td align="left">GCHQ, MI5 &amp; MI6</td>
+<td align="left">GRU</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">NCSC</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">RIS</td>
 <td align="right">4</td>
 </tr>
 <tr class="even">
 <td align="left">DI &amp; GCHQ</td>
-<td align="right">3</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">DI &amp; NATO</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">DI, GCHQ, MI5 &amp; MI6</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">DI, GCHQ, MI5, MI6, NSS &amp; OSCT</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">ISC</td>
+<td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="left">MI5 &amp; MI6</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">NSS</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">UN</td>
 <td align="right">2</td>
 </tr>
 <tr class="even">
@@ -447,34 +1065,56 @@ rr_sentences &lt;- rr_sentences %&gt;%
 <td align="right">1</td>
 </tr>
 <tr class="odd">
-<td align="left">GCHQ &amp; GRU</td>
+<td align="left">DI, GCHQ, OSCT, UN, FCO &amp; RIS</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
+<td align="left">FCO</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
 <td align="left">GCHQ &amp; MI5</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GCHQ &amp; NCSC</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GCHQ &amp; NSS</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">GCHQ, FCO &amp; GRU</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">GRU &amp; RIS</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">ISC &amp; GCHQ</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">MI5 &amp; OSCT</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">NATO &amp; GRU</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">NATO &amp; RAF</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">OSCT</td>
 <td align="right">1</td>
 </tr>
 </tbody>
 </table>
-<p>Does mentioning an intel agency (any of them) in a sentence make it more likely that the sentence will have a redaction?</p>
-<pre class="r"><code>any_redact_tab &lt;- rr_sentences %&gt;%
-  group_by(any_intel_agency) %&gt;%
-  summarise(perc_redacted = 100*mean(redacted)) %&gt;%
-  mutate(any_intel_agency = c(&quot;None mentioned&quot;,
-                              &quot;One or more&quot;))
-
-any_redact_tab %&gt;%
-  ggplot(aes(x = any_intel_agency,
-             y = perc_redacted,
-             fill = any_intel_agency)) +
-    geom_col() +
-    labs(x = &quot;Any intel agency mentioned&quot;,
-         y = &quot;% sentences redacted&quot;) +
-    expand_limits(y = 100) +
-    theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
-<p>Yes. Sentences mentioning any service are 3.8 times more likely to contain a redaction.</p>
-<p>How about the various patterns of mention versus no mention?</p>
+<p>Does mention of any of these organisations in a sentence predict a redaction in the same sentence?</p>
 <pre class="r"><code>redacted_tab &lt;- rr_sentences %&gt;%
   group_by(mentioned_services, redacted) %&gt;%
   summarise(n = n()) %&gt;%
@@ -502,68 +1142,128 @@ redacted_tab %&gt;%
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">GCHQ &amp; GRU</td>
+<td align="left">GCHQ &amp; NSS</td>
 <td align="right">0</td>
 <td align="right">1</td>
 <td align="right">100</td>
 </tr>
 <tr class="even">
+<td align="left">GCHQ, FCO &amp; GRU</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">100</td>
+</tr>
+<tr class="odd">
+<td align="left">ISC &amp; GCHQ</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">100</td>
+</tr>
+<tr class="even">
+<td align="left">NSS</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">100</td>
+</tr>
+<tr class="odd">
 <td align="left">MI6</td>
 <td align="right">5</td>
 <td align="right">10</td>
 <td align="right">67</td>
 </tr>
+<tr class="even">
+<td align="left">JIC</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">60</td>
+</tr>
 <tr class="odd">
 <td align="left">GCHQ</td>
-<td align="right">13</td>
-<td align="right">16</td>
-<td align="right">55</td>
-</tr>
-<tr class="even">
-<td align="left">DI</td>
-<td align="right">21</td>
-<td align="right">16</td>
-<td align="right">43</td>
-</tr>
-<tr class="odd">
-<td align="left">MI5</td>
-<td align="right">20</td>
-<td align="right">11</td>
-<td align="right">35</td>
+<td align="right">12</td>
+<td align="right">14</td>
+<td align="right">54</td>
 </tr>
 <tr class="even">
 <td align="left">DI &amp; GCHQ</td>
-<td align="right">2</td>
 <td align="right">1</td>
-<td align="right">33</td>
+<td align="right">1</td>
+<td align="right">50</td>
 </tr>
 <tr class="odd">
+<td align="left">DI &amp; NATO</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">50</td>
+</tr>
+<tr class="even">
+<td align="left">DI</td>
+<td align="right">24</td>
+<td align="right">15</td>
+<td align="right">38</td>
+</tr>
+<tr class="odd">
+<td align="left">MI5</td>
+<td align="right">19</td>
+<td align="right">11</td>
+<td align="right">37</td>
+</tr>
+<tr class="even">
 <td align="left">GCHQ &amp; MI6</td>
 <td align="right">7</td>
 <td align="right">3</td>
 <td align="right">30</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">GCHQ, MI5 &amp; MI6</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">25</td>
+</tr>
+<tr class="even">
+<td align="left">NCSC</td>
 <td align="right">3</td>
 <td align="right">1</td>
 <td align="right">25</td>
 </tr>
 <tr class="odd">
 <td align="left">(None)</td>
-<td align="right">676</td>
-<td align="right">82</td>
+<td align="right">631</td>
+<td align="right">75</td>
 <td align="right">11</td>
 </tr>
 <tr class="even">
+<td align="left">DCMS</td>
+<td align="right">17</td>
+<td align="right">1</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
 <td align="left">DI, GCHQ &amp; MI6</td>
 <td align="right">1</td>
 <td align="right">0</td>
 <td align="right">0</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">DI, GCHQ, MI5 &amp; MI6</td>
-<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">DI, GCHQ, MI5, MI6, NSS &amp; OSCT</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">DI, GCHQ, OSCT, UN, FCO &amp; RIS</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">FCO</td>
+<td align="right">1</td>
 <td align="right">0</td>
 <td align="right">0</td>
 </tr>
@@ -574,19 +1274,80 @@ redacted_tab %&gt;%
 <td align="right">0</td>
 </tr>
 <tr class="odd">
-<td align="left">GRU</td>
-<td align="right">6</td>
+<td align="left">GCHQ &amp; NCSC</td>
+<td align="right">1</td>
 <td align="right">0</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
+<td align="left">GRU</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">GRU &amp; RIS</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">ISC</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
 <td align="left">MI5 &amp; MI6</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">MI5 &amp; OSCT</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">NATO</td>
+<td align="right">8</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">NATO &amp; GRU</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">NATO &amp; RAF</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">OSCT</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">RIS</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">UN</td>
 <td align="right">2</td>
 <td align="right">0</td>
 <td align="right">0</td>
 </tr>
 </tbody>
 </table>
+<p>As a picture:</p>
 <pre class="r"><code>redacted_tab %&gt;%
   mutate(percentage_redacted = perc_redact_1) %&gt;%
   ggplot(aes(x = reorder(mentioned_services, percentage_redacted),
@@ -596,65 +1357,84 @@ redacted_tab %&gt;%
     coord_flip() +
     labs(x = &quot;Services mentioned in sentence&quot;,
          y = &quot;% of sentences with a redaction&quot;,
-         title = &quot;Predictors of redacted sentences&quot;) + 
+         title = &quot;Predictors of redacted sentences&quot;,
+         caption =
+           &quot;Bars are labelled with counts (redactions/total)&quot;) + 
     expand_limits(y = 105) +
     theme(legend.position = &quot;none&quot;) +
-    geom_text(aes(label = round(percentage_redacted,0),
+    geom_text(aes(label = paste0(n_redact_1,&quot;/&quot;,
+                                 n_redact_1+n_redact_0),
                   y = percentage_redacted+1,
-                  hjust = 0))</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
-<p>(The winner there, GCHQ and GRU, is only one sentence!)</p>
-<div id="some-text" class="section level3">
-<h3>Some text</h3>
-<div id="sentences-mentioning-a-service-with-a-redaction" class="section level4">
-<h4>Sentences mentioning a service with a redaction</h4>
-<p><strong>Note</strong> be careful with the numbers - they’re mostly superscript citations!</p>
+                  hjust = 0),
+              size = 4)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-18-1.png" width="576" /></p>
+<p>(The winner there, NSS mentioned alone, with 100% redactions is only two sentences.)</p>
+<div id="view-the-text" class="section level3">
+<h3>View the text</h3>
+<p>First, a function to make it easier to view the text.</p>
+<pre class="r"><code>viewSentences &lt;- function(the_sentences) {
+  the_sentences %&gt;%
+    mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
+           replace = &quot;\\*\\*\\*[redacted]\\*\\*\\*&quot;,
+           x = sentence)
+    ) %&gt;%
+    select(page, mentioned_services, nice_sentence) %&gt;%
+    kable(col.names = c(&quot;Page&quot;, &quot;Services&quot;, &quot;Sentence&quot;))
+}</code></pre>
+<p><strong>Note be careful interpreting the numbers - they’re mostly superscript citations!</strong></p>
+<div id="sentences-mentioning-an-organisation-and-with-a-redaction" class="section level4">
+<h4>Sentences mentioning an organisation and with a redaction</h4>
 <pre class="r"><code>rr_sentences %&gt;%
-  filter(any_intel_agency == 1 &amp; redacted == 1) %&gt;%
-  mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
-         replace = &quot;\\*\\*\\*[redacted]\\*\\*\\*&quot;,
-         x = sentence)
-  ) %&gt;%
-  select(page, mentioned_services, nice_sentence) %&gt;%
-  kable()</code></pre>
+  filter(any_org == 1 &amp; redacted == 1) %&gt;%
+  viewSentences()</code></pre>
 <table>
 <colgroup>
 <col width="0%" />
-<col width="3%" />
-<col width="95%" />
+<col width="2%" />
+<col width="96%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="right">page</th>
-<th align="left">mentioned_services</th>
-<th align="left">nice_sentence</th>
+<th align="right">Page</th>
+<th align="left">Services</th>
+<th align="left">Sentence</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="right">12</td>
-<td align="left">GCHQ &amp; GRU</td>
-<td align="left">• GCHQ has also advised that Russian GRU 6 actors have orchestrated phishing 7 attempts against Government departments – to take one example, there were attempts against <strong><em>[redacted]</em></strong>, 8 the Foreign and Commonwealth Office (FCO) and the Defence Science and Technology Laboratory (DSTL) during the early stages of the investigation into the Salisbury attacks.</td>
+<td align="left">NCSC</td>
+<td align="left">5 The National Cyber Security Centre (NCSC) has advised that there is <strong><em>[redacted]</em></strong> Russian cyber intrusion into the UK’s CNI – particularly marked in the <strong><em>[redacted]</em></strong> sectors.</td>
 </tr>
 <tr class="even">
+<td align="right">12</td>
+<td align="left">GCHQ, FCO &amp; GRU</td>
+<td align="left">• GCHQ has also advised that Russian GRU 6 actors have orchestrated phishing 7 attempts against Government departments – to take one example, there were attempts against <strong><em>[redacted]</em></strong>, 8 the Foreign and Commonwealth Office (FCO) and the Defence Science and Technology Laboratory (DSTL) during the early stages of the investigation into the Salisbury attacks.</td>
+</tr>
+<tr class="odd">
 <td align="right">12</td>
 <td align="left">GCHQ</td>
 <td align="left">10 GCHQ told the Committee that there is “a quite considerable balance of intelligence now which shows the links between serious and organised crime groups and Russian state activity” and that “we’ve seen more evidence of <strong><em>[redacted]</em></strong> serious and organised crime <strong><em>[redacted]</em></strong> being connected at high levels of Russian state and Russian intelligence”, in what it described as a “symbiotic relationship”.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">12</td>
-<td align="left">GCHQ</td>
+<td align="left">ISC &amp; GCHQ</td>
 <td align="left">8 <strong><em>[redacted]</em></strong> 9 GCHQ, Quarterly Report to the ISC, July–September 2018.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">12</td>
 <td align="left">MI6</td>
 <td align="left">10 Oral evidence – SIS, <strong><em>[redacted]</em></strong> February 2019.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">12</td>
 <td align="left">GCHQ</td>
 <td align="left">11 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="left">NSS</td>
+<td align="left">When attacks can be traced back – and we accept 12 Oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
 </tr>
 <tr class="even">
 <td align="right">14</td>
@@ -678,18 +1458,38 @@ redacted_tab %&gt;%
 </tr>
 <tr class="even">
 <td align="right">17</td>
-<td align="left">GCHQ</td>
-<td align="left">31 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018; oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
+<td align="left">JIC</td>
+<td align="left">33 This was reflected in the Joint Intelligence Committee (JIC) judgement in May 2017 that “the UK paper-based voting process is protected from cyber operations but <strong><em>[redacted]</em></strong>”.</td>
 </tr>
 <tr class="odd">
+<td align="right">17</td>
+<td align="left">GCHQ &amp; NSS</td>
+<td align="left">31 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018; oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
+<tr class="even">
 <td align="right">17</td>
 <td align="left">GCHQ</td>
 <td align="left">32 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
 </tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="left">NSS</td>
+<td align="left">33 Oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
+</tr>
 <tr class="even">
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">With that said, we note that – as with so many other issues currently – it is the social media companies which hold the key and yet are failing to play their part; DCMS informed us that <strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
 <td align="right">18</td>
 <td align="left">MI5</td>
 <td align="left">This matter is, in our 38 Section 1(2), Security Service Act 1989; MI5 has informed us that it currently has a role to (i) “investigate leads to any of this sort of clandestine activity by foreign states”; (ii) “translate [the] intelligence picture into protective advice to defend our systems”; and (iii) “provide assessed intelligence reporting into the policy system to assist in policy formulation” (oral evidence – MI5, <strong><em>[redacted]</em></strong> December 2018).</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="left">JIC</td>
+<td align="left">In May 2017, the Joint Intelligence Committee (JIC) concluded that “<strong><em>[redacted]</em></strong>” and that “<strong><em>[redacted]</em></strong>”.</td>
 </tr>
 <tr class="odd">
 <td align="right">20</td>
@@ -697,307 +1497,356 @@ redacted_tab %&gt;%
 <td align="left">45 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018 <strong><em>[redacted]</em></strong>.</td>
 </tr>
 <tr class="even">
+<td align="right">20</td>
+<td align="left">JIC</td>
+<td align="left">46 <strong><em>[redacted]</em></strong> 47 <strong><em>[redacted]</em></strong> 48 JIC Key Judgement, <strong><em>[redacted]</em></strong>, 26 May 2017. 49 <strong><em>[redacted]</em></strong> (written evidence – HMG, 29 June 2018).</td>
+</tr>
+<tr class="odd">
 <td align="right">24</td>
 <td align="left">MI5</td>
 <td align="left">We welcomed this process, but questioned whether the Intelligence Community has a clear picture of how many Russians there are in the UK who are at risk – for example, would MI5 or any other relevant agency <strong><em>[redacted]</em></strong>?</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
 <td align="left">MI6</td>
 <td align="left">Areas of intelligence coverage work that SIS undertakes in relation to Russia include cultivating agents who are in a position to pass on secret information, particularly in relation to the capabilities and intent of the Russian government, and its intelligence effects work includes <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">27</td>
 <td align="left">MI6</td>
 <td align="left">In 2001, SIS’s operational effort against Russia was <strong><em>[redacted]</em></strong>%.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
 <td align="left">MI5</td>
 <td align="left">76 Written evidence – MI5, 12 March 2019; MI5’s overall resource has increased significantly over this period. <strong><em>[redacted]</em></strong> allocation of effort on Hostile State Activity has <strong><em>[redacted]</em></strong>, spending on Hostile State Activity has <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">28</td>
 <td align="left">GCHQ</td>
 <td align="left">81 Approximately <strong><em>[redacted]</em></strong>% of GCHQ’s current operational effort is on Russia.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">28</td>
 <td align="left">DI</td>
 <td align="left">Defence Intelligence has advised that currently <strong><em>[redacted]</em></strong> of its All Source analysts spend more than 50% of their time on Russia and a further <strong><em>[redacted]</em></strong> spend less than 50% of their time on Russia.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">28</td>
 <td align="left">GCHQ</td>
 <td align="left">This is understandable: the 80 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">28</td>
 <td align="left">DI</td>
 <td align="left">84 This represents <strong><em>[redacted]</em></strong>% of Defence Intelligence’s current analytical resource being focused on Russia (written evidence – Defence Intelligence, 6 March 2019).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">29</td>
 <td align="left">MI5</td>
 <td align="left">87 Oral evidence – MI5, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">29</td>
 <td align="left">DI</td>
 <td align="left">88 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">29</td>
 <td align="left">MI6</td>
 <td align="left">89 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">29</td>
 <td align="left">GCHQ</td>
 <td align="left">90 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">30</td>
 <td align="left">GCHQ &amp; MI6</td>
 <td align="left">SIS and GCHQ planned to change their operational effort against Russia still further – to <strong><em>[redacted]</em></strong>% and <strong><em>[redacted]</em></strong>% respectively by 2020.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">30</td>
 <td align="left">MI5</td>
 <td align="left">92 MI5 is <strong><em>[redacted]</em></strong> and seeking to <strong><em>[redacted]</em></strong> on Hostile State Activity.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">30</td>
 <td align="left">MI5</td>
 <td align="left">For example, MI5 told us that: We quite frequently find ourselves quarter on quarter taking <strong><em>[redacted]</em></strong> decisions about … how we will <strong><em>[redacted]</em></strong> across these different subject areas and at the moment we have stuck with some of the resourcing that’s surged towards hostile state work after Salisbury, despite the fact that our CT [Counter-Terrorism] investigations suspensions rate remains higher than we want it to be.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">30</td>
 <td align="left">MI5</td>
 <td align="left">93 Oral evidence – MI5, <strong><em>[redacted]</em></strong> November 2018.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">32</td>
 <td align="left">GCHQ, MI5 &amp; MI6</td>
 <td align="left">However, it is clear that Russia is a high ministerial priority: the Home Secretary has informed us that he meets the Director-General of MI5 “at least once a week, sometimes more, and … in … <strong><em>[redacted]</em></strong> … there has been some discussion around Russia”, 98 and, when asked about how much he speaks to the Chief of SIS and the Director of GCHQ about Russia, the Foreign Secretary replied “<strong><em>[redacted]</em></strong>”, 99 explaining his concern that Russia-related problems – whilst serious – risk crowding out broader global issues.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">33</td>
 <td align="left">DI</td>
 <td align="left">In relation to the Agencies and Defence Intelligence, given the difficulties in working against Russia (explored in the next section), it is particularly important that all sources – HUMINT, SIGINT, MASINT, GEOINT, 101 open source and others – are used to complement each other as much as possible, and that they are used across all aspects of the co-ordinated Russian threat (<strong><em>[redacted]</em></strong>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">33</td>
 <td align="left">DI</td>
 <td align="left">Given the combined nature of the Russian threat, it is essential that the Agencies’ and Defence Intelligence’s work on <strong><em>[redacted]</em></strong> is not viewed separately from wider Russian foreign policy and influence efforts.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">34</td>
 <td align="left">DI</td>
 <td align="left">104 We recognise that it may not be appropriate for Defence Intelligence to be covered by ICE, but we were surprised to discover that Defence Intelligence is not included in the tri-Agency approach: <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">34</td>
 <td align="left">DI</td>
 <td align="left">Whilst we would not expect to receive highly 104 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">34</td>
 <td align="left">DI</td>
 <td align="left">105 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> January 2019.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">34</td>
 <td align="left">MI6</td>
 <td align="left">106 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">37</td>
 <td align="left">GCHQ</td>
 <td align="left">increasing privacy protection – including ubiquitous encryption – presents particular problems for GCHQ, and in the case of Russia it faces a real SIGINT challenge with the use by the Russian government of <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">37</td>
 <td align="left">DI</td>
 <td align="left">The Agencies and Defence Intelligence must therefore be particularly discerning <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">37</td>
 <td align="left">MI6</td>
 <td align="left">111 Whilst there are a <strong><em>[redacted]</em></strong> group of staff working on this issue, SIS was clear that a sudden surge in numbers would not yield results more quickly.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">37</td>
 <td align="left">GCHQ</td>
 <td align="left">108 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">37</td>
 <td align="left">MI5</td>
 <td align="left">109 Oral evidence – MI5, <strong><em>[redacted]</em></strong> November 2018.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">37</td>
 <td align="left">MI6</td>
 <td align="left">111 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">37</td>
 <td align="left">MI6</td>
 <td align="left">112 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018; we note that SIS <strong><em>[redacted]</em></strong> and has a “series of protections” around the people who do go into the team.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">38</td>
 <td align="left">GCHQ</td>
 <td align="left">116 In relation to SIGINT, GCHQ has focused on not only deploying a broad range of capabilities against Russia, but in joining up with others to use their capabilities in tandem, allowing them to <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">38</td>
 <td align="left">DI</td>
 <td align="left">Defence Intelligence has sought to <strong><em>[redacted]</em></strong> “try to understand how they think and why they think”.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">38</td>
 <td align="left">GCHQ &amp; MI6</td>
 <td align="left">For example, SIS usually deploys only <strong><em>[redacted]</em></strong> of its overall operational Russia effort in support of <strong><em>[redacted]</em></strong>, whilst GCHQ uses approximately <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">38</td>
 <td align="left">DI &amp; GCHQ</td>
 <td align="left">120 This raises the question of whether return now to a ‘normal’, relatively low, level of <strong><em>[redacted]</em></strong> effort against Russia would undermine this, or whether it would now be more 113 GCHQ and Defence Intelligence staff working on Russia are UK based.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">38</td>
 <td align="left">MI6</td>
 <td align="left">114 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">38</td>
 <td align="left">DI</td>
 <td align="left">115 <strong><em>[redacted]</em></strong> 116 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">38</td>
 <td align="left">DI</td>
 <td align="left">117 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">38</td>
 <td align="left">GCHQ &amp; MI6</td>
 <td align="left">118 Oral evidence – SIS and GCHQ, <strong><em>[redacted]</em></strong> January 2019.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">40</td>
 <td align="left">MI5</td>
 <td align="left">123 Oral evidence – MI5, <strong><em>[redacted]</em></strong> February 2019.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">40</td>
 <td align="left">MI5</td>
 <td align="left">126 Oral evidence – MI5, <strong><em>[redacted]</em></strong> January 2019.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">41</td>
 <td align="left">MI5</td>
 <td align="left">128 Oral evidence – MI5, <strong><em>[redacted]</em></strong> January 2019.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">43</td>
 <td align="left">GCHQ</td>
 <td align="left">143 Oral evidence – GCHQ, <strong><em>[redacted]</em></strong> February 2019.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">44</td>
 <td align="left">DI</td>
 <td align="left">The Agencies and Defence Intelligence are increasingly working with <strong><em>[redacted]</em></strong> on the Russian threat.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">45</td>
 <td align="left">DI</td>
 <td align="left">147 Oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> January 2019.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">45</td>
 <td align="left">MI6</td>
 <td align="left">150 Oral evidence – SIS, <strong><em>[redacted]</em></strong> December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">45</td>
-<td align="left">DI</td>
+<td align="left">DI &amp; NATO</td>
 <td align="left">Defence Intelligence also observed that the impact of the Salisbury attack on the NATO intelligence community had “been significant in terms of bolstering individuals”, noting that <strong><em>[redacted]</em></strong> (oral evidence – Defence Intelligence, <strong><em>[redacted]</em></strong> February 2019).</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="sentences-mentioning-a-service-with-no-redaction" class="section level4">
-<h4>Sentences mentioning a service with no redaction</h4>
-<p><strong>Note</strong> be careful with the numbers - they’re mostly superscript citations!</p>
+<div id="sentences-mentioning-the-organisations-but-with-no-redaction" class="section level4">
+<h4>Sentences mentioning the organisations but with no redaction</h4>
 <pre class="r"><code>rr_sentences %&gt;%
-  filter(any_intel_agency == 1 &amp; redacted == 0) %&gt;%
-  mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
-         replace = &quot;\\*\\*\\*[redacted]\\*\\*\\*&quot;,
-         x = sentence)
-  ) %&gt;%
-  select(page, mentioned_services, nice_sentence) %&gt;%
-  kable()</code></pre>
+  filter(any_org == 1 &amp; redacted == 0) %&gt;%
+  viewSentences()</code></pre>
 <table>
 <colgroup>
 <col width="0%" />
-<col width="1%" />
+<col width="2%" />
 <col width="97%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="right">page</th>
-<th align="left">mentioned_services</th>
-<th align="left">nice_sentence</th>
+<th align="right">Page</th>
+<th align="left">Services</th>
+<th align="left">Sentence</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="right">4</td>
-<td align="left">DI, GCHQ, MI5 &amp; MI6</td>
-<td align="left">The Committee oversees the intelligence and security activities of the UK Intelligence Community, including the policies, expenditure, administration and operations of MI5 (the Security Service), MI6 (the Secret Intelligence Service or SIS) and GCHQ (the Government Communications Headquarters)* and the work of the Joint Intelligence Organisation (JIO) and the National Security Secretariat (NSS) in the Cabinet Office; Defence Intelligence (DI) in the Ministry of Defence; and the Office for Security and Counter-Terrorism (OSCT) in the Home Office.</td>
+<td align="left">ISC</td>
+<td align="left">Keith Simpson MP The Intelligence and Security Committee of Parliament (ISC) is a statutory committee of Parliament that has responsibility for oversight of the UK Intelligence Community.</td>
 </tr>
 <tr class="even">
+<td align="right">4</td>
+<td align="left">DI, GCHQ, MI5, MI6, NSS &amp; OSCT</td>
+<td align="left">The Committee oversees the intelligence and security activities of the UK Intelligence Community, including the policies, expenditure, administration and operations of MI5 (the Security Service), MI6 (the Secret Intelligence Service or SIS) and GCHQ (the Government Communications Headquarters)* and the work of the Joint Intelligence Organisation (JIO) and the National Security Secretariat (NSS) in the Cabinet Office; Defence Intelligence (DI) in the Ministry of Defence; and the Office for Security and Counter-Terrorism (OSCT) in the Home Office.</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="left">DI</td>
+<td align="left">5 A sophisticated player ……………………………………………………………………………………………5 Leading the response ……………………………………………………………………………………………..6 Attribution: a new approach ……………………………………………………………………………………6 HMG as a player: Offensive Cyber………………………………………………………………………….7 International actions ………………………………………………………………………………………………7 DISINFORMATION AND INFLUENCE ……………………………………………………………..</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">DI</td>
+<td align="left">19 Coverage ……………………………………………………………………………………………………………19 Did HMG take its eye off the ball? ………………………………………………………………………..21 Future resourcing ………………………………………………………………………………………………..23 STRATEGY, CO-ORDINATION AND TASKING ……………………………………………..</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">UN</td>
+<td align="left">The strengths which Russia retains are largely its inheritances from the USSR and its status as a victor of the Second World War: nuclear weapons, a space presence and a permanent seat on the UN Security Council.</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">NATO</td>
+<td align="left">It is also seemingly fed by paranoia, believing that Western institutions such as NATO and the EU have a far more aggressive posture towards it than they do in reality.</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="left">NATO</td>
+<td align="left">It appears that Russia considers the UK one of its top Western intelligence targets: while we may not experience the level and type of threat that countries on Russia’s borders suffer, witnesses have suggested that we would sit just behind the US and NATO in any 1</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="left">NATO</td>
+<td align="left">This perception will have been reinforced by the UK’s firm stance recently in response to Russian aggression: following the UK-led international response to the Salisbury attack – which saw an unprecedented 153 Russian intelligence officers and diplomats expelled from 29 countries and NATO – it appears to the Committee that Putin considers the UK to be a key diplomatic adversary.</td>
+</tr>
+<tr class="odd">
 <td align="right">9</td>
 <td align="left">DI</td>
 <td align="left">We have been told, repeatedly, that the Russian Intelligence Services will analyse whatever we put in the public domain and therefore, on this subject more than any other, the potential to damage the capabilities of the intelligence and security Agencies and Defence Intelligence was both real and significant.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">9</td>
 <td align="left">DI</td>
 <td align="left">The Report covers aspects of the Russian threat to the UK (Cyber; Disinformation and Influence; and Russian Expatriates) followed by an examination of how the UK Government – in particular the Agencies and Defence Intelligence – has responded (Allocation of Effort; Strategy, Co-ordination and Tasking; A Hard Target; Legislation; International Partnerships; and Engagement with Russia).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">9</td>
-<td align="left">DI, GCHQ, MI5 &amp; MI6</td>
+<td align="left">DI, GCHQ, MI5, MI6, NSS &amp; OSCT</td>
 <td align="left">2 Throughout this report the term ‘Intelligence Community’ is used to refer to the seven organisations that the Committee oversees: the intelligence and security Agencies (MI5, SIS and GCHQ); Defence Intelligence in the Ministry of Defence; the Office for Security and Counter-Terrorism (OSCT) in the Home Office; and the National Security Secretariat (NSS) and Joint Intelligence Organisation (JIO) in the Cabinet Office.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">12</td>
 <td align="left">GCHQ</td>
 <td align="left">GCHQ assesses that Russia is a highly capable cyber actor with a proven capability to carry out operations which can deliver a range of impacts across any sector: • Since 2014, Russia has carried out malicious cyber activity in order to assert itself aggressively in a number of spheres, including attempting to influence the democratic elections of other countries – for example, it has been widely reported that the Russians were behind the cyber-enabled ‘hack and leak’ operation to compromise the accounts of members of the French political party En Marche!</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">12</td>
 <td align="left">MI6</td>
 <td align="left">Russia has sought to employ organised crime groups to supplement its cyber skills: SIS has observed that “this comes to the very muddy nexus between business and corruption and state power in Russia”.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">12</td>
 <td align="left">GRU</td>
 <td align="left">6 The GRU is the Main Intelligence Directorate of the General Staff of the Russian Armed Forces.</td>
 </tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="left">GCHQ &amp; NCSC</td>
+<td align="left">The NCSC – part of GCHQ – leads on protecting the UK from cyber attack and, as the authority on the UK’s cyber security environment, sharing knowledge and addressing systemic vulnerabilities.</td>
+</tr>
 <tr class="even">
 <td align="right">13</td>
-<td align="left">GCHQ</td>
-<td align="left">The NCSC – part of GCHQ – leads on protecting the UK from cyber attack and, as the authority on the UK’s cyber security environment, sharing knowledge and addressing systemic vulnerabilities.</td>
+<td align="left">NCSC</td>
+<td align="left">Accountability is an issue in particular – whilst the Foreign Secretary has responsibility for the NCSC, which is responsible for incident response, the Home Secretary leads on the response to major cyber incidents.</td>
 </tr>
 <tr class="odd">
 <td align="right">13</td>
+<td align="left">DCMS</td>
+<td align="left">Indeed, there are a number of other Ministers with some form of responsibility for cyber – the Defence Secretary has overall responsibility for Offensive Cyber as a ‘warfighting tool’ and for the National Offensive Cyber Programme, while the Secretary of State for the Department for Digital, Culture, Media and Sport (DCMS) leads on digital matters, with the Chancellor of the Duchy of Lancaster being responsible for the National Cyber Security Strategy and the National Cyber Security Programme.</td>
+</tr>
+<tr class="even">
+<td align="right">13</td>
 <td align="left">GRU</td>
 <td align="left">This new approach was indicated first by the response to the November 2017 WannaCry attack (with a statement by Foreign Office Minister Lord Ahmad condemning the attack) and the subsequent response to the February 2018 NotPetya attack, then more recently when the Foreign Secretary took the step, on 3 October 2018, of announcing publicly that the UK and its allies had identified a campaign by the GRU of indiscriminate and reckless cyber attacks targeting public institutions, businesses, media and sport 14 – including attribution of the attempted hacking of the Organisation for the Prohibition of Chemical Weapons (OPCW) in the Hague.</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="left">NCSC</td>
+<td align="left">14 NCSC, Reckless campaign of cyber attacks by Russian military intelligence service exposed, 3 October 2018, (www.ncsc.gov.uk/news/reckless-campaign-cyber-attacks-russian-military-intelligence-service- exposed).</td>
 </tr>
 <tr class="even">
 <td align="right">14</td>
@@ -1035,8 +1884,18 @@ redacted_tab %&gt;%
 <td align="left">19 The Director of GCHQ referenced the cyber campaign against Daesh in a speech at CyberUK on 21 April 2018.</td>
 </tr>
 <tr class="odd">
+<td align="right">15</td>
+<td align="left">UN</td>
+<td align="left">While the UN has agreed that international law, and in particular the UN Charter, applies in cyberspace, there is still a need for a greater global understanding of how this should work in practice.</td>
+</tr>
+<tr class="even">
 <td align="right">16</td>
-<td align="left">GRU</td>
+<td align="left">DI</td>
+<td align="left">DISINFORMATION AND INFLUENCE 27.</td>
+</tr>
+<tr class="odd">
+<td align="right">16</td>
+<td align="left">NATO &amp; GRU</td>
 <td align="left">23 Examples include: • use of state-owned traditional media: open source studies have shown serious distortions in the coverage provided by Russian state-owned international broadcasters such as RT and Sputnik; 24 • ‘bots’ and ‘trolls’: open source studies have identified significant activity on social media; • ‘hack and leak’: the US has publicly avowed that Russia conducted ‘hack and leak’ operations in relation to its presidential election in 2016, and it has been widely alleged that Russia was responsible for a similar attack on the French presidential election in 2017; and • ‘real life’ political interference: it has been widely reported that Kremlin-linked entities have made ‘soft loans’ to the (then) Front National in France, seemingly at least in part as a reward for the party having supported Russia’s annexation of Crimea, 25 and the GRU sponsored a failed coup in Montenegro in October 2016 26 – an astonishingly bold move in a country just a few months from its accession to NATO.</td>
 </tr>
 <tr class="even">
@@ -1045,14 +1904,54 @@ redacted_tab %&gt;%
 <td align="left">In terms of the direct threat to elections, we have been informed that the mechanics of the UK’s voting system are deemed largely sound: the use of a highly dispersed paper- based voting and counting system makes any significant interference difficult, and we understand that GCHQ has undertaken a great deal of work to help ensure that the online voter registration system is safe.</td>
 </tr>
 <tr class="odd">
+<td align="right">17</td>
+<td align="left">JIC</td>
+<td align="left">34 JIC(17)053.</td>
+</tr>
+<tr class="even">
+<td align="right">17</td>
+<td align="left">NCSC</td>
+<td align="left">37 We note that the Centre for the Protection of National Infrastructure (CPNI) and the National Cyber Security Centre (NCSC) also support the Government security architecture and play a role in protecting the mechanics of elections, including informing improvements to electoral management software and through protective security advice to political parties.</td>
+</tr>
+<tr class="odd">
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">They informed us that the Department for Digital, Culture, Media and Sport (DCMS) holds primary responsibility for disinformation campaigns, and that the Electoral Commission has responsibility for the overall security of democratic processes.</td>
+</tr>
+<tr class="even">
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">However, DCMS told us that its function is largely confined to the broad HMG policy regarding the use of disinformation rather than an assessment of, or operations against, hostile state campaigns.</td>
+</tr>
+<tr class="odd">
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">And without seeking in any way to imply that DCMS is not capable, or that the Electoral Commission is not a staunch defender of democracy, it is a question of scale and access.</td>
+</tr>
+<tr class="even">
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">DCMS is a small Whitehall policy department and the Electoral Commission is an arm’s length body; neither is in the central position required to tackle a major hostile state threat to our democracy.</td>
+</tr>
+<tr class="odd">
 <td align="right">18</td>
 <td align="left">MI5</td>
 <td align="left">In our opinion, the operational role must sit primarily with MI5, in line with its statutory responsibility for “the protection of national security and, in particular, its protection against threats from espionage, terrorism and sabotage, from the activities of agents of foreign powers and from actions intended to overthrow or undermine parliamentary democracy …”.</td>
 </tr>
 <tr class="even">
 <td align="right">18</td>
-<td align="left">MI5</td>
+<td align="left">MI5 &amp; OSCT</td>
 <td align="left">38 The policy role should sit with the Office for Security and Counter-Terrorism (OSCT) – primarily due to its ten years of experience in countering the terrorist threat and its position working closely with MI5 within the central Government machinery.</td>
+</tr>
+<tr class="odd">
+<td align="right">18</td>
+<td align="left">DCMS</td>
+<td align="left">39 Written evidence – DCMS, 13 February 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">19</td>
+<td align="left">DCMS</td>
+<td align="left">We agree, however, with the DCMS Select Committee’s conclusion that the regulatory framework needs urgent review if it is to be fit for purpose in the age of widespread social media.</td>
 </tr>
 <tr class="odd">
 <td align="right">19</td>
@@ -1065,184 +1964,234 @@ redacted_tab %&gt;%
 <td align="left">In response to our request for written evidence at the outset of the Inquiry, MI5 initially provided just six lines of text.</td>
 </tr>
 <tr class="odd">
+<td align="right">19</td>
+<td align="left">DCMS</td>
+<td align="left">41 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">19</td>
+<td align="left">DCMS</td>
+<td align="left">42 The DCMS Select Committee’s report Disinformation and ‘Fake News’ (HC 1791, 18 February 2019) surveys and comments on some of these studies.</td>
+</tr>
+<tr class="odd">
 <td align="right">21</td>
 <td align="left">GCHQ &amp; MI6</td>
 <td align="left">Whilst it may be true that some issues highlighted in open source did not require the secret investigative capabilities of the intelligence and security Agencies or were at the periphery of their remits, the Agencies nonetheless have capabilities which allow them to ‘stand on the shoulders’ of open source coverage: for example, GCHQ might attempt to look behind the suspicious social media accounts which open source analysis has identified to uncover their true operators (and even disrupt their use), or SIS might specifically task an agent to provide information on the extent and nature of any Russian influence campaigns.</td>
 </tr>
 <tr class="even">
+<td align="right">21</td>
+<td align="left">DCMS</td>
+<td align="left">55 We note that the DCMS Select Committee has called on the Government to launch an independent investigation into foreign influence, disinformation, funding, voter manipulation and the sharing of data in relation to the Scottish independence referendum, the EU referendum and the 2017 General Election.</td>
+</tr>
+<tr class="odd">
+<td align="right">21</td>
+<td align="left">DCMS</td>
+<td align="left">If the Government were to take up this recommendation for a wider investigation, the assessment we recommend should take place could feed into it (DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019, recommendation 39).</td>
+</tr>
+<tr class="even">
+<td align="right">23</td>
+<td align="left">ISC</td>
+<td align="left">The Committee does not oversee the NCA; its work and operations usually fall outside the remit of the ISC.</td>
+</tr>
+<tr class="odd">
+<td align="right">24</td>
+<td align="left">RIS</td>
+<td align="left">61 They are of interest to the Russian Intelligence Services (RIS), which may seek to target them in a number of ways: • it is possible the RIS will seek to monitor some of these individuals using human sources (i.e. agents) and by technical means, for example by intercepting phone calls and hacking into their personal electronic devices; • RIS collection of intelligence could also be used in support of ‘influence operations’, with the objective of degrading an individual’s ability to encourage international or domestic Russian political opposition to Putin and his government; or • the RIS may seek to identify or engineer opportunities to arrange an individual’s arrest and transfer to Russia to stand trial, or indeed meet a worse fate.</td>
+</tr>
+<tr class="even">
+<td align="right">26</td>
+<td align="left">JIC</td>
+<td align="left">This situation needs to be addressed and managed by Ministers and the JIC [Joint Intelligence Committee].</td>
+</tr>
+<tr class="odd">
 <td align="right">26</td>
 <td align="left">MI5</td>
 <td align="left">68 In 2003–2004, the Committee again expressed concern: We remain concerned that, because of the necessary additional effort allocated to counter-terrorism by the Security Service, significant risks are inevitably being taken in the area of counter-espionage.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
 <td align="left">MI5</td>
 <td align="left">MI5 66.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">27</td>
 <td align="left">MI5</td>
 <td align="left">MI5’s remit – as set out in the Security Service Act 1989 – is the “protection of national security and, in particular, its protection against threats from espionage, terrorism and sabotage, from the activities of agents of foreign powers and from actions intended to overthrow or undermine parliamentary democracy by political, industrial or violent means”.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
 <td align="left">MI5</td>
 <td align="left">70 MI5 states its objectives in this area as being to “seek to find those trying to pass sensitive UK information and equipment to other countries and ensure they don’t succeed” and to “investigate and disrupt the actions of foreign intelligence officers where these are damaging to our country’s interests”.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">27</td>
 <td align="left">MI5</td>
 <td align="left">Twenty years ago, MI5 devoted around 20% of its effort to Hostile State Activity, which includes Russian activity alongside the hostile activity of other states, such as China and Iran.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
 <td align="left">MI5</td>
 <td align="left">This fall continued until, by 2008/09, only 3% of effort was allocated by MI5 to all its work against Hostile State Activity (noting that reductions in proportion of overall effort do not translate directly into changes in resource).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">27</td>
 <td align="left">MI5</td>
 <td align="left">73 It was not until 2013/14 that effort began to increase significantly, rising to 14.5% 74 – a level that MI5 says meant that slightly more staff were working on Russia than had been during the Cold War.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
 <td align="left">GCHQ &amp; MI6</td>
 <td align="left">76 SIS and GCHQ 68.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">27</td>
 <td align="left">MI6</td>
 <td align="left">SIS is the UK’s foreign human intelligence (HUMINT) agency, with a “global covert capability” 77 focusing on intelligence gathering.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
 <td align="left">GCHQ</td>
 <td align="left">GCHQ is the UK’s signals intelligence (SIGINT) agency – also focusing on intelligence gathering.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">27</td>
 <td align="left">GCHQ</td>
 <td align="left">79 GCHQ’s intelligence effects work primarily comprises Offensive Cyber.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
 <td align="left">GCHQ &amp; MI5</td>
 <td align="left">Areas of intelligence coverage work that GCHQ undertakes include: applying selectors to emails obtained by bulk interception; targeted interception of the phone calls of 70 Section 1(2) of the Security Service Act 1989. 71 www.mi5.gov.uk/espionage 72 Written evidence – MI5, 31 October 2018.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">27</td>
 <td align="left">MI5</td>
 <td align="left">74 Written evidence – MI5, 31 October 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
 <td align="left">MI5 &amp; MI6</td>
 <td align="left">This operational effort also benefits from the support of corporate and ‘enabling’ services across MI5 (which is not reflected in these figures). 77 www.sis.gov.uk 78 Written evidence – SIS, 17 December 2018.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">28</td>
 <td align="left">GCHQ</td>
 <td align="left">At the height of the Cold War, 70% of GCHQ’s effort was focused on the Soviet bloc.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">28</td>
 <td align="left">DI</td>
 <td align="left">82 Defence Intelligence 71.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">28</td>
 <td align="left">DI</td>
 <td align="left">Defence Intelligence has wide-ranging responsibilities for intelligence collection and analysis, and a key role within Government in the preparation of All Source intelligence on Russia.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">28</td>
 <td align="left">GCHQ</td>
 <td align="left">Alongside GCHQ, it also has a major role in the UK’s Offensive Cyber capability.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">28</td>
 <td align="left">DI</td>
 <td align="left">Defence Intelligence effort on Russia also underwent significant reduction in the early 2000s.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">28</td>
 <td align="left">DI</td>
 <td align="left">Although Defence Intelligence has been unable to provide figures for its allocation of effort over the past 20 years, we have been told that in 2013 there were relatively few All Source analysts in the Russia/Eurasia team (in addition to Russia-focused analysts in other teams).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">28</td>
 <td align="left">GCHQ, MI5 &amp; MI6</td>
 <td align="left">However, by 2006, operational effort was being directed to the fight against international terrorism: in 2006/07, MI5 devoted 92% of its effort to counter-terrorism work, 85 with SIS and GCHQ at 33%.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">28</td>
 <td align="left">GCHQ</td>
 <td align="left">81 Written evidence – GCHQ, 8 March 2019.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">28</td>
 <td align="left">GCHQ</td>
 <td align="left">82 Written evidence – GCHQ, 14 December 2018.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">28</td>
 <td align="left">MI5</td>
 <td align="left">85 Written evidence – MI5, 31 October 2018.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">28</td>
 <td align="left">MI6</td>
 <td align="left">86 Written evidence – SIS, 17 December 2018; Intelligence and Security Committee of Parliament Annual Report 2007–2008 Cm 7542.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">28</td>
 <td align="left">DI</td>
 <td align="left">Defence Intelligence told us that it seconded its analytical effort on counter- terrorism to the Joint Terrorism Analysis Centre (JTAC) when it was established in 2003.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">28</td>
 <td align="left">DI</td>
 <td align="left">This was estimated to be 20 posts by 2006/07 – just 1% of its then workforce (written evidence – Defence Intelligence, 21 March 2019).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">29</td>
 <td align="left">DI, GCHQ, MI5 &amp; MI6</td>
 <td align="left">On figures alone, it could be said that they took their eye off the ball; nevertheless, the Heads of MI5, SIS, GCHQ and Defence Intelligence all sought to defend against this suggestion.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">29</td>
 <td align="left">MI5</td>
 <td align="left">MI5 was clear that there was an inevitable reprioritisation due to the terrorist threat: … back then it’s how can we possibly do enough to get ahead of this appalling terrorism problem which … back then was larger than we could see the edges of and one of the things we used to say about it, at exactly the time you’re talking about, was we haven’t yet found the edges of this problem.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">29</td>
 <td align="left">DI</td>
 <td align="left">87 Defence Intelligence viewed it similarly: So in terms of relative prioritisation, rather than losing focus … our coverage of Russia undoubtedly suffered as a consequence of that prioritisation, which was necessary for the conduct of military operations.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">29</td>
 <td align="left">GCHQ &amp; MI6</td>
 <td align="left">88 By comparison, SIS and GCHQ saw it as due to the longer lead time required for work on Russia.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">29</td>
 <td align="left">MI6</td>
 <td align="left">SIS said: I don’t think we did take our eye off the ball.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">29</td>
 <td align="left">GCHQ &amp; MI6</td>
 <td align="left">89 And GCHQ agreed: A bit like [SIS’s] point, some of the kind of hardcore capabilities that were necessary to keep in the business we maintained and then, really, as the reviews and the discussion around what happened in Crimea really brought minds more to the fore again on Russia, that then led us to move in ramping up again.</td>
 </tr>
+<tr class="even">
+<td align="right">32</td>
+<td align="left">DI</td>
+<td align="left">STRATEGY, CO-ORDINATION AND TASKING The cross-Whitehall Russia Strategy 78.</td>
+</tr>
 <tr class="odd">
+<td align="right">32</td>
+<td align="left">FCO</td>
+<td align="left">This Implementation Group is co-ordinated by the HMG Russia Unit in the Foreign and Commonwealth Office (FCO), and chaired by the Senior Responsible Owner for implementing the Strategy (currently the FCO’s Director-General Consular and Security).</td>
+</tr>
+<tr class="even">
 <td align="right">32</td>
 <td align="left">MI5</td>
 <td align="left">In particular, it is our view that, whilst MI5 already works with the police regional Counter- Terrorism Units (which have responsibility for Hostile State Activity), there is scope for them to work more closely together in this area.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">32</td>
 <td align="left">DI, GCHQ, MI5 &amp; MI6</td>
 <td align="left">The Home Secretary holds ministerial responsibility for MI5, the Foreign Secretary for SIS and GCHQ, and the Defence Secretary for Defence Intelligence.</td>
+</tr>
+<tr class="even">
+<td align="right">32</td>
+<td align="left">OSCT</td>
+<td align="left">This appears unusual: the Home Office might seem a more natural home for it, as it would allow the Office for Security and Counter-Terrorism’s (OSCT) experience on counter-terrorism matters to be brought to bear against the hostile state threat.</td>
 </tr>
 <tr class="odd">
 <td align="right">33</td>
@@ -1306,58 +2255,128 @@ redacted_tab %&gt;%
 </tr>
 <tr class="odd">
 <td align="right">36</td>
-<td align="left">GRU</td>
+<td align="left">GRU &amp; RIS</td>
 <td align="left">The well- publicised mistakes Russian operatives made in Salisbury, and later in trying to infiltrate the Organisation for the Prohibition of Chemical Weapons (OPCW), have led to public speculation about the competence of the Russian Intelligence Services (RIS), and the GRU in particular.</td>
 </tr>
 <tr class="even">
+<td align="right">36</td>
+<td align="left">RIS</td>
+<td align="left">Whilst these attacks demonstrate that the RIS are not infallible, it would be foolhardy to think that they are any less dangerous because of these mistakes.</td>
+</tr>
+<tr class="odd">
+<td align="right">36</td>
+<td align="left">RIS</td>
+<td align="left">Indeed, the likelihood is that the RIS will learn from their errors, and become more difficult to detect and protect against as a result.</td>
+</tr>
+<tr class="even">
+<td align="right">36</td>
+<td align="left">RIS</td>
+<td align="left">The Russian decision-making apparatus is concentrated on Putin and a small group of trusted and secretive advisers (many of whom share Putin’s background in the RIS).</td>
+</tr>
+<tr class="odd">
 <td align="right">37</td>
 <td align="left">MI6</td>
 <td align="left">SIS told us that this means operating with “strategic patience” in terms of both recruiting agents and increasing staff.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">38</td>
 <td align="left">DI</td>
 <td align="left">Defence Intelligence brings to the table a range of specialised geospatial intelligence (GEOINT) and measurement and signature intelligence (MASINT) capabilities, which can be used to observe Russian targets at a distance, with a focus on military capabilities and organisations.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">38</td>
 <td align="left">DI</td>
 <td align="left">117 Defence Intelligence is also involved in the expansion of HMG’s open source intelligence capabilities (i.e. the analysis of information that can be accessed freely on the internet, or bought through commercial providers) through the Defence Intelligence Open Source Hub.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">38</td>
 <td align="left">DI</td>
 <td align="left">Analysis of open source information is being increasingly used by the Agencies and Defence Intelligence to enhance their overall situational awareness, and can be fused with a smaller proportion of secret intelligence to provide a richer picture. (iii) Real-world threat, real-world outcomes 107.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">40</td>
 <td align="left">MI5</td>
 <td align="left">122 The Director-General of MI5 told us that: … there are things that compellingly we must investigate, everybody would expect us to address, where there isn’t actually an obvious criminal offence because of the changing shape of the threat and that for me is fundamentally where this doesn’t make sense.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">40</td>
 <td align="left">MI5</td>
 <td align="left">125 The Director-General of MI5 echoed this, saying: The purpose of [a potential new Espionage Act] is to be able to tighten up on the powers that have become, you know, dusty and largely ineffective since the days of the Official Secrets Act, half of which was drafted for First World War days and was about sketches of naval dockyards, etc., and then there was a 1989 … addition to it, but we are left with something which makes it very hard these days to deal with some of the situations we are talking about today in the realm of the economic sphere, cyber, things that could be, you know, more to do with influence.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">41</td>
 <td align="left">MI5</td>
 <td align="left">The Director-General of MI5 explained that FARA-type legislative provisions would create: … the basis therefore of being able to pursue under criminal means somebody not declaring, thereby being undercover.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">41</td>
 <td align="left">MI5</td>
 <td align="left">It is essential that there is a clear commitment to bring forward new legislation to replace it (and a timetable within which it will be introduced) that can be used by MI5 to defend the UK against agents of a hostile foreign power such as Russia.</td>
 </tr>
+<tr class="odd">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">The Digital, Culture, Media and Sport (DCMS) Select Committee has already asked the Government “whether current legislation to protect the electoral process from malign interference is sufficient.</td>
+</tr>
 <tr class="even">
-<td align="right">44</td>
-<td align="left">DI</td>
-<td align="left">The West is strongest when acting in coalition, and therefore the Agencies and Defence Intelligence have a role to play in encouraging their international partners to draw together.</td>
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">We note that physical interference in the UK’s democratic processes is less likely given the use of a paper-based system – however, we support the DCMS Select Committee’s calls for the Electoral Commission to be given power to “stop someone acting illegally in a campaign if they live outside the UK”.</td>
+</tr>
+<tr class="odd">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">141 We note – and, again, agree with the DCMS Select Committee – that “the UK is clearly vulnerable to covert digital influence campaigns”.</td>
+</tr>
+<tr class="even">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">140 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
+</tr>
+<tr class="odd">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">141 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
+</tr>
+<tr class="even">
+<td align="right">43</td>
+<td align="left">DCMS</td>
+<td align="left">142 DCMS Select Committee, Disinformation and ‘Fake News’, HC 1791, 18 February 2019.</td>
 </tr>
 <tr class="odd">
 <td align="right">44</td>
 <td align="left">DI</td>
+<td align="left">The West is strongest when acting in coalition, and therefore the Agencies and Defence Intelligence have a role to play in encouraging their international partners to draw together.</td>
+</tr>
+<tr class="even">
+<td align="right">44</td>
+<td align="left">NATO</td>
+<td align="left">NATO remains at the heart of strategic thought: the Kremlin considers that any further enlargement of NATO would constitute a breach of the 1997 NATO–Russia Founding Act, and an unacceptable encroachment into its perceived ‘sphere of influence’.</td>
+</tr>
+<tr class="odd">
+<td align="right">44</td>
+<td align="left">NATO</td>
+<td align="left">Diminishing the strength of NATO is therefore a key aim of the Kremlin, as is undermining the credibility of Article V of the 1949 North Atlantic Treaty, 146 and “delivering NATO and non-NATO deterrence” therefore forms a key part of the 2019 cross-Whitehall Russia Strategy.</td>
+</tr>
+<tr class="even">
+<td align="right">44</td>
+<td align="left">DI &amp; NATO</td>
 <td align="left">We are encouraged to note that Defence Intelligence shares its intelligence assessments with NATO, which we were told aim to try “to ensure as common an understanding of the nature of the Russian threat and situation that we face”.</td>
+</tr>
+<tr class="odd">
+<td align="right">44</td>
+<td align="left">NATO</td>
+<td align="left">Defence Intelligence highlighted several “really important part[s] of how we feed into the NATO 144 ‘Rise of far-right in Italy and Austria gives Putin some friends in the west’, The Guardian, 7 June 2018.</td>
+</tr>
+<tr class="even">
+<td align="right">44</td>
+<td align="left">NATO</td>
+<td align="left">146 Article V of the 1949 North Atlantic Treaty concerns the principle of ‘collective self-defence’, and states that an armed attack against one or more NATO Members will be considered an attack against them all, and that all NATO Members will act to repel the attack against the affected Member State(s).</td>
+</tr>
+<tr class="odd">
+<td align="right">45</td>
+<td align="left">NATO &amp; RAF</td>
+<td align="left">system”, including “working very closely with NATO colleagues, putting assessments into NATO, [and] working very closely with the NATO Intelligence Fusion Cell at RAF Molesworth”.</td>
 </tr>
 <tr class="even">
 <td align="right">45</td>
@@ -1366,15 +2385,20 @@ redacted_tab %&gt;%
 </tr>
 <tr class="odd">
 <td align="right">45</td>
+<td align="left">NATO</td>
+<td align="left">As mentioned previously, the resulting expulsion of 153 Russian intelligence officers and diplomats from 29 countries and NATO was an unprecedented international response.</td>
+</tr>
+<tr class="even">
+<td align="right">45</td>
 <td align="left">GRU</td>
 <td align="left">This diplomatic response, and the subsequent exposure of the responsible GRU agents, sent a strong message to Russia that such actions would not be tolerated, and provides a platform for the future.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">50</td>
-<td align="left">DI &amp; GCHQ</td>
+<td align="left">DI, GCHQ, OSCT, UN, FCO &amp; RIS</td>
 <td align="left">Jim Hockenhull OBE – Chief of Defence Intelligence Other officials FOREIGN AND COMMONWEALTH OFFICE Sir Philip Barton KCMG OBE – then Director-General Consular and Security, FCO, and cross-Government Senior Responsible Owner for Russia Other officials GOVERNMENT COMMUNICATIONS HEADQUARTERS Mr Jeremy Fleming – Director, GCHQ Other officials NATIONAL CRIME AGENCY Ms Lynne Owens CBE QPM – Director-General, NCA Other officials OFFICE FOR SECURITY AND COUNTER-TERRORISM Mr Tom Hurd OBE – Director-General, OSCT Other officials 43</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">51</td>
 <td align="left">MI5 &amp; MI6</td>
 <td align="left">SECRET INTELLIGENCE SERVICE (MI6) Sir Alex Younger KCMG – Chief, SIS Other officials SECURITY SERVICE (MI5) Sir Andrew Parker KCB – then Director-General, Security Service Other officials Expert external witnesses Professor Anne Applebaum – Institute of Global Affairs Mr William Browder – Head of the Global Magnitsky Justice Movement Mr Christopher Donnelly CMG TD – Head of the Institute for Statecraft Mr Edward Lucas – Writer and consultant specialising in European and transatlantic security Mr Christopher Steele – Director, Orbis Business Intelligence Ltd 44</td>
@@ -1382,355 +2406,398 @@ redacted_tab %&gt;%
 </tbody>
 </table>
 </div>
-<div id="sentences-mentioning-none-of-the-services-but-still-redacted" class="section level4">
-<h4>Sentences mentioning none of the services but still redacted</h4>
-<p><strong>Note</strong> be careful with the numbers - they’re mostly superscript citations!</p>
+<div id="sentences-mentioning-none-of-the-organisations-but-still-redacted" class="section level4">
+<h4>Sentences mentioning none of the organisations but still redacted</h4>
 <pre class="r"><code>rr_sentences %&gt;%
-  filter(any_intel_agency == 0 &amp; redacted == 1) %&gt;%
-  mutate(nice_sentence = gsub(pattern = &quot;\\*\\*\\*&quot;,
-         replace = &quot;\\*\\*\\*[redacted]\\*\\*\\*&quot;,
-         x = sentence)
-  ) %&gt;%
-  select(page, nice_sentence) %&gt;%
-  kable()</code></pre>
+  filter(any_org == 0 &amp; redacted == 1) %&gt;%
+  viewSentences()</code></pre>
 <table>
 <colgroup>
 <col width="1%" />
-<col width="98%" />
+<col width="2%" />
+<col width="96%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="right">page</th>
-<th align="left">nice_sentence</th>
+<th align="right">Page</th>
+<th align="left">Services</th>
+<th align="left">Sentence</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="right">5</td>
+<td align="left">(None)</td>
 <td align="left">The Committee believes that it is important that Parliament and the public should be able to see where information had to be redacted: redactions are clearly indicated in the report by <strong><em>[redacted]</em></strong>.</td>
 </tr>
 <tr class="even">
 <td align="right">10</td>
+<td align="left">(None)</td>
 <td align="left">We note here, however, that there have been a number of cross-cutting themes which have emerged during the course of our work: • Most surprising, perhaps, was the extent to which much of the work of the Intelligence Community is focused on <strong><em>[redacted]</em></strong>.</td>
 </tr>
 <tr class="odd">
-<td align="right">12</td>
-<td align="left">5 The National Cyber Security Centre (NCSC) has advised that there is <strong><em>[redacted]</em></strong> Russian cyber intrusion into the UK’s CNI – particularly marked in the <strong><em>[redacted]</em></strong> sectors.</td>
-</tr>
-<tr class="even">
-<td align="right">13</td>
-<td align="left">When attacks can be traced back – and we accept 12 Oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
-</tr>
-<tr class="odd">
 <td align="right">16</td>
+<td align="left">(None)</td>
 <td align="left">25 <strong><em>[redacted]</em></strong> 26 Written evidence – HMG, 29 June 2018.</td>
 </tr>
 <tr class="even">
 <td align="right">17</td>
-<td align="left">33 This was reflected in the Joint Intelligence Committee (JIC) judgement in May 2017 that “the UK paper-based voting process is protected from cyber operations but <strong><em>[redacted]</em></strong>”.</td>
-</tr>
-<tr class="odd">
-<td align="right">17</td>
+<td align="left">(None)</td>
 <td align="left">34 <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
-<td align="right">17</td>
-<td align="left">33 Oral evidence – NSS, <strong><em>[redacted]</em></strong> February 2019.</td>
-</tr>
 <tr class="odd">
 <td align="right">17</td>
+<td align="left">(None)</td>
 <td align="left">35 We note that the formal HMG assessment categorises the UK as a “<strong><em>[redacted]</em></strong>” target for political influence operations.</td>
 </tr>
 <tr class="even">
 <td align="right">17</td>
+<td align="left">(None)</td>
 <td align="left">36 In addition to providing secret intelligence, the Agencies may <strong><em>[redacted]</em></strong>.</td>
 </tr>
 <tr class="odd">
-<td align="right">18</td>
-<td align="left">With that said, we note that – as with so many other issues currently – it is the social media companies which hold the key and yet are failing to play their part; DCMS informed us that <strong><em>[redacted]</em></strong>.</td>
-</tr>
-<tr class="even">
 <td align="right">19</td>
+<td align="left">(None)</td>
 <td align="left">It stated that <strong><em>[redacted]</em></strong>, before referring to academic studies.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">19</td>
+<td align="left">(None)</td>
 <td align="left">43 This was noteworthy in terms of the way it was couched (<strong><em>[redacted]</em></strong>) and the reference to open source studies <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">20</td>
+<td align="left">(None)</td>
 <td align="left">44 However, at the time <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">20</td>
+<td align="left">(None)</td>
 <td align="left">It appears that <strong><em>[redacted]</em></strong> what some commentators have described as potentially the first post-Soviet Russian interference in a Western democratic process.</td>
 </tr>
-<tr class="even">
-<td align="right">20</td>
-<td align="left">We note that – almost five years on – <strong><em>[redacted]</em></strong>.</td>
-</tr>
 <tr class="odd">
 <td align="right">20</td>
-<td align="left">In May 2017, the Joint Intelligence Committee (JIC) concluded that “<strong><em>[redacted]</em></strong>” and that “<strong><em>[redacted]</em></strong>”.</td>
+<td align="left">(None)</td>
+<td align="left">We note that – almost five years on – <strong><em>[redacted]</em></strong>.</td>
 </tr>
 <tr class="even">
 <td align="right">20</td>
+<td align="left">(None)</td>
 <td align="left">49,50 <strong><em>[redacted]</em></strong>.</td>
 </tr>
 <tr class="odd">
 <td align="right">20</td>
+<td align="left">(None)</td>
 <td align="left"><strong><em>[redacted]</em></strong>.</td>
 </tr>
 <tr class="even">
 <td align="right">20</td>
-<td align="left">46 <strong><em>[redacted]</em></strong> 47 <strong><em>[redacted]</em></strong> 48 JIC Key Judgement, <strong><em>[redacted]</em></strong>, 26 May 2017. 49 <strong><em>[redacted]</em></strong> (written evidence – HMG, 29 June 2018).</td>
-</tr>
-<tr class="odd">
-<td align="right">20</td>
+<td align="left">(None)</td>
 <td align="left">In October 2018, the Electoral Commission – which had been investigating the source of this donation – referred the case to the National Crime Agency, which investigated it <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">20</td>
+<td align="left">(None)</td>
 <td align="left">51 <strong><em>[redacted]</em></strong> 13</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">21</td>
+<td align="left">(None)</td>
 <td align="left">This focus on <strong><em>[redacted]</em></strong> indicates that open source material (for example, the studies of attempts to influence the referendum using RT and Sputnik, or social media campaigns referred to earlier) was not fully taken into account.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">21</td>
+<td align="left">(None)</td>
 <td align="left">52 However, we have found <strong><em>[redacted]</em></strong> which suggests that <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">21</td>
+<td align="left">(None)</td>
 <td align="left"><strong><em>[redacted]</em></strong>. (iii) Lack of retrospective assessment 47.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">21</td>
+<td align="left">(None)</td>
 <td align="left">We have not been provided with any post-referendum assessment of Russian attempts at interference, <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
-<td align="right">21</td>
-<td align="left"><strong><em>[redacted]</em></strong>.</td>
-</tr>
 <tr class="even">
 <td align="right">21</td>
+<td align="left">(None)</td>
+<td align="left"><strong><em>[redacted]</em></strong>.</td>
+</tr>
+<tr class="odd">
+<td align="right">21</td>
+<td align="left">(None)</td>
 <td align="left">52 <strong><em>[redacted]</em></strong> 53 <strong><em>[redacted]</em></strong> 54 Office of the Director of National Intelligence, Assessing Russian Activities and Intentions in Recent US Elections, 6 January 2017.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">23</td>
+<td align="left">(None)</td>
 <td align="left">The extent to which Russian expatriates are using their access to UK businesses and politicians to exert influence in the UK is <strong><em>[redacted]</em></strong>: it is widely recognised that Russian intelligence and business are completely intertwined.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">23</td>
+<td align="left">(None)</td>
 <td align="left">The Government must <strong><em>[redacted]</em></strong>, take the necessary measures to counter the threat and challenge the impunity of Putin-linked elites.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">24</td>
+<td align="left">(None)</td>
 <td align="left">We have been told that <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">24</td>
+<td align="left">(None)</td>
 <td align="left">64 <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">24</td>
+<td align="left">(None)</td>
 <td align="left">We were assured that all figures at risk – Russian or otherwise – receive protection according to the level of risk, through a police-led process <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">24</td>
+<td align="left">(None)</td>
 <td align="left">This would appear to be an immediate and obvious way in to the issue, and the <strong><em>[redacted]</em></strong>, so it would appear manageable.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">24</td>
+<td align="left">(None)</td>
 <td align="left">In response we were told that <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">24</td>
+<td align="left">(None)</td>
 <td align="left">61 These include such high-profile figures as <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">24</td>
+<td align="left">(None)</td>
 <td align="left">64 <strong><em>[redacted]</em></strong> 65 Oral evidence – <strong><em>[redacted]</em></strong> February 2019.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">27</td>
+<td align="left">(None)</td>
 <td align="left">75 The past two years have seen <strong><em>[redacted]</em></strong>: currently, <strong><em>[redacted]</em></strong>% is allocated to Hostile State Activity, approximately <strong><em>[redacted]</em></strong> which is dedicated to countering Russian Hostile State Activity.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">27</td>
+<td align="left">(None)</td>
 <td align="left">This declined to <strong><em>[redacted]</em></strong>% in 2007.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">27</td>
+<td align="left">(None)</td>
 <td align="left">It only began to increase significantly in <strong><em>[redacted]</em></strong> and currently stands at approximately <strong><em>[redacted]</em></strong>%.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">28</td>
+<td align="left">(None)</td>
 <td align="left">83 It also holds a SIGINT role <strong><em>[redacted]</em></strong>, and has a HUMINT unit which is primarily used to support military operations.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">29</td>
+<td align="left">(None)</td>
 <td align="left"><strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">30</td>
+<td align="left">(None)</td>
 <td align="left">The Home Secretary told us that, in his view, resourcing on Russia <strong><em>[redacted]</em></strong> and that there “needs to be more resources in … countering the Hostile State Activity”.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">32</td>
+<td align="left">(None)</td>
 <td align="left">The latest iteration of the Strategy – in March 2019 – has an overarching long-term ‘vision’ of “A Russia that chooses to co-operate, rather than challenge or confront”, 96 <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">33</td>
+<td align="left">(None)</td>
 <td align="left">In some cases, we have noted that it has not been clear <strong><em>[redacted]</em></strong>: this must be addressed.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">33</td>
+<td align="left">(None)</td>
 <td align="left">102 The ICE Plan for Russia requires <strong><em>[redacted]</em></strong> coverage outcomes and <strong><em>[redacted]</em></strong> effects outcomes, which are prioritised at five levels: ‘non-negotiable’, high, medium, low and ‘opportunity only’.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">33</td>
+<td align="left">(None)</td>
 <td align="left">103 <strong><em>[redacted]</em></strong> 26</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">34</td>
+<td align="left">(None)</td>
 <td align="left">Defence Intelligence clearly explained that “we survey our customers of our product, on a scale that we set out from zero to nine, at the moment … the score that we have aggregated across all of our Russia work is <strong><em>[redacted]</em></strong>”.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">36</td>
+<td align="left">(None)</td>
 <td align="left">While some are generic problems that are heightened by Russian ability to exploit them (for example, <strong><em>[redacted]</em></strong>), others are unique to Russia (for example, <strong><em>[redacted]</em></strong>). (i) Structure 94.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">36</td>
+<td align="left">(None)</td>
 <td align="left">However, <strong><em>[redacted]</em></strong>: a way must be found to maintain this momentum across Government. (ii) Technology and data 97.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">37</td>
+<td align="left">(None)</td>
 <td align="left">In terms of human intelligence (HUMINT) operations, technological advancements that gather and analyse data on individuals have generally increased the difficulty <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">37</td>
+<td align="left">(None)</td>
 <td align="left">The expansion of smart city technology (such as CCTV, smart sensors and mobile device tracking), and the capability that this provides, has increased the ability of <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">37</td>
+<td align="left">(None)</td>
 <td align="left">108 <strong><em>[redacted]</em></strong>. (iii) The risk of escalation 99.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">37</td>
+<td align="left">(None)</td>
 <td align="left">Due to the difficulty of <strong><em>[redacted]</em></strong>, the Intelligence Community have focused their effort on <strong><em>[redacted]</em></strong> main strategic targets, which they assess will provide insight on the most important strategic topics, with intelligence on the lowest priorities collected on an ‘opportunity-only’ basis.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">37</td>
+<td align="left">(None)</td>
 <td align="left">These key targets are <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">37</td>
+<td align="left">(None)</td>
 <td align="left"><strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">38</td>
+<td align="left">(None)</td>
 <td align="left">Russia is a particularly hard operating environment for other countries’ intelligence officers, so <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">38</td>
+<td align="left">(None)</td>
 <td align="left">113 <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">38</td>
+<td align="left">(None)</td>
 <td align="left">This may be <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">38</td>
+<td align="left">(None)</td>
 <td align="left">The Committee was struck by the relatively small proportion of <strong><em>[redacted]</em></strong> work that is carried out by the Agencies in relation to Russia, compared with the intelligence coverage of Russia that is undertaken.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">38</td>
+<td align="left">(None)</td>
 <td align="left">As a result, the Agencies’ effects work primarily concentrates on <strong><em>[redacted]</em></strong>; capability-building (the sharing of knowledge and capabilities with partners); and counter-intelligence work to disrupt <strong><em>[redacted]</em></strong> operations.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">38</td>
+<td align="left">(None)</td>
 <td align="left">We note that the focus on <strong><em>[redacted]</em></strong> work increased significantly following the events in Salisbury as HMG <strong><em>[redacted]</em></strong> engaged in a substantive and concerted diplomacy effort to co- ordinate a strong international response to the use of chemical weapons against civilians on UK soil.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">43</td>
+<td align="left">(None)</td>
 <td align="left">It is important to include local authorities <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">44</td>
+<td align="left">(None)</td>
 <td align="left">It is clear that this partnership provides valuable capabilities that <strong><em>[redacted]</em></strong> to the UK, and avoids the duplication of coverage through effective burden-sharing.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">44</td>
+<td align="left">(None)</td>
 <td align="left">However, there remains a question as to whether <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">44</td>
+<td align="left">(None)</td>
 <td align="left">Their perspectives are particularly useful: whilst UK and Western resources were diverted towards the threat from international terrorism in the early 2000s, <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">44</td>
+<td align="left">(None)</td>
 <td align="left">As well as providing a wealth of <strong><em>[redacted]</em></strong> intelligence on Russia, they also share the UK’s approach to the Russian threat, and have been willing to stand alongside the UK in taking an increasingly assertive approach to Russian activities.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">44</td>
+<td align="left">(None)</td>
 <td align="left">Whilst there appear to be increasing signs that others in Europe are taking the threat from Russia more seriously <strong><em>[redacted]</em></strong> there has clearly been less success in translating this into building public support for the UK’s diplomatic approach to attribution and condemnation of Russia’s cyber activities.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">44</td>
+<td align="left">(None)</td>
 <td align="left">144 We also note reporting that Israel <strong><em>[redacted]</em></strong> has welcomed Russian oligarchs and their investment, and has thus far been unwilling to challenge the Kremlin openly.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">45</td>
+<td align="left">(None)</td>
 <td align="left"><strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">45</td>
+<td align="left">(None)</td>
 <td align="left">In terms of its ‘near abroad’, Russia clearly intends keeping these countries within its ‘sphere of influence’, and conducts cyber activity and pursues economic policy to that end in <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">45</td>
+<td align="left">(None)</td>
 <td align="left">HMG initiatives <strong><em>[redacted]</em></strong> are therefore essential.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">45</td>
+<td align="left">(None)</td>
 <td align="left">However, we note that this is not a short-term project: continuing investment and a long-term strategy are required <strong><em>[redacted]</em></strong> against Russian influence.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">45</td>
+<td align="left">(None)</td>
 <td align="left">148 The UK Government (<strong><em>[redacted]</em></strong>) embarked on a diplomacy effort to provide allies with the evidence related to the attack, and to persuade them to join the UK in taking action in the form of expulsions and strengthened sanctions.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">45</td>
+<td align="left">(None)</td>
 <td align="left">149 Whilst the fact that chemical weapons were used – in clear breach of international law and attracting the opprobrium of the international community – was undoubtedly a factor in persuading countries to join forces with the UK, the quick and co- ordinated response from <strong><em>[redacted]</em></strong> HMG more widely, which provided evidence and reassurance to partners, made it easier for them to join in the public condemnation.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">45</td>
+<td align="left">(None)</td>
 <td align="left">148 <strong><em>[redacted]</em></strong> 149 It presents a stark comparison with HMG’s slow and isolated response to Russian aggression after the murder of Alexander Litvinenko in 2006 (despite the use of a radioactive substance in that case).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">46</td>
+<td align="left">(None)</td>
 <td align="left">If HMG is to contribute to peace and security in the Middle East, the Intelligence Community must <strong><em>[redacted]</em></strong>, and the UK must have a clear strategy as to how this should be tackled.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">48</td>
+<td align="left">(None)</td>
 <td align="left">153 These were subsequently closed in 2014 after the Games, but re-opened in 2016 ahead of the Euro 2016 tournament and kept open in the run-up to the 2018 Football World Cup, to ensure the security of Russian citizens visiting the UK and UK citizens visiting Russia respectively. <strong><em>[redacted]</em></strong> more proactive engagement, or relationship-building, has been frozen recently, as has planned ministerial engagement.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">48</td>
+<td align="left">(None)</td>
 <td align="left">The ability to have direct conversations enables an understanding of the intentions of both sides in times of crisis – <strong><em>[redacted]</em></strong>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">48</td>
+<td align="left">(None)</td>
 <td align="left">Any public move towards a more allied relationship with Russia at present 153 <strong><em>[redacted]</em></strong> 154 We note, however, that these two pillars only make up a very small part of the overall action.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">52</td>
+<td align="left">(None)</td>
 <td align="left">ANNEX <strong><em>[redacted]</em></strong> 45</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">54</td>
+<td align="left">(None)</td>
 <td align="left">CLASSIFIED ORAL AND WRITTEN EVIDENCE <strong><em>[redacted]</em></strong> 47</td>
 </tr>
 </tbody>
@@ -1744,9 +2811,8 @@ redacted_tab %&gt;%
 <ol style="list-style-type: decimal">
 <li>Take the sentence level analysis from above.</li>
 <li>Unnest further to the word level.</li>
-<li>Explore some of relationships with sentiment.</li>
+<li>Explore some of relationships with sentiment, using the word-emotion lexicon by <a href="https://doi.org/10.1111/j.1467-8640.2012.00460.x">Saif M. Mohammad and Peter D. Turney (2013)</a>:</li>
 </ol>
-<p>I’ll use the word-emotion lexicon by <a href="https://doi.org/10.1111/j.1467-8640.2012.00460.x">Saif M. Mohammad and Peter D. Turney (2013)</a>:</p>
 <pre class="r"><code>library(textdata)
 nrc_sentiments &lt;- get_sentiments(&quot;nrc&quot;)</code></pre>
 <pre class="r"><code>rr_sentiment &lt;- rr_sentences %&gt;%
@@ -1757,7 +2823,7 @@ rr_sentiment$word_i &lt;- 1:nrow(rr_sentiment)
 
 rr_sentiment &lt;- rr_sentiment %&gt;%
   inner_join(nrc_sentiments, by = &quot;word&quot;)</code></pre>
-<p>Let’s see which words appear by sentiment:</p>
+<p>Let’s see which report words appear by sentiment:</p>
 <pre class="r"><code>library(ggwordcloud)</code></pre>
 <pre class="r"><code>makeWordCloud &lt;- function(theSentiment) {
   rr_sentiment %&gt;%
@@ -1766,7 +2832,9 @@ rr_sentiment &lt;- rr_sentiment %&gt;%
     summarise(n = n()) %&gt;%
     mutate(prop = n/sum(n)) %&gt;%
     filter(n &gt;= 5) %&gt;%
-    ggplot(aes(label = word, size = log1p(prop), col = log1p(n))) +
+    ggplot(aes(label = word,
+               size = log1p(prop),
+               col = log1p(n))) +
     scale_size_area(max_size = 12) +
     geom_text_wordcloud() +
     theme_minimal() + 
@@ -1777,38 +2845,38 @@ allTheClouds &lt;- map(unique(rr_sentiment$sentiment)
                       %&gt;% na.omit(), makeWordCloud)
 allTheClouds</code></pre>
 <pre><code>## [[1]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
 <pre><code>## 
 ## [[2]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-23-2.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-2.png" width="672" /></p>
 <pre><code>## 
 ## [[3]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-23-3.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-3.png" width="672" /></p>
 <pre><code>## 
 ## [[4]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-23-4.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-4.png" width="672" /></p>
 <pre><code>## 
 ## [[5]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-23-5.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-5.png" width="672" /></p>
 <pre><code>## 
 ## [[6]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-23-6.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-6.png" width="672" /></p>
 <pre><code>## 
 ## [[7]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-23-7.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-7.png" width="672" /></p>
 <pre><code>## 
 ## [[8]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-23-8.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-8.png" width="672" /></p>
 <pre><code>## 
 ## [[9]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-23-9.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-9.png" width="672" /></p>
 <pre><code>## 
 ## [[10]]</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-23-10.png" width="672" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-10.png" width="672" /></p>
 <p>I’m not entirely convinced by the words picked out for each of those sentiments - maybe anger, disgust, and sadness show something interesting.</p>
-<pre class="r"><code>toView = c(&quot;anger&quot;, &quot;disgust&quot;, &quot;sadness&quot;)</code></pre>
-<p>First glue the word-level analysis back to the sentences.</p>
-<p>I just want to know if a sentiment has been expressed at least once per sentence (the <code>b</code> below is for Boolean).</p>
+<pre class="r"><code>toView &lt;- c(&quot;anger&quot;, &quot;disgust&quot;, &quot;sadness&quot;)</code></pre>
+<p>First glue the word-level analysis back onto the sentences.</p>
+<p>I want a count by sentence of each sentence (<code>n</code>) and also a count of whether a sentiment has been expressed at least once per sentence (the <code>b</code> below is for Boolean).</p>
 <pre class="r"><code>sentiment_counts &lt;- rr_sentiment %&gt;%
   group_by(sentence_i, sentiment) %&gt;%
   summarise(n = n()) %&gt;%
@@ -1816,22 +2884,22 @@ allTheClouds</code></pre>
 <pre><code>## `summarise()` regrouping output by &#39;sentence_i&#39; (override with `.groups` argument)</code></pre>
 <pre class="r"><code>sentiment_counts &lt;- rr_sentences %&gt;%
   inner_join(sentiment_counts, by = &quot;sentence_i&quot;)</code></pre>
-<p>Plot by page as a proportion of words which have a sentiment coded.</p>
+<p>Now plot by page how many times each sentiment has been expressed:</p>
 <pre class="r"><code>emo_by_page &lt;- sentiment_counts %&gt;%
   group_by(page, sentiment) %&gt;%
   filter(sentiment != &quot;NA&quot;) %&gt;%
-  summarise(n = n()) %&gt;%
-  mutate(p = n/sum(n))</code></pre>
+  summarise(instances = sum(n)) %&gt;%
+  mutate(p = instances/sum(instances))</code></pre>
 <pre><code>## `summarise()` regrouping output by &#39;page&#39; (override with `.groups` argument)</code></pre>
 <pre class="r"><code>emo_by_page %&gt;%
   filter(sentiment %in% toView) %&gt;%
-  ggplot(aes(x = page, y = n, color = sentiment)) +
+  ggplot(aes(x = page, y = instances, color = sentiment)) +
     geom_line() +
     labs(x = &quot;Page&quot;, y = &quot;Count&quot;)</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" width="576" /></p>
+<p><img src="index_files/figure-html/unnamed-chunk-29-1.png" width="576" /></p>
 <p>Looks like a spike for “anger” there on PDF <a href="https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=18">page 18</a>.</p>
 <pre class="r"><code>emo_by_page %&gt;%
-  filter (n &gt; 10 &amp; sentiment %in% toView) %&gt;%
+  filter (instances &gt; 20 &amp; sentiment %in% toView) %&gt;%
   kable(col.names = c(&quot;Page&quot;, &quot;Sentiment&quot;, &quot;N&quot;, &quot;Proportion&quot;))</code></pre>
 <table>
 <thead>
@@ -1846,26 +2914,14 @@ allTheClouds</code></pre>
 <tr class="odd">
 <td align="right">18</td>
 <td align="left">anger</td>
-<td align="right">13</td>
-<td align="right">0.1340206</td>
+<td align="right">25</td>
+<td align="right">0.1315789</td>
 </tr>
 <tr class="even">
 <td align="right">42</td>
 <td align="left">anger</td>
-<td align="right">11</td>
-<td align="right">0.1157895</td>
-</tr>
-<tr class="odd">
-<td align="right">44</td>
-<td align="left">anger</td>
-<td align="right">11</td>
-<td align="right">0.1089109</td>
-</tr>
-<tr class="even">
-<td align="right">48</td>
-<td align="left">anger</td>
-<td align="right">11</td>
-<td align="right">0.1341463</td>
+<td align="right">21</td>
+<td align="right">0.1000000</td>
 </tr>
 </tbody>
 </table>
@@ -2006,7 +3062,8 @@ allTheClouds</code></pre>
 </div>
 <div id="word-cloud-of-redactions" class="section level2">
 <h2>Word cloud of redactions</h2>
-<p>Now we have data labelled in various ways, it’s easy to make a word cloud comparing words in sentences which do with those which don’t contain redactions.</p>
+<p>Now we have data labelled in various ways, it’s easy to make word clouds comparing words in sentences which have redactions with those which don’t.</p>
+<p>Firstly, let’s just do this for all sentences:</p>
 <pre class="r"><code>rr_sentiment %&gt;%
   anti_join(stop_words) %&gt;%
   mutate(redacted = recode(redacted,
@@ -2021,11 +3078,16 @@ allTheClouds</code></pre>
     geom_text_wordcloud() +
     theme_minimal() + 
     facet_grid(cols = vars(redacted))</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-29-1.png" width="576" /></p>
-<pre class="r"><code>excluded_words &lt;- c(&quot;gchq&quot;, &quot;mi6&quot;, &quot;mi5&quot;, &quot;sis&quot;,
-                    &quot;intelligence&quot;, &quot;www.mi5&quot;)
-
-rr_sentiment %&gt;%
+<p><img src="index_files/figure-html/unnamed-chunk-32-1.png" width="576" /></p>
+<p>Some words are irritating in the output - remove these:</p>
+<pre class="r"><code>excluded_words &lt;- c(&quot;gchq&quot;,
+                    &quot;mi6&quot;,
+                    &quot;mi5&quot;,
+                    &quot;sis&quot;,
+                    &quot;intelligence&quot;,
+                    &quot;www.mi5&quot;)</code></pre>
+<p>(Note below how stop words have been removed too with <code>anti_join</code>).</p>
+<pre class="r"><code>rr_sentiment %&gt;%
   anti_join(stop_words) %&gt;%
   mutate(redacted = recode(redacted,
                            `0` = &quot;No redactions&quot;,
@@ -2033,14 +3095,15 @@ rr_sentiment %&gt;%
   group_by(redacted, mentioned_services, word) %&gt;%
   summarise(n = n()) %&gt;%
   mutate(prop = n/sum(n)) %&gt;%
-  filter(prop &gt; .005 &amp; !(word %in% excluded_words)) %&gt;%
+  filter(prop &gt; .01 &amp; !(word %in% excluded_words)) %&gt;%
+  mutate(services_wrapped = stringr::str_wrap(mentioned_services,5)) %&gt;%
   ggplot(aes(label = word, size = log1p(prop), color = redacted)) +
     scale_size_area(max_size = 9) +
     geom_text_wordcloud() +
     theme_minimal() + 
     facet_grid(cols = vars(redacted),
-               rows = vars(mentioned_services))</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-30-1.png" width="576" /></p>
+               rows = vars(services_wrapped))</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-34-1.png" width="576" /></p>
 </div>
 </div>
 
