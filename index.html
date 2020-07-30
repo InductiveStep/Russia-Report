@@ -11,7 +11,7 @@
 
 <meta name="author" content="Andi Fugard (almost@gmail.com, @inductivestep)" />
 
-<meta name="date" content="2020-07-29" />
+<meta name="date" content="2020-07-30" />
 
 <title>Analysing the Russia Report</title>
 
@@ -256,7 +256,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Analysing the Russia Report</h1>
 <h4 class="author">Andi Fugard (<a href="mailto:almost@gmail.com" class="email">almost@gmail.com</a>, @<a href="https://twitter.com/InductiveStep">inductivestep</a>)</h4>
-<h4 class="date">29 July 2020</h4>
+<h4 class="date">30 July 2020</h4>
 
 </div>
 
@@ -337,7 +337,7 @@ rr_text &lt;- pdf_text(&quot;20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_
 </tr>
 </tbody>
 </table>
-<p>The section on PDF pages 37 and 38 (printed page nums 30 and 31) is the winner: “Rising to the challenge”. Here’s a link to the <a href="https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=37">pdf pages</a>.</p>
+<p>The section on PDF pages 37-39 (printed pages 30-32) is the winner: “Rising to the challenge”. Here’s a link to the <a href="https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=37">pdf pages</a>.</p>
 </div>
 </div>
 <div id="word-counts" class="section level2">
@@ -957,7 +957,7 @@ rr_initialisms &lt;- rr_tib %&gt;%
 <div id="sentence-level-analysis" class="section level2">
 <h2>Sentence-level analysis</h2>
 <p>Is there a relationship between which intelligence service (e.g., MI5, MI6, or GCHQ) is mentioned and whether there is a redaction in that sentence?</p>
-<p>Again use <code>tidytext</code>, but this time at the sentence level.</p>
+<p>Again I’ll use <code>unnest</code>, but this time at the sentence level.</p>
 <pre class="r"><code>rr_sentences &lt;- rr_tib %&gt;%
   unnest_sentences(sentence, text,
                    to_lower = FALSE) %&gt;%
@@ -968,7 +968,7 @@ rr_sentences$sentence_i &lt;- 1:nrow(rr_sentences)</code></pre>
 <ul>
 <li>Citations at the end of sentences confused it (possible to fix this by using <code>unnest_regex</code>).</li>
 <li>Footnotes need to be addressed separately (they are sentences beginning with numbers, once the aforementioned sentence problem has been fixed).</li>
-<li>It doesn’t deal with sentences which cross pages - definitely not when there’s a footnote splitting them too (it may be possible to fix this problem by removing footnotes, gluing all the sentences together, and unnesting again).</li>
+<li>It doesn’t deal with sentences which cross pages (it may be possible to fix this problem by removing footnotes, gluing all the sentences together, and unnesting again).</li>
 </ul>
 <p>Next: code redactions and whether sentences mention one of the big three intel agencies (and some other organisations, for comparison).</p>
 <p>I’ll use (the fantastic!) <code>fuzzyjoin</code> for this, which joins two tables based on a regular expression.</p>
@@ -995,7 +995,7 @@ rr_sentences$sentence_i &lt;- 1:nrow(rr_sentences)</code></pre>
   initialism_regex,                      &quot;initialism&quot;,
   &quot;\\*\\*\\*&quot;,                           &quot;redacted&quot;
 )</code></pre>
-<p>Now, fuzzyjoin and reshape so that there’s a binary variable for each feature:</p>
+<p>Now, fuzzyjoin and reshape so that each row is a sentence and there’s a binary variable for each feature:</p>
 <pre class="r"><code>rr_mentions &lt;- rr_sentences %&gt;%
   regex_left_join(mapping,
                   by = c(sentence = &quot;regex&quot;)) %&gt;%
@@ -1011,7 +1011,7 @@ rr_sentences$sentence_i &lt;- 1:nrow(rr_sentences)</code></pre>
 
 rr_sentences &lt;- rr_sentences %&gt;%
   left_join(rr_mentions, by = &quot;sentence_i&quot;)</code></pre>
-<p>Make a summary variable of the services mentioned.</p>
+<p>Make a summary variable of the organisations mentioned.</p>
 <pre class="r"><code>rr_sentences$mentioned_services &lt;- rr_sentences %&gt;%
   select(starts_with(&quot;org_&quot;)) %&gt;%
   handbag::binary_patterns_var(strip_prefix = &quot;org_&quot;)</code></pre>
@@ -1434,9 +1434,9 @@ redacted_tab %&gt;%
     arrange(mentioned_services) %&gt;%
     kable(col.names = c(&quot;Page&quot;, &quot;Services&quot;, &quot;Sentence&quot;))
 }</code></pre>
-<p><strong>Note be careful interpreting the numbers - they’re mostly superscript citations!</strong></p>
-<div id="sentences-mentioning-an-organisation-and-with-a-redaction" class="section level4">
-<h4>Sentences mentioning an organisation and with a redaction</h4>
+<p>Note: be careful interpreting the numbers - they’re mostly superscript citations! Most quantities have been redacted in the report.</p>
+<div id="sentences-mentioning-an-organisation-and-redacted" class="section level4">
+<h4>Sentences mentioning an organisation and redacted</h4>
 <pre class="r"><code>rr_sentences %&gt;%
   filter(any_org == 1 &amp; redacted == 1) %&gt;%
   viewSentences()</code></pre>
@@ -1787,8 +1787,8 @@ redacted_tab %&gt;%
 </tbody>
 </table>
 </div>
-<div id="sentences-mentioning-the-organisations-but-with-no-redaction" class="section level4">
-<h4>Sentences mentioning the organisations but with no redaction</h4>
+<div id="sentences-mentioning-the-organisations-but-not-redacted" class="section level4">
+<h4>Sentences mentioning the organisations but not redacted</h4>
 <pre class="r"><code>rr_sentences %&gt;%
   filter(any_org == 1 &amp; redacted == 0) %&gt;%
   viewSentences()</code></pre>
@@ -2860,6 +2860,7 @@ redacted_tab %&gt;%
 </div>
 <div id="sentiment-analysis" class="section level2">
 <h2>Sentiment analysis</h2>
+<p>There’s increasing interest in the sentiment of text- roughly, what emotion is expressed - and a variety of tools for modelling it.</p>
 <p>Here’s the plan:</p>
 <ol style="list-style-type: decimal">
 <li>Take the sentence level analysis from above.</li>
@@ -2886,9 +2887,9 @@ rr_sentiment &lt;- rr_sentiment %&gt;%
     mutate(prop = n/sum(n)) %&gt;%
     filter(n &gt;= 5) %&gt;%
     ggplot(aes(label = word,
-               size = log1p(prop),
-               col = log1p(n))) +
-    scale_size_area(max_size = 12) +
+               size = prop,
+               col  = prop)) +
+    scale_size_area(max_size = 10) +
     geom_text_wordcloud() +
     theme_minimal() + 
     labs(title = theSentiment)
@@ -2899,11 +2900,11 @@ allTheClouds &lt;- map(unique(rr_sentiment$sentiment)
 
 library(patchwork)
 wrap_plots(allTheClouds, ncol = 2)</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" width="960" /></p>
-<p>I’m not entirely convinced by the words picked out for each of those sentiments - maybe anger, disgust, and sadness show something interesting.</p>
+<p><img src="index_files/figure-html/unnamed-chunk-26-1.png" width="768" /></p>
+<p>I’m not entirely convinced by the words picked out for each of those sentiments (e.g., look where “government” and “money” appear) - maybe anger, disgust, and sadness show something interesting.</p>
 <pre class="r"><code>toView &lt;- c(&quot;anger&quot;, &quot;disgust&quot;, &quot;sadness&quot;)</code></pre>
 <p>First glue the word-level analysis back onto the sentences.</p>
-<p>I want a count by sentence of each sentence (<code>n</code>) and also a count of whether a sentiment has been expressed at least once per sentence (the <code>b</code> below is for Boolean).</p>
+<p>I want a count by sentence of each sentiment (<code>n</code>) and also a count of whether a sentiment has been expressed at least once per sentence (the <code>b</code> below is for Boolean).</p>
 <pre class="r"><code>sentiment_counts &lt;- rr_sentiment %&gt;%
   group_by(sentence_i, sentiment) %&gt;%
   summarise(n = n()) %&gt;%
@@ -2953,7 +2954,7 @@ wrap_plots(allTheClouds, ncol = 2)</code></pre>
 </tbody>
 </table>
 <pre class="r"><code>sentiment_counts %&gt;%
-  filter(page == 18 &amp; sentiment %in% toView) %&gt;%
+  filter(page == 18 &amp; sentiment == &quot;anger&quot;) %&gt;%
   select(sentiment, sentence) %&gt;%
   kable()</code></pre>
 <table>
@@ -2973,39 +2974,23 @@ wrap_plots(allTheClouds, ncol = 2)</code></pre>
 <td align="left">holding primary responsibility for the active defence of the UK’s democratic processes from hostile foreign interference, and indeed during the course of our Inquiry appeared determined to distance themselves from any suggestion that they might have a prominent role in relation to the democratic process itself, noting the caution which had to be applied in relation to intrusive powers in the context of a democratic process.</td>
 </tr>
 <tr class="even">
-<td align="left">disgust</td>
-<td align="left">holding primary responsibility for the active defence of the UK’s democratic processes from hostile foreign interference, and indeed during the course of our Inquiry appeared determined to distance themselves from any suggestion that they might have a prominent role in relation to the democratic process itself, noting the caution which had to be applied in relation to intrusive powers in the context of a democratic process.</td>
-</tr>
-<tr class="odd">
 <td align="left">anger</td>
 <td align="left">They informed us that the Department for Digital, Culture, Media and Sport (DCMS) holds primary responsibility for disinformation campaigns, and that the Electoral Commission has responsibility for the overall security of democratic processes.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">anger</td>
 <td align="left">However, DCMS told us that its function is largely confined to the broad HMG policy regarding the use of disinformation rather than an assessment of, or operations against, hostile state campaigns.</td>
 </tr>
-<tr class="odd">
-<td align="left">disgust</td>
-<td align="left">However, DCMS told us that its function is largely confined to the broad HMG policy regarding the use of disinformation rather than an assessment of, or operations against, hostile state campaigns.</td>
-</tr>
 <tr class="even">
-<td align="left">sadness</td>
-<td align="left">However, DCMS told us that its function is largely confined to the broad HMG policy regarding the use of disinformation rather than an assessment of, or operations against, hostile state campaigns.</td>
-</tr>
-<tr class="odd">
 <td align="left">anger</td>
 <td align="left">Overall, the issue of defending the UK’s democratic processes and discourse has appeared to be something of a ‘hot potato’, with no one organisation recognising itself as having an overall lead.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">anger</td>
 <td align="left">Whilst we understand the nervousness around any suggestion that the intelligence and security Agencies might be involved in democratic processes – certainly a fear that is writ large in other countries – that cannot apply when it comes to the protection of those processes.</td>
 </tr>
-<tr class="odd">
-<td align="left">anger</td>
-<td align="left">DCMS is a small Whitehall policy department and the Electoral Commission is an arm’s length body; neither is in the central position required to tackle a major hostile state threat to our democracy.</td>
-</tr>
 <tr class="even">
-<td align="left">disgust</td>
+<td align="left">anger</td>
 <td align="left">DCMS is a small Whitehall policy department and the Electoral Commission is an arm’s length body; neither is in the central position required to tackle a major hostile state threat to our democracy.</td>
 </tr>
 <tr class="odd">
@@ -3013,51 +2998,19 @@ wrap_plots(allTheClouds, ncol = 2)</code></pre>
 <td align="left">Protecting our democratic discourse and processes from hostile foreign interference is a central responsibility of Government, and should be a ministerial priority.</td>
 </tr>
 <tr class="even">
-<td align="left">disgust</td>
-<td align="left">Protecting our democratic discourse and processes from hostile foreign interference is a central responsibility of Government, and should be a ministerial priority.</td>
-</tr>
-<tr class="odd">
 <td align="left">anger</td>
 <td align="left">In our opinion, the operational role must sit primarily with MI5, in line with its statutory responsibility for “the protection of national security and, in particular, its protection against threats from espionage, terrorism and sabotage, from the activities of agents of foreign powers and from actions intended to overthrow or undermine parliamentary democracy …”.</td>
 </tr>
-<tr class="even">
-<td align="left">disgust</td>
-<td align="left">In our opinion, the operational role must sit primarily with MI5, in line with its statutory responsibility for “the protection of national security and, in particular, its protection against threats from espionage, terrorism and sabotage, from the activities of agents of foreign powers and from actions intended to overthrow or undermine parliamentary democracy …”.</td>
-</tr>
 <tr class="odd">
-<td align="left">sadness</td>
-<td align="left">In our opinion, the operational role must sit primarily with MI5, in line with its statutory responsibility for “the protection of national security and, in particular, its protection against threats from espionage, terrorism and sabotage, from the activities of agents of foreign powers and from actions intended to overthrow or undermine parliamentary democracy …”.</td>
-</tr>
-<tr class="even">
 <td align="left">anger</td>
 <td align="left">38 The policy role should sit with the Office for Security and Counter-Terrorism (OSCT) – primarily due to its ten years of experience in countering the terrorist threat and its position working closely with MI5 within the central Government machinery.</td>
 </tr>
-<tr class="odd">
-<td align="left">disgust</td>
-<td align="left">38 The policy role should sit with the Office for Security and Counter-Terrorism (OSCT) – primarily due to its ten years of experience in countering the terrorist threat and its position working closely with MI5 within the central Government machinery.</td>
-</tr>
 <tr class="even">
-<td align="left">sadness</td>
-<td align="left">38 The policy role should sit with the Office for Security and Counter-Terrorism (OSCT) – primarily due to its ten years of experience in countering the terrorist threat and its position working closely with MI5 within the central Government machinery.</td>
+<td align="left">anger</td>
+<td align="left">This would also have the advantage that the relationship built with social media companies to encourage them to co-operate in dealing with terrorist use of social media could be brought to bear against the hostile state threat; indeed, it is not clear to us why the Government is not already doing this.</td>
 </tr>
 <tr class="odd">
 <td align="left">anger</td>
-<td align="left">This would also have the advantage that the relationship built with social media companies to encourage them to co-operate in dealing with terrorist use of social media could be brought to bear against the hostile state threat; indeed, it is not clear to us why the Government is not already doing this.</td>
-</tr>
-<tr class="even">
-<td align="left">disgust</td>
-<td align="left">This would also have the advantage that the relationship built with social media companies to encourage them to co-operate in dealing with terrorist use of social media could be brought to bear against the hostile state threat; indeed, it is not clear to us why the Government is not already doing this.</td>
-</tr>
-<tr class="odd">
-<td align="left">sadness</td>
-<td align="left">This would also have the advantage that the relationship built with social media companies to encourage them to co-operate in dealing with terrorist use of social media could be brought to bear against the hostile state threat; indeed, it is not clear to us why the Government is not already doing this.</td>
-</tr>
-<tr class="even">
-<td align="left">anger</td>
-<td align="left">With that said, we note that – as with so many other issues currently – it is the social media companies which hold the key and yet are failing to play their part; DCMS informed us that ***.</td>
-</tr>
-<tr class="odd">
-<td align="left">sadness</td>
 <td align="left">With that said, we note that – as with so many other issues currently – it is the social media companies which hold the key and yet are failing to play their part; DCMS informed us that ***.</td>
 </tr>
 <tr class="even">
@@ -3065,23 +3018,7 @@ wrap_plots(allTheClouds, ncol = 2)</code></pre>
 <td align="left">39 The Government must now seek to establish a protocol with the social media companies to ensure that they take covert hostile state use of their platforms seriously, and have clear timescales within which they commit to removing such material.</td>
 </tr>
 <tr class="odd">
-<td align="left">disgust</td>
-<td align="left">39 The Government must now seek to establish a protocol with the social media companies to ensure that they take covert hostile state use of their platforms seriously, and have clear timescales within which they commit to removing such material.</td>
-</tr>
-<tr class="even">
-<td align="left">disgust</td>
-<td align="left">Government should ‘name and shame’ those which fail to act.</td>
-</tr>
-<tr class="odd">
-<td align="left">sadness</td>
-<td align="left">Government should ‘name and shame’ those which fail to act.</td>
-</tr>
-<tr class="even">
 <td align="left">anger</td>
-<td align="left">Such a protocol could, usefully, be expanded to encompass the other areas in which action is required from the social media companies, since this issue is not unique to Hostile State Activity.</td>
-</tr>
-<tr class="odd">
-<td align="left">disgust</td>
 <td align="left">Such a protocol could, usefully, be expanded to encompass the other areas in which action is required from the social media companies, since this issue is not unique to Hostile State Activity.</td>
 </tr>
 </tbody>
@@ -3089,9 +3026,15 @@ wrap_plots(allTheClouds, ncol = 2)</code></pre>
 </div>
 <div id="word-cloud-of-redactions" class="section level2">
 <h2>Word cloud of redactions</h2>
-<p>Now we have data labelled in various ways, it’s easy to make word clouds comparing words in sentences which have redactions with those which don’t.</p>
-<p>Firstly, let’s just do this for all sentences:</p>
-<pre class="r"><code>rr_sentiment %&gt;%
+<p>Now we have four different levels of representations for the report: page, sentence, word, sentiment.</p>
+<p>I’d like to compare word frequency, grouped by whether the sentence they are in has a redaction. That’s a combination of word and sentence level analyses.</p>
+<p>It’s probably easiest to revisit <code>rr_sentences</code>, which has the sentence-level information, and unnest it to word-level.</p>
+<pre class="r"><code>rr_sentences_and_words &lt;- rr_sentences %&gt;%
+    unnest_tokens(word,
+                  sentence)</code></pre>
+<p>I’ll leave the stop words in - removing them by analysis, where necessary.</p>
+<p>Firstly, let’s just do the comparison for all sentences:</p>
+<pre class="r"><code>rr_sentences_and_words %&gt;%
   anti_join(stop_words) %&gt;%
   mutate(redacted = recode(redacted,
                            `0` = &quot;No redactions&quot;,
@@ -3099,24 +3042,18 @@ wrap_plots(allTheClouds, ncol = 2)</code></pre>
   group_by(redacted, word) %&gt;%
   summarise(n = n()) %&gt;%
   mutate(prop = n/sum(n)) %&gt;%
-  filter(prop &gt; .002) %&gt;%
-  ggplot(aes(label = word, size = log1p(prop), color = redacted)) +
+  filter(prop &gt;= 1/1000) %&gt;%
+  ggplot(aes(label = word, size = prop, color = redacted)) +
     scale_size_area(max_size = 11) +
     geom_text_wordcloud() +
     theme_minimal() + 
     facet_grid(cols = vars(redacted))</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-32-1.png" width="576" /></p>
-<p>Some words are irritating in the output - remove these:</p>
-<pre class="r"><code>excluded_words &lt;- c(&quot;gchq&quot;,
-                    &quot;mi6&quot;,
-                    &quot;mi5&quot;,
-                    &quot;sis&quot;,
-                    &quot;intelligence&quot;,
-                    &quot;www.mi5&quot;)</code></pre>
-<p>(Note below how stop words have been removed too with <code>anti_join</code>).</p>
+<p><img src="index_files/figure-html/unnamed-chunk-33-1.png" width="576" /></p>
+<p>The mentions of “oral”, “evidence”, and dates is probably from the footnotes of who gave evidence.</p>
+<p>Now by what organisations were mentioned.</p>
 <pre class="r"><code>library(stringr)
 
-dat4clouds &lt;- rr_sentiment %&gt;%
+dat4clouds &lt;- rr_sentences_and_words %&gt;%
   anti_join(stop_words) %&gt;%
   mutate(redacted = recode(redacted,
                            `0` = &quot;No redactions&quot;,
@@ -3124,12 +3061,13 @@ dat4clouds &lt;- rr_sentiment %&gt;%
   group_by(redacted, mentioned_services, word) %&gt;%
   summarise(n = n()) %&gt;%
   mutate(prop = n/sum(n)) %&gt;%
-  filter(n &gt;= 2 &amp; !(word %in% excluded_words)) %&gt;%
+  filter(n &gt;= 2 &amp;
+         mentioned_services != &quot;(None)&quot;) %&gt;%
   mutate(services_wrapped = str_wrap(mentioned_services,
                                      5))</code></pre>
 <pre><code>## Joining, by = &quot;word&quot;</code></pre>
 <pre><code>## `summarise()` regrouping output by &#39;redacted&#39;, &#39;mentioned_services&#39; (override with `.groups` argument)</code></pre>
-<p>Now plot it:</p>
+<p>Plot it:</p>
 <pre class="r"><code>dat4clouds %&gt;%
   ggplot(aes(label = word,
              size = prop,
@@ -3138,8 +3076,10 @@ dat4clouds &lt;- rr_sentiment %&gt;%
       geom_text_wordcloud() +
       theme_minimal() + 
       facet_grid(cols = vars(redacted),
-                 rows = vars(services_wrapped))</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-36-1.png" width="576" /></p>
+                 rows = vars(services_wrapped)) +
+  labs(title = &quot;Word frequency by organisation and redaction&quot;,
+       subtitle = &quot;(Words included if mentioned at least twice)&quot;)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-35-1.png" width="576" /></p>
 </div>
 </div>
 

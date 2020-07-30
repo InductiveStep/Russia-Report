@@ -76,7 +76,7 @@ rr_tib %>%
   kable()
 ```
 
-The section on PDF pages 37 and 38 (printed page nums 30 and 31) is the winner: "Rising to the challenge". Here's a link to the [pdf pages](https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=37).
+The section on PDF pages 37-39 (printed pages 30-32) is the winner: "Rising to the challenge". Here's a link to the [pdf pages](https://inductivestep.github.io/Russia-Report/20200721_HC632_CCS001_CCS1019402408-001_ISC_Russia_Report_Web_Accessible.pdf#page=37).
 
 
 ## Word counts
@@ -148,7 +148,7 @@ rr_initialisms %>%
 
 Is there a relationship between which intelligence service (e.g., MI5, MI6, or GCHQ) is mentioned and whether there is a redaction in that sentence?
 
-Again use `tidytext`, but this time at the sentence level.
+Again I'll use `unnest`, but this time at the sentence level.
 
 ```{r}
 rr_sentences <- rr_tib %>%
@@ -163,7 +163,7 @@ That worked reasonably well, though:
 
 * Citations at the end of sentences confused it (possible to fix this by using `unnest_regex`).
 * Footnotes need to be addressed separately (they are sentences beginning with numbers, once the aforementioned sentence problem has been fixed).
-* It doesn't deal with sentences which cross pages - definitely not when there's a footnote splitting them too (it may be possible to fix this problem by removing footnotes, gluing all the sentences together, and unnesting again).
+* It doesn't deal with sentences which cross pages (it may be possible to fix this problem by removing footnotes, gluing all the sentences together, and unnesting again).
 
 Next: code redactions and whether sentences mention one of the big three intel agencies (and some other organisations, for comparison).
 
@@ -199,7 +199,7 @@ mapping <- tribble(
 )
 ```
 
-Now, fuzzyjoin and reshape so that there's a binary variable for each feature:
+Now, fuzzyjoin and reshape so that each row is a sentence and there's a binary variable for each feature:
 
 ```{r}
 rr_mentions <- rr_sentences %>%
@@ -219,7 +219,7 @@ rr_sentences <- rr_sentences %>%
   left_join(rr_mentions, by = "sentence_i")
 ```
 
-Make a summary variable of the services mentioned.
+Make a summary variable of the organisations mentioned.
 
 ```{r}
 rr_sentences$mentioned_services <- rr_sentences %>%
@@ -303,10 +303,10 @@ viewSentences <- function(the_sentences) {
 ```
 
 
-**Note be careful interpreting the numbers - they're mostly superscript citations!**
+Note: be careful interpreting the numbers - they're mostly superscript citations! Most quantities have been redacted in the report.
 
 
-#### Sentences mentioning an organisation and with a redaction
+#### Sentences mentioning an organisation and redacted
 
 ```{r}
 rr_sentences %>%
@@ -314,7 +314,7 @@ rr_sentences %>%
   viewSentences()
 ```
 
-#### Sentences mentioning the organisations but with no redaction
+#### Sentences mentioning the organisations but not redacted
 
 ```{r}
 rr_sentences %>%
@@ -335,6 +335,8 @@ rr_sentences %>%
 
 
 ## Sentiment analysis
+
+There's increasing interest in the sentiment of text- roughly, what emotion is expressed - and a variety of tools for modelling it.
 
 Here's the plan:
 
@@ -364,7 +366,7 @@ Let's see which report words appear by sentiment:
 library(ggwordcloud)
 ```
 
-```{r fig.height=25, fig.width=10, message=FALSE, warning=FALSE}
+```{r fig.height=25, fig.width=8, message=FALSE, warning=FALSE}
 makeWordCloud <- function(theSentiment) {
   rr_sentiment %>%
     filter(sentiment == theSentiment) %>%
@@ -373,9 +375,9 @@ makeWordCloud <- function(theSentiment) {
     mutate(prop = n/sum(n)) %>%
     filter(n >= 5) %>%
     ggplot(aes(label = word,
-               size = log1p(prop),
-               col = log1p(n))) +
-    scale_size_area(max_size = 12) +
+               size = prop,
+               col  = prop)) +
+    scale_size_area(max_size = 10) +
     geom_text_wordcloud() +
     theme_minimal() + 
     labs(title = theSentiment)
@@ -389,7 +391,7 @@ wrap_plots(allTheClouds, ncol = 2)
 ```
 
 
-I'm not entirely convinced by the words picked out for each of those sentiments - maybe anger, disgust, and sadness show something interesting.
+I'm not entirely convinced by the words picked out for each of those sentiments (e.g., look where "government" and "money" appear) - maybe anger, disgust, and sadness show something interesting.
 
 ```{r}
 toView <- c("anger", "disgust", "sadness")
@@ -397,7 +399,7 @@ toView <- c("anger", "disgust", "sadness")
 
 First glue the word-level analysis back onto the sentences.
 
-I want a count by sentence of each sentence (`n`) and also a count of whether a sentiment has been expressed at least once per sentence (the `b` below is for Boolean).
+I want a count by sentence of each sentiment (`n`) and also a count of whether a sentiment has been expressed at least once per sentence (the `b` below is for Boolean).
 
 ```{r}
 sentiment_counts <- rr_sentiment %>%
@@ -435,22 +437,33 @@ emo_by_page %>%
 
 ```{r}
 sentiment_counts %>%
-  filter(page == 18 & sentiment %in% toView) %>%
+  filter(page == 18 & sentiment == "anger") %>%
   select(sentiment, sentence) %>%
   kable()
 ```
 
 
 
-
 ## Word cloud of redactions
 
-Now we have data labelled in various ways, it's easy to make word clouds comparing words in sentences which have redactions with those which don't.
+Now we have four different levels of representations for the report: page, sentence, word, sentiment.
 
-Firstly, let's just do this for all sentences:
+I'd like to compare word frequency, grouped by whether the sentence they are in has a redaction. That's a combination of word and sentence level analyses.
 
-```{r fig.height=3, fig.width=6, message=FALSE, warning=FALSE}
-rr_sentiment %>%
+It's probably easiest to revisit `rr_sentences`, which has the sentence-level information, and unnest it to word-level.
+
+```{r}
+rr_sentences_and_words <- rr_sentences %>%
+    unnest_tokens(word,
+                  sentence)
+```
+
+I'll leave the stop words in - removing them by analysis, where necessary.
+
+Firstly, let's just do the comparison for all sentences:
+
+```{r fig.height=8, fig.width=6, message=FALSE, warning=FALSE}
+rr_sentences_and_words %>%
   anti_join(stop_words) %>%
   mutate(redacted = recode(redacted,
                            `0` = "No redactions",
@@ -458,32 +471,22 @@ rr_sentiment %>%
   group_by(redacted, word) %>%
   summarise(n = n()) %>%
   mutate(prop = n/sum(n)) %>%
-  filter(prop > .002) %>%
-  ggplot(aes(label = word, size = log1p(prop), color = redacted)) +
+  filter(prop >= 1/1000) %>%
+  ggplot(aes(label = word, size = prop, color = redacted)) +
     scale_size_area(max_size = 11) +
     geom_text_wordcloud() +
     theme_minimal() + 
     facet_grid(cols = vars(redacted))
 ```
 
-Some words are irritating in the output - remove these:
+The mentions of "oral", "evidence", and dates is probably from the footnotes of who gave evidence.
 
-```{r}
-excluded_words <- c("gchq",
-                    "mi6",
-                    "mi5",
-                    "sis",
-                    "intelligence",
-                    "www.mi5")
-```
-
-
-(Note below how stop words have been removed too with `anti_join`).
+Now by what organisations were mentioned.
 
 ```{r}
 library(stringr)
 
-dat4clouds <- rr_sentiment %>%
+dat4clouds <- rr_sentences_and_words %>%
   anti_join(stop_words) %>%
   mutate(redacted = recode(redacted,
                            `0` = "No redactions",
@@ -491,18 +494,14 @@ dat4clouds <- rr_sentiment %>%
   group_by(redacted, mentioned_services, word) %>%
   summarise(n = n()) %>%
   mutate(prop = n/sum(n)) %>%
-  filter(n >= 2 & !(word %in% excluded_words)) %>%
+  filter(n >= 2 &
+         mentioned_services != "(None)") %>%
   mutate(services_wrapped = str_wrap(mentioned_services,
                                      5))
 ```
+Plot it:
 
-```{r eval=FALSE, include=FALSE}
-View(dat4clouds)
-```
-
-Now plot it:
-
-```{r fig.height=36, fig.width=6, message=FALSE, warning=FALSE}
+```{r fig.height=50, fig.width=6, message=FALSE, warning=FALSE}
 dat4clouds %>%
   ggplot(aes(label = word,
              size = prop,
@@ -511,6 +510,8 @@ dat4clouds %>%
       geom_text_wordcloud() +
       theme_minimal() + 
       facet_grid(cols = vars(redacted),
-                 rows = vars(services_wrapped))
+                 rows = vars(services_wrapped)) +
+  labs(title = "Word frequency by organisation and redaction",
+       subtitle = "(Words included if mentioned at least twice)")
 ```
 
