@@ -267,7 +267,7 @@ redacted_tab %>%
              fill = mentioned_services)) +
     geom_col() + 
     coord_flip() +
-    labs(x = "Services mentioned in sentence",
+    labs(x = "Organisations mentioned in sentence",
          y = "% of sentences with a redaction",
          title = "Predictors of redacted sentences",
          caption =
